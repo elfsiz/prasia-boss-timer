@@ -1,0 +1,25 @@
+{
+  "name": "프라시아 전기 결사 보스 타이머",
+  "short_name": "보스 타이머",
+  "description": "프라시아 전기 결사 보스 리젠 타이머 및 일정 관리",
+  "start_url": "./boss-timer.html",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#0f0f1a",
+  "orientation": "portrait",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230f0f1a' rx='80'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='%23c9a84c'%3E%E2%9A%94%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230f0f1a' rx='80'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='%23c9a84c'%3E%E2%9A%94%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
