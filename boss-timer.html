@@ -384,7 +384,6 @@ input[type="date"]{color-scheme:dark}
   <div class="tabs" id="tabs">
     <button class="tab on"    onclick="setTab('all',this)">전체</button>
     <button class="tab"       onclick="setTab('ready',this)">리젠됨</button>
-    <button class="tab"       onclick="setTab('awaken',this)">각성 대기</button>
     <button class="tab today" onclick="setTab('today',this)">오늘 리젠</button>
     <button class="tab tmrw"  onclick="setTab('tmrw',this)">내일 리젠</button>
     <button class="tab sched" onclick="setTab('sched',this)">📋 일정표</button>
@@ -434,7 +433,6 @@ input[type="date"]{color-scheme:dark}
 <div class="stats" style="margin-top:10px">
   <div class="stat"><div class="sv green"  id="st-ready">0</div><div class="sl">리젠됨</div></div>
   <div class="stat"><div class="sv amber"  id="st-urgent">0</div><div class="sl">30분 이내</div></div>
-  <div class="stat"><div class="sv purple" id="st-awaken">0</div><div class="sl">각성 대기</div></div>
 </div>
 
 <!-- 보스 목록 (전체/리젠됨/각성) -->
@@ -1107,7 +1105,6 @@ function updateStats(){
   bosses.forEach(b=>{const s=getState(b),k=getK(b.id);if(s==='ready')r++;if(s==='urgent')u++;if(k.awkActive||(b.awkEnable&&awkRemain(b)===0))a++;});
   document.getElementById('st-ready').textContent=r;
   document.getElementById('st-urgent').textContent=u;
-  document.getElementById('st-awaken').textContent=a;
 }
 
 // ═══════════════════════════════
@@ -1310,9 +1307,11 @@ function openModal(boss=null){
   }else if(btype==='fixed'){
     addFixedTimeRow();
   }
-  // 리젠 시각 섹션 숨김/표시
+  // 리젠 시각 섹션: 고정 시간 보스는 불필요하므로 숨김
   const spawnSec=document.getElementById('spawn-section');
+  const spawnHr=document.getElementById('spawn-hr');
   if(spawnSec)spawnSec.style.display=btype==='kill'?'block':'none';
+  if(spawnHr)spawnHr.style.display=btype==='kill'?'block':'none';
 
   // 리젠 예정 시각: 기존 lastKill이 있으면 계산, 없으면 빈값
   const cntRow=document.getElementById('cnt-row');
