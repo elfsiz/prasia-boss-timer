@@ -1876,6 +1876,7 @@ function openShotPanel(){
 
 // 설정 상태 전역 보관 (다시 설정 시 복원용)
 let _shotState = { raidTime:'', bossChecks:null, evChecks:null };
+let _shotEl = null;
 
 function renderShotSetup(panel){
   const now=new Date(),nowMs=now.getTime(),dow=now.getDay();
@@ -1936,35 +1937,32 @@ function renderShotSetup(panel){
 }
 
 function autoSaveShot(){
-  const el=document.getElementById('shot-body');
-  if(!el){showToast('저장할 내용이 없습니다.');return;}
   if(typeof html2canvas==='undefined'){showToast('라이브러리 로딩 중입니다. 잠시 후 다시 시도해 주세요.');return;}
+  const el = _shotEl || document.getElementById('shot-body');
+  if(!el){showToast('저장할 내용이 없습니다.');return;}
   showToast('이미지 생성 중...');
-  html2canvas(el,{
-    backgroundColor:'#f4f4f0',
-    scale:2,
-    useCORS:true,
-    allowTaint:true,
-    foreignObjectRendering:false,
-    logging:false,
-    onclone:(cloned)=>{
-      // 이모지 폰트 강제 지정
-      cloned.querySelectorAll('*').forEach(el=>{
-        el.style.fontFamily="'Pretendard',-apple-system,sans-serif";
-      });
-    }
-  }).then(canvas=>{
-    const link=document.createElement('a');
-    const now=new Date();
-    const fname=`결사일정_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.png`;
-    link.download=fname;
-    link.href=canvas.toDataURL('image/png');
-    link.click();
-    showToast('이미지가 저장되었습니다!');
-  }).catch(e=>{
-    console.error(e);
-    showToast('이미지 저장 실패. 스크린샷을 직접 찍어주세요.');
-  });
+  // 300ms 딜레이: DOM/폰트 렌더 완료 보장
+  setTimeout(()=>{
+    html2canvas(el,{
+      backgroundColor:'#f4f4f0',
+      scale:2,
+      useCORS:true,
+      allowTaint:true,
+      foreignObjectRendering:false,
+      logging:false
+    }).then(canvas=>{
+      const link=document.createElement('a');
+      const now=new Date();
+      const fname=`결사일정_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.png`;
+      link.download=fname;
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+      showToast('이미지가 저장되었습니다!');
+    }).catch(e=>{
+      console.error(e);
+      showToast('이미지 저장 실패. 스크린샷을 직접 찍어주세요.');
+    });
+  }, 300);
 }
 
 function _saveShotChecks(){
@@ -2182,6 +2180,8 @@ function renderShotResult(panel){
       <button class="shot-close" style="flex:1" onclick="renderShotSetup(document.getElementById('shot-panel'))">← 다시 설정</button>
       <button class="shot-close" style="flex:1" onclick="_resetShotState();document.getElementById('shot-panel').classList.remove('show')">닫기</button>
     </div>`;
+  // DOM 렌더 완료 후 요소 참조 저장
+  requestAnimationFrame(()=>{ _shotEl = document.getElementById('shot-body'); });
 }
 
 // ═══════════════════════════════
