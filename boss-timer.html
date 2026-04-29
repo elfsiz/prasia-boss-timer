@@ -1729,7 +1729,7 @@ function buildSchedContent(){
   }
   html+=`</div>`;
 
-  // ── 내일 새벽 미리보기 (00:00~07:59) ──
+  // ── 내일 새벽 일정 (00:00~07:59) ──
   const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+1);tmrStart.setHours(0,0,0,0);
   const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+1);tmrEnd.setHours(8,0,0,0);
   const tmrStartMs=tmrStart.getTime(),tmrEndMs=tmrEnd.getTime();
@@ -1788,7 +1788,7 @@ function buildSchedContent(){
   if(dawnItems.length){
     const tmrDateStr=`${String(tmrStart.getMonth()+1).padStart(2,'0')}/${String(tmrStart.getDate()).padStart(2,'0')}`;
     html+=`<div class="sched-block">
-      <div class="sched-blk-hdr dawn">🌙 내일 새벽 미리보기 <span class="dawn-badge">${tmrDateStr} 00:00~08:00</span></div>`;
+      <div class="sched-blk-hdr dawn">🌙 내일 새벽 일정 <span class="dawn-badge">${tmrDateStr} 00:00~08:00</span></div>`;
     dawnItems.forEach(it=>{
       const dot=it.type==='boss'?'#c9a84c':(DOT_COLOR[it.cat]||'#8888a8');
       html+=`<div class="sched-row">
@@ -2062,7 +2062,7 @@ function renderShotResult(panel){
       selEv.map(evRow).join(''), null);
   }
 
-  // ── 내일 새벽 미리보기 ──
+  // ── 내일 새벽 일정 ──
   const _tmrStart=new Date();_tmrStart.setDate(_tmrStart.getDate()+1);_tmrStart.setHours(0,0,0,0);
   const _tmrEnd=new Date();_tmrEnd.setDate(_tmrEnd.getDate()+1);_tmrEnd.setHours(8,0,0,0);
   const _tmrStartMs=_tmrStart.getTime(),_tmrEndMs=_tmrEnd.getTime();
@@ -2114,7 +2114,7 @@ function renderShotResult(panel){
 
   if(dawnShot.length){
     const _tmrStr=`${String(_tmrStart.getMonth()+1).padStart(2,'0')}/${String(_tmrStart.getDate()).padStart(2,'0')}`;
-    body+=section('🌙', `내일 새벽 미리보기 (${_tmrStr} 00:00~08:00)`, '#6644aa',
+    body+=section('🌙', `내일 새벽 일정 (${_tmrStr} 00:00~08:00)`, '#6644aa',
       dawnShot.map(it=>{
         if(it.type==='boss'){
           const awkLine=(it.awkEnable&&(it.cnt+1)>=it.awkN)
