@@ -2062,6 +2062,79 @@ function renderShotResult(panel){
       selEv.map(evRow).join(''), null);
   }
 
+  // ── 내일 새벽 미리보기 ──
+  const _tmrStart=new Date();_tmrStart.setDate(_tmrStart.getDate()+1);_tmrStart.setHours(0,0,0,0);
+  const _tmrEnd=new Date();_tmrEnd.setDate(_tmrEnd.getDate()+1);_tmrEnd.setHours(8,0,0,0);
+  const _tmrStartMs=_tmrStart.getTime(),_tmrEndMs=_tmrEnd.getTime();
+  const _tmrDow=_tmrStart.getDay();
+  const dawnShot=[];
+
+  bosses.forEach(boss=>{
+    const k=getK(boss.id);
+    if(boss.bossType==='fixed'){
+      boss.fixedTimes?.forEach(ft=>{
+        if(ft.day!==_tmrDow)return;
+        const d=new Date(_tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);
+        const ms=d.getTime();
+        if(ms>=_tmrStartMs&&ms<_tmrEndMs){
+          const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
+          dawnShot.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:ms,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
+        }
+      });
+    }else if(k.lastKill&&!k.awkActive){
+      const sm=k.lastKill+boss.hours*3600000;
+      if(sm>=_tmrStartMs&&sm<_tmrEndMs){
+        const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
+        dawnShot.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:sm,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
+      }
+    }
+  });
+  events.forEach(ev=>{
+    if(ev.evType==='period'){
+      const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();
+      if(ps<_tmrEndMs&&pe>_tmrStartMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});
+    }else if(ev.evType==='fixed'){
+      ev.fixedTimes?.forEach(ft=>{
+        if(ft.day!==_tmrDow)return;
+        const d=new Date(_tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);
+        const ms=d.getTime();
+        if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
+      });
+    }else if(ev.evType==='once'){
+      const ms=new Date(ev.onceDt).getTime();
+      if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
+    }else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(_tmrDow))){
+      const[sh,sm2]=ev.start.split(':').map(Number);
+      const d=new Date(_tmrStart);d.setHours(sh,sm2,0,0);
+      const ms=d.getTime();
+      if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
+    }
+  });
+  dawnShot.sort((a,b)=>a.timeMs-b.timeMs);
+
+  if(dawnShot.length){
+    const _tmrStr=`${String(_tmrStart.getMonth()+1).padStart(2,'0')}/${String(_tmrStart.getDate()).padStart(2,'0')}`;
+    body+=SEC(`🌙 내일 새벽 미리보기 (${_tmrStr} 00:00~08:00)`,'#6644aa',
+      dawnShot.map(it=>{
+        if(it.type==='boss'){
+          const awkLine=(it.awkEnable&&(it.cnt+1)>=it.awkN)
+            ?`<div style="font-size:10px;font-weight:700;color:#7c5fcf;margin-top:3px;padding:2px 6px;background:#ede8fb;border-radius:3px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`:'';
+          return`<div style="display:flex;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);gap:10px">
+            <div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;background:#b8860b"></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600;color:${T1}">${it.name}</div>
+            <div style="font-size:11px;color:${T3}">${it.sub} · <span style="font-weight:600;color:#444">${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span></div>
+            ${awkLine}</div>
+          </div>`;
+        }else{
+          return`<div style="display:flex;align-items:center;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);gap:10px">
+            <div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:${DOT_COLOR[it.cat]||'#8888a8'}"></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600;color:${T1}">${it.name}</div>
+            <div style="font-size:11px;color:${T3}">${it.sub} · <span style="font-weight:600;color:#444">${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span></div></div>
+          </div>`;
+        }
+      }).join(''));
+  }
+
   body += `<div style="margin-top:10px;font-size:10px;color:${T3};text-align:center">프라시아 전기 · 결사 보스 타이머</div></div>`;
 
   panel.innerHTML=`
