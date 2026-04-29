@@ -1991,15 +1991,24 @@ function renderShotResult(panel){
   const W='#ffffff', BG='#f4f4f0', BD='rgba(0,0,0,.08)';
   const T1='#1a1a2e', T2='#444455', T3='#888899';
 
-  const bossRow=(it,showBadge)=>`
-    <div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${W}">
-      <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${it.state==='awaken'?'#7c5fcf':it.isPast?'#2e9e5b':'#b8860b'}"></div>
+  const bossRow=(it,showBadge)=>{
+    // 각성 알림 라인
+    const awkLine=(it.awkEnable&&it.state!=='awaken')
+      ?((it.cnt+1)>=it.awkN
+        ?`<div style="font-size:10px;font-weight:700;color:#7c5fcf;margin-top:4px;padding:2px 8px;background:#ede8fb;border:1px solid #c4b0f8;border-radius:4px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`
+        :`<div style="font-size:10px;color:#888;margin-top:3px">각성까지 ${it.awkN-(it.cnt+1)}회 남음 (${it.cnt+1}/${it.awkN})</div>`)
+      :'';
+    const isAwkAlert=it.awkEnable&&it.state!=='awaken'&&(it.cnt+1)>=it.awkN;
+    return`<div style="display:flex;align-items:flex-start;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${isAwkAlert?'#f8f4ff':W};${isAwkAlert?'border-left:3px solid #7c5fcf;':''}">
+      <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;background:${it.state==='awaken'?'#7c5fcf':it.isPast?'#2e9e5b':'#b8860b'}"></div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:700;color:${T1}">${it.name}</div>
         <div style="font-size:11px;color:${T3};margin-top:1px">${it.sub}${it.timeMs>0?` · <span style="color:${it.isPast?'#2e9e5b':T2};font-weight:600">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</span>`:''}</div>
+        ${awkLine}
       </div>
-      ${showBadge?`<div style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${it.isPast||it.state==='awaken'?'#e8f7ee':'#ede8fb'};color:${it.isPast||it.state==='awaken'?'#2e9e5b':'#7c5fcf'}">${it.isPast||it.state==='awaken'?'처치 가능':'시작 전'}</div>`:''}
+      ${showBadge?`<div style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;background:${it.isPast||it.state==='awaken'?'#e8f7ee':'#ede8fb'};color:${it.isPast||it.state==='awaken'?'#2e9e5b':'#7c5fcf'}">${it.isPast||it.state==='awaken'?'처치 가능':'시작 전'}</div>`:''}
     </div>`;
+  };
 
   const evRow=(ev)=>`
     <div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${W}">
