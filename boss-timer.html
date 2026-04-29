@@ -1938,31 +1938,39 @@ function renderShotSetup(panel){
 
 function autoSaveShot(){
   if(typeof html2canvas==='undefined'){showToast('라이브러리 로딩 중입니다. 잠시 후 다시 시도해 주세요.');return;}
-  const el = _shotEl || document.getElementById('shot-body');
-  if(!el){showToast('저장할 내용이 없습니다.');return;}
+  const original=document.getElementById('shot-body');
+  if(!original){showToast('저장할 내용이 없습니다.');return;}
   showToast('이미지 생성 중...');
-  // 300ms 딜레이: DOM/폰트 렌더 완료 보장
+
+  // 모달 밖 임시 컨테이너에 복사 → html2canvas 부모 컨텍스트 문제 우회
+  const temp=document.createElement('div');
+  temp.style.cssText='position:fixed;left:-9999px;top:0;z-index:-1;width:420px;background:#f4f4f0;';
+  temp.innerHTML=original.outerHTML;
+  document.body.appendChild(temp);
+
   setTimeout(()=>{
-    html2canvas(el,{
+    html2canvas(temp.firstChild,{
       backgroundColor:'#f4f4f0',
       scale:2,
+      width:420,
       useCORS:true,
       allowTaint:true,
       foreignObjectRendering:false,
       logging:false
     }).then(canvas=>{
+      document.body.removeChild(temp);
       const link=document.createElement('a');
       const now=new Date();
-      const fname=`결사일정_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.png`;
-      link.download=fname;
+      link.download=`결사일정_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.png`;
       link.href=canvas.toDataURL('image/png');
       link.click();
       showToast('이미지가 저장되었습니다!');
     }).catch(e=>{
+      document.body.removeChild(temp);
       console.error(e);
-      showToast('이미지 저장 실패. 스크린샷을 직접 찍어주세요.');
+      showToast('저장 실패. 스크린샷을 직접 찍어주세요.');
     });
-  }, 300);
+  },200);
 }
 
 function _saveShotChecks(){
