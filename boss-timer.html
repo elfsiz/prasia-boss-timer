@@ -348,6 +348,18 @@ input[type="date"]{color-scheme:dark}
 /* 새벽 미리보기 */
 .sched-blk-hdr.dawn{background:rgba(155,127,232,.12);color:var(--purple2)}
 .dawn-badge{font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(155,127,232,.15);color:var(--purple2);border:1px solid rgba(155,127,232,.3);margin-left:6px}
+
+/* 오늘/내일 리젠 탭 각성 알림 */
+.day-item.awk-alert-item{border-color:rgba(155,127,232,.4);background:rgba(155,127,232,.04)}
+.di-awk-alert{
+  font-size:11px;font-weight:600;color:var(--purple2);
+  margin-top:6px;padding:3px 8px;
+  background:var(--purple-bg);
+  border:1px solid rgba(155,127,232,.35);
+  border-radius:4px;display:inline-block;
+  animation:bl 1.2s infinite;
+}
+.di-awk-info{font-size:11px;color:var(--t2);margin-top:4px}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -1593,7 +1605,7 @@ function getTodayBossItems(){
         const isPast=sm<=nowMs;
         const isNext=next&&Math.abs(sm-next)<60000&&sm>nowMs;
         const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
-        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':(isNext?'wait':'wait'),isFixed:true});
+        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':(isNext?'wait':'wait'),isFixed:true,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
       });
       return;
     }
@@ -1602,7 +1614,7 @@ function getTodayBossItems(){
       if(sm>=todayMs&&sm<todayMs+86400000){
         const isPast=sm<=nowMs;
         const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
-        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':'wait'});
+        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':'wait',awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
       }
     }
   });
@@ -1668,11 +1680,19 @@ function buildSchedContent(){
       const dot=it.state==='awaken'?'#9b7fe8':it.state==='ready'?'#4caf7d':'#c9a84c';
       const timeStr=it.timeMs?fmtHHMM(it.timeMs):'현재';
       const timeCls=it.isPast?' past':'';
-      html+=`<div class="sched-row">
+      // 각성 알림
+      let awkHtml='';
+      if(it.awkEnable&&it.state!=='awaken'){
+        const afterKill=it.cnt+1;
+        if(afterKill>=it.awkN) awkHtml=`<div style="font-size:11px;font-weight:600;color:var(--purple2);margin-top:4px;padding:2px 8px;background:var(--purple-bg);border:1px solid rgba(155,127,232,.3);border-radius:4px;display:inline-block;animation:bl 1.4s infinite">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`;
+        else awkHtml=`<div style="font-size:11px;color:var(--t2);margin-top:3px">각성까지 ${it.awkN-afterKill}회 남음 (${afterKill}/${it.awkN})</div>`;
+      }
+      html+=`<div class="sched-row" style="${it.awkEnable&&(it.cnt+1)>=it.awkN&&it.state!=='awaken'?'background:rgba(155,127,232,.04);border-left:2px solid var(--purple);':''}">
         <div class="sched-dot" style="background:${dot}"></div>
         <div class="sched-row-left">
           <div class="sched-row-name">${it.name}</div>
           <div class="sched-row-sub">${it.sub}</div>
+          ${awkHtml}
         </div>
         <div class="sched-row-right">
           <div class="sched-row-time${timeCls}">${it.isPast&&it.state!=='awaken'?'리젠됨':timeStr}</div>
