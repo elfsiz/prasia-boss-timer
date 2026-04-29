@@ -1935,7 +1935,7 @@ function renderShotSetup(panel){
 }
 
 function autoSaveShot(){
-  const el=document.querySelector('#shot-panel .shot-content');
+  const el=document.querySelector('#shot-panel .shot-content > div');
   if(!el){showToast('저장할 내용이 없습니다.');return;}
   if(typeof html2canvas==='undefined'){showToast('라이브러리 로딩 중입니다. 잠시 후 다시 시도해 주세요.');return;}
   showToast('이미지 생성 중...');
@@ -2021,8 +2021,8 @@ function renderShotResult(panel){
         :`<div style="font-size:10px;color:#888;margin-top:3px">각성까지 ${it.awkN-(it.cnt+1)}회 남음 (${it.cnt+1}/${it.awkN})</div>`)
       :'';
     const isAwkAlert=it.awkEnable&&it.state!=='awaken'&&(it.cnt+1)>=it.awkN;
-    return`<div style="display:flex;align-items:flex-start;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${isAwkAlert?'#f8f4ff':W};${isAwkAlert?'border-left:3px solid #7c5fcf;':''}">
-      <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;background:${it.state==='awaken'?'#7c5fcf':it.isPast?'#2e9e5b':'#b8860b'}"></div>
+    return`<div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${isAwkAlert?'#f8f4ff':W};${isAwkAlert?'border-left:3px solid #7c5fcf;':''}">
+      <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${it.state==='awaken'?'#7c5fcf':it.isPast?'#2e9e5b':'#b8860b'}"></div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:700;color:${T1}">${it.name}</div>
         <div style="font-size:11px;color:${T3};margin-top:1px">${it.sub}${it.timeMs>0?` · <span style="color:${it.isPast?'#2e9e5b':T2};font-weight:600">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</span>`:''}</div>
@@ -2056,26 +2056,26 @@ function renderShotResult(panel){
 
   let body=`<div style="background:${BG};border-radius:14px;padding:16px;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:420px;margin:0 auto">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid ${BD}">
-      <div>
+      <div style="flex:1">
         <div style="font-size:16px;font-weight:800;color:${T1}">⚔ 결사 오늘 일정</div>
-        ${raidTimeVal?`<div style="margin-top:6px;display:inline-block;background:#ede8fb;border:1.5px solid #b09ae8;border-radius:8px;padding:5px 14px"><span style="font-size:11px;color:#7c5fcf;font-weight:600;letter-spacing:.3px">🗓 보스일정 시작</span><span style="font-size:22px;font-weight:900;color:#5c3d9e;display:block;line-height:1.1;letter-spacing:1px">${raidTimeVal}</span></div>`:''}
       </div>
       <div style="text-align:right">
         <div style="font-size:12px;font-weight:600;color:${T2}">${dateStr}</div>
       </div>
+    ${raidTimeVal?`<div style="text-align:center;margin-bottom:14px">
+      <div style="display:inline-block;background:#ede8fb;border:1.5px solid #b09ae8;border-radius:10px;padding:8px 24px">
+        <div style="font-size:11px;color:#7c5fcf;font-weight:600;letter-spacing:.3px">🗓 보스일정 시작</div>
+        <div style="font-size:28px;font-weight:900;color:#5c3d9e;line-height:1.2;letter-spacing:2px">${raidTimeVal}</div>
+      </div>
+    </div>`:''}
+
     </div>`;
 
   if(raidMs){
     // 처치 대상 + 이후 리젠을 하나의 박스로
     const allBossRows=[];
-    if(bossTarget.length){
-      allBossRows.push(`<div style="padding:6px 12px;font-size:10px;font-weight:700;color:#fff;background:rgba(255,255,255,.15);letter-spacing:.5px">⚔ ${raidTimeVal} 처치 대상 (${bossTarget.length}마리)</div>`);
-      allBossRows.push(bossTarget.map(it=>bossRow(it,true)).join(''));
-    }
-    if(bossAfter.length){
-      allBossRows.push(`<div style="padding:6px 12px;font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,.15);letter-spacing:.5px">⚔ ${raidTimeVal} 이후 리젠</div>`);
-      allBossRows.push(bossAfter.map(it=>bossRow(it,false)).join(''));
-    }
+    if(bossTarget.length) allBossRows.push(bossTarget.map(it=>bossRow(it,true)).join(''));
+    if(bossAfter.length)  allBossRows.push(bossAfter.map(it=>bossRow(it,false)).join(''));
     if(!bossTarget.length&&!bossAfter.length){
       allBossRows.push(`<div style="padding:10px 12px;font-size:12px;color:${T3};background:${W}">선택된 보스 없음</div>`);
     }
@@ -2154,8 +2154,8 @@ function renderShotResult(panel){
         const dot=it.type==='boss'?'#b8860b':(DOT_COLOR[it.cat]||'#8888a8');
         const awkLine=(it.type==='boss'&&it.awkEnable&&(it.cnt+1)>=it.awkN)
           ?`<div style="font-size:10px;font-weight:700;color:#7c5fcf;margin-top:3px;padding:2px 6px;background:#ede8fb;border-radius:3px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`:'';
-        return`<div style="display:flex;align-items:flex-start;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${W}">
-          <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;background:${dot}"></div>
+        return`<div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${W}">
+          <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${dot}"></div>
           <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:700;color:${T1}">${it.name}</div>
             <div style="font-size:11px;color:${T3};margin-top:1px">${it.sub} · <span style="font-weight:700;font-size:13px;color:#444">${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span></div>
