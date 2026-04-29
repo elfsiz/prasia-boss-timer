@@ -1009,7 +1009,7 @@ function buildDayView(isToday){
     // 일반 보스 리젠
     if(k.lastKill&&!k.awkActive){
       const spawnMs=k.lastKill+boss.hours*3600000;
-      if(sameDay(spawnMs,refDate))items.push({name:boss.name,zone:boss.zone,spawnMs,type:'normal',past:spawnMs<=now,id:boss.id});
+      if(sameDay(spawnMs,refDate))items.push({name:boss.name,zone:boss.zone,spawnMs,type:'normal',past:spawnMs<=now,id:boss.id,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
     }
     // 각성 보스 재리젠
     if(boss.awkEnable&&k.awkKill!==null&&!k.awkActive){
@@ -1028,17 +1028,32 @@ function buildDayView(isToday){
 
   const listEl=document.getElementById('day-list');
   if(!items.length){listEl.innerHTML=`<div class="empty">${label} 리젠 예정 보스가 없습니다.</div>`;return;}
-  listEl.innerHTML=items.map(it=>`
-    <div class="day-item${it.past?' ready-item':''}">
+  listEl.innerHTML=items.map(it=>{
+    // 각성 알림 계산
+    let awkHtml='';
+    if(it.type==='normal'&&it.awkEnable){
+      const afterKill=it.cnt+1;
+      if(afterKill>=it.awkN){
+        awkHtml=`<div class="di-awk-alert">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`;
+      }else{
+        awkHtml=`<div class="di-awk-info">각성까지 ${it.awkN-afterKill}회 남음 (${afterKill}/${it.awkN})</div>`;
+      }
+    }else if(it.type==='awaken'){
+      awkHtml=`<div class="di-awk-info" style="color:var(--purple2)">각성 보스</div>`;
+    }
+    const isAwkAlert=it.type==='normal'&&it.awkEnable&&(it.cnt+1)>=it.awkN;
+    return`<div class="day-item${it.past?' ready-item':''}${isAwkAlert?' awk-alert-item':''}">
       <div class="di-left">
-        <div class="di-name">${it.name}${it.type==='awaken'?' <span style="font-size:10px;color:var(--purple2);">(각성)</span>':''}</div>
+        <div class="di-name">${it.name}</div>
         <div class="di-meta">${it.zone}</div>
+        ${awkHtml}
       </div>
       <div class="di-right">
         <div class="di-time${it.past?' past':''}">${it.past?'리젠됨':fmtHHMM(it.spawnMs)}</div>
         <div class="di-label">${it.past?'처치 가능':'리젠 예정'}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ═══════════════════════════════
