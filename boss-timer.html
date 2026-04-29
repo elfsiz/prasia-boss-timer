@@ -1914,7 +1914,7 @@ function renderShotSetup(panel){
       <div class="shot-setup-title">📋 일정표 생성</div>
       <div class="shot-setup-date">${dateStr}</div>
 
-      <div class="shot-section-lbl">🗓 보스일정 시작 시간 <span style="font-size:10px;font-weight:400;color:var(--t3)">(선택 — 입력 시 그룹 분리)</span></div>
+      <div class="shot-section-lbl">결사 일정 시작 시간 <span style="font-size:10px;font-weight:400;color:var(--t3)">(선택 — 입력 시 그룹 분리)</span></div>
       <div class="shot-time-row">
 <div class="hm-row"><select class="shot-hm-sel" id="shot-time-h" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select><span class="hm-colon" style="color:var(--purple2)">:</span><select class="shot-hm-sel" id="shot-time-m" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select></div>
         ${_shotState.raidTime?`<button class="raid-clear-btn" onclick="_shotState.raidTime='';fillHM('shot-time-h','shot-time-m','00:00')">초기화</button>`:''}
@@ -1936,7 +1936,7 @@ function renderShotSetup(panel){
 }
 
 function autoSaveShot(){
-  const el=document.getElementById('shot-body')||document.querySelector('#shot-panel .shot-content > div');
+  const el=document.getElementById('shot-body');
   if(!el){showToast('저장할 내용이 없습니다.');return;}
   if(typeof html2canvas==='undefined'){showToast('라이브러리 로딩 중입니다. 잠시 후 다시 시도해 주세요.');return;}
   showToast('이미지 생성 중...');
@@ -1944,7 +1944,15 @@ function autoSaveShot(){
     backgroundColor:'#f4f4f0',
     scale:2,
     useCORS:true,
-    logging:false
+    allowTaint:true,
+    foreignObjectRendering:false,
+    logging:false,
+    onclone:(cloned)=>{
+      // 이모지 폰트 강제 지정
+      cloned.querySelectorAll('*').forEach(el=>{
+        el.style.fontFamily="'Pretendard',-apple-system,sans-serif";
+      });
+    }
   }).then(canvas=>{
     const link=document.createElement('a');
     const now=new Date();
@@ -1953,7 +1961,10 @@ function autoSaveShot(){
     link.href=canvas.toDataURL('image/png');
     link.click();
     showToast('이미지가 저장되었습니다!');
-  }).catch(()=>showToast('이미지 저장 실패. 스크린샷을 직접 찍어주세요.'));
+  }).catch(e=>{
+    console.error(e);
+    showToast('이미지 저장 실패. 스크린샷을 직접 찍어주세요.');
+  });
 }
 
 function _saveShotChecks(){
@@ -2061,9 +2072,9 @@ function renderShotResult(panel){
       <div style="font-size:12px;font-weight:600;color:${T2}">${dateStr}</div>
     </div>
     ${raidTimeVal?`<div style="text-align:center;margin-bottom:14px">
-      <div style="display:inline-block;background:#ede8fb;border:1.5px solid #b09ae8;border-radius:10px;padding:8px 28px">
-        <div style="font-size:11px;color:#7c5fcf;font-weight:600;letter-spacing:.3px">🗓 보스일정 시작</div>
-        <div style="font-size:28px;font-weight:900;color:#5c3d9e;line-height:1.2;letter-spacing:2px">${raidTimeVal}</div>
+      <div style="display:inline-block;background:#ede8fb;border:2px solid #b09ae8;border-radius:10px;padding:10px 32px">
+        <div style="font-size:12px;color:#7c5fcf;font-weight:700;margin-bottom:4px">결사 일정 시작 시간</div>
+        <div style="font-size:30px;font-weight:900;color:#5c3d9e;line-height:1;letter-spacing:3px;font-family:monospace">${raidTimeVal}</div>
       </div>
     </div>`:''}`;
 
