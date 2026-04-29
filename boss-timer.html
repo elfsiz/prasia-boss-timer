@@ -336,6 +336,18 @@ input[type="date"]{color-scheme:dark}
 .fixed-time-chip.next{background:var(--gold-bg);color:var(--gold2);border-color:rgba(201,168,76,.35);font-weight:700}
 
 .install-btn{font-size:10px;padding:3px 8px;border-radius:8px;border:1px solid rgba(201,168,76,.4);background:var(--gold-bg);color:var(--gold2);cursor:pointer;margin-top:3px;font-weight:600}
+
+/* 남은 시간 입력 */
+.remain-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.remain-inp{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:9px 10px;font-size:14px;color:var(--text);outline:none;width:70px;text-align:center}
+.remain-inp:focus{border-color:rgba(201,168,76,.5)}
+.remain-unit{font-size:13px;color:var(--t2)}
+.remain-calc-btn{padding:8px 14px;border-radius:var(--rs);background:var(--gold-bg);border:1px solid rgba(201,168,76,.4);color:var(--gold2);font-size:12px;font-weight:600;cursor:pointer}
+.remain-calc-btn:active{opacity:.7}
+.remain-or{font-size:11px;color:var(--t3);margin:8px 0 4px}
+/* 새벽 미리보기 */
+.sched-blk-hdr.dawn{background:rgba(155,127,232,.12);color:var(--purple2)}
+.dawn-badge{font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(155,127,232,.15);color:var(--purple2);border:1px solid rgba(155,127,232,.3);margin-left:6px}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -493,8 +505,17 @@ input[type="date"]{color-scheme:dark}
   <hr class="divider" id="spawn-hr">
   <div id="spawn-section"><div class="section-label">리젠 시각 & 처치 기록 수정</div>
   <div class="fgrp">
-    <label class="flbl">다음 리젠 예정 시각 (직접 입력)</label>
-    <div class="fdesc">이 시각에 보스가 리젠됩니다. 비워두면 현재 기록을 유지합니다.</div>
+    <label class="flbl">① 남은 시간으로 입력</label>
+    <div class="fdesc">지금부터 몇 시간 몇 분 후에 리젠되는지 입력하세요.</div>
+    <div class="remain-row">
+      <input class="remain-inp" id="f-remain-h" type="number" min="0" max="999" placeholder="0"> <span class="remain-unit">시간</span>
+      <input class="remain-inp" id="f-remain-m" type="number" min="0" max="59" placeholder="0"> <span class="remain-unit">분 후 리젠</span>
+      <button class="remain-calc-btn" onclick="applyRemainTime()">적용</button>
+    </div>
+  </div>
+  <div class="fgrp">
+    <label class="flbl">② 리젠 예정 시각으로 입력</label>
+    <div class="fdesc">날짜와 시각을 직접 지정합니다. 비워두면 현재 기록을 유지합니다.</div>
     <div class="dt-row">
       <input class="finput" id="f-spawn-date" type="date">
 <div class="hm-row"><select class="hm-sel" id="f-spawn-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="f-spawn-m"></select></div>
@@ -1232,6 +1253,18 @@ function getTodayFixedSpawns(boss){
   return spawns;
 }
 
+function applyRemainTime(){
+  const h=parseInt(document.getElementById('f-remain-h').value)||0;
+  const m=parseInt(document.getElementById('f-remain-m').value)||0;
+  if(h===0&&m===0){showToast('시간 또는 분을 입력해 주세요.');return;}
+  const spawnMs=Date.now()+(h*3600+m*60)*1000;
+  const d=new Date(spawnMs);
+  document.getElementById('f-spawn-date').value=toDatePart(spawnMs);
+  fillHM('f-spawn-h','f-spawn-m',toTimePart(spawnMs));
+  document.getElementById('f-remain-h').value='';
+  document.getElementById('f-remain-m').value='';
+  showToast(`리젠 시각 ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} 으로 설정됨`);
+}
 function openBossModal(){openModal(null);}
 function openModal(boss=null){
   editId=boss?boss.id:null;
@@ -1258,11 +1291,15 @@ function openModal(boss=null){
   if(boss){
     const k=getK(boss.id);
     const spawnMs=k.lastKill?k.lastKill+boss.hours*3600000:null;
+    document.getElementById('f-remain-h').value='';
+    document.getElementById('f-remain-m').value='';
     document.getElementById('f-spawn-date').value=spawnMs?toDatePart(spawnMs):'';
     fillHM('f-spawn-h','f-spawn-m',spawnMs?toTimePart(spawnMs):'00:00');
     document.getElementById('f-cnt').value=k.cnt;
     cntRow.style.display=boss.awkEnable?'block':'none';
   }else{
+    document.getElementById('f-remain-h').value='';
+    document.getElementById('f-remain-m').value='';
     document.getElementById('f-spawn-date').value='';
     fillHM('f-spawn-h','f-spawn-m','00:00');
     document.getElementById('f-cnt').value=0;
@@ -1656,6 +1693,83 @@ function buildSchedContent(){
     });
   }
   html+=`</div>`;
+
+  // ── 내일 새벽 미리보기 (00:00~07:59) ──
+  const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+1);tmrStart.setHours(0,0,0,0);
+  const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+1);tmrEnd.setHours(8,0,0,0);
+  const tmrStartMs=tmrStart.getTime(),tmrEndMs=tmrEnd.getTime();
+  const dawnItems=[];
+
+  // 내일 새벽 보스
+  bosses.forEach(boss=>{
+    const k=getK(boss.id);
+    if(boss.bossType==='fixed'){
+      boss.fixedTimes?.forEach(ft=>{
+        const tmrDow=tmrStart.getDay();
+        if(ft.day!==tmrDow)return;
+        const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);
+        const ms=d.getTime();
+        if(ms>=tmrStartMs&&ms<tmrEndMs){
+          const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
+          dawnItems.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:ms});
+        }
+      });
+    }else if(k.lastKill&&!k.awkActive){
+      const sm=k.lastKill+boss.hours*3600000;
+      if(sm>=tmrStartMs&&sm<tmrEndMs){
+        const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
+        dawnItems.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:sm});
+      }
+    }
+  });
+
+  // 내일 새벽 이벤트
+  const tmrDow=tmrStart.getDay();
+  events.forEach(ev=>{
+    if(ev.evType==='period'){
+      const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();
+      if(ps<tmrEndMs&&pe>tmrStartMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});
+    }else if(ev.evType==='fixed'){
+      ev.fixedTimes?.forEach(ft=>{
+        if(ft.day!==tmrDow)return;
+        const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);
+        const ms=d.getTime();
+        if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
+      });
+    }else if(ev.evType==='once'){
+      const ms=new Date(ev.onceDt).getTime();
+      if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
+    }else if(ev.evType==='repeat'){
+      if(ev.days.includes(7)||ev.days.includes(tmrDow)){
+        const[sh,sm2]=ev.start.split(':').map(Number);
+        const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);
+        const ms=d.getTime();
+        if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
+      }
+    }
+  });
+  dawnItems.sort((a,b)=>a.timeMs-b.timeMs);
+
+  if(dawnItems.length){
+    const tmrDateStr=`${String(tmrStart.getMonth()+1).padStart(2,'0')}/${String(tmrStart.getDate()).padStart(2,'0')}`;
+    html+=`<div class="sched-block">
+      <div class="sched-blk-hdr dawn">🌙 내일 새벽 미리보기 <span class="dawn-badge">${tmrDateStr} 00:00~08:00</span></div>`;
+    dawnItems.forEach(it=>{
+      const dot=it.type==='boss'?'#c9a84c':(DOT_COLOR[it.cat]||'#8888a8');
+      html+=`<div class="sched-row">
+        <div class="sched-dot" style="background:${dot}"></div>
+        <div class="sched-row-left">
+          <div class="sched-row-name">${it.name}</div>
+          <div class="sched-row-sub">${it.sub}</div>
+        </div>
+        <div class="sched-row-right">
+          <div class="sched-row-time">${fmtHHMM(it.timeMs)}</div>
+          <div class="sched-row-badge">${it.type==='boss'?'리젠 예정':'예정'}</div>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
 
   // 이벤트 관리 목록
   html+=`<div style="margin-top:16px">
