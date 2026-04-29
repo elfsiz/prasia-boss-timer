@@ -2114,7 +2114,7 @@ function renderShotResult(panel){
 
   if(dawnShot.length){
     const _tmrStr=`${String(_tmrStart.getMonth()+1).padStart(2,'0')}/${String(_tmrStart.getDate()).padStart(2,'0')}`;
-    body+=SEC(`🌙 내일 새벽 미리보기 (${_tmrStr} 00:00~08:00)`,'#6644aa',
+    body+=section('🌙', `내일 새벽 미리보기 (${_tmrStr} 00:00~08:00)`, '#6644aa',
       dawnShot.map(it=>{
         if(it.type==='boss'){
           const awkLine=(it.awkEnable&&(it.cnt+1)>=it.awkN)
