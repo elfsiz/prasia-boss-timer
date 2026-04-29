@@ -13,7 +13,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#0f0f1a">
-<title>프라시아 전기 · 결사 보스 타이머</title>
+<title>프라시아 전기 · 결사 일정 관리</title>
 <style>
 :root{
   --bg:#0f0f1a;--bg2:#1a1a2e;--bg3:#222240;--card:#1c1c30;
@@ -361,6 +361,7 @@ input[type="date"]{color-scheme:dark}
 }
 .di-awk-info{font-size:11px;color:var(--t2);margin-top:4px}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
@@ -1933,6 +1934,27 @@ function renderShotSetup(panel){
   fillMin('shot-time-m', _sm||'00');
 }
 
+function autoSaveShot(){
+  const el=document.querySelector('#shot-panel .shot-content');
+  if(!el){showToast('저장할 내용이 없습니다.');return;}
+  if(typeof html2canvas==='undefined'){showToast('라이브러리 로딩 중입니다. 잠시 후 다시 시도해 주세요.');return;}
+  showToast('이미지 생성 중...');
+  html2canvas(el,{
+    backgroundColor:'#f4f4f0',
+    scale:2,
+    useCORS:true,
+    logging:false
+  }).then(canvas=>{
+    const link=document.createElement('a');
+    const now=new Date();
+    const fname=`결사일정_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.png`;
+    link.download=fname;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    showToast('이미지가 저장되었습니다!');
+  }).catch(()=>showToast('이미지 저장 실패. 스크린샷을 직접 찍어주세요.'));
+}
+
 function _saveShotChecks(){
   _shotState.bossChecks = new Set(
     [...document.querySelectorAll('.shot-boss-chk:checked')].map(el=>parseInt(el.dataset.idx))
@@ -2044,13 +2066,26 @@ function renderShotResult(panel){
     </div>`;
 
   if(raidMs){
-    body += section('⚔', `${raidTimeVal} 처치 대상 (${bossTarget.length}마리)`, '#5c3d9e',
-      bossTarget.length ? bossTarget.map(it=>bossRow(it,true)).join('') : null,
-      '해당 시간까지 리젠되는 보스 없음');
-    if(bossAfter.length){
-      body += section('⚔', `${raidTimeVal} 이후 리젠`, '#888899',
-        bossAfter.map(it=>bossRow(it,false)).join(''), null);
+    // 처치 대상 + 이후 리젠을 하나의 박스로
+    const allBossRows=[];
+    if(bossTarget.length){
+      allBossRows.push(`<div style="padding:6px 12px;font-size:10px;font-weight:700;color:#fff;background:rgba(255,255,255,.15);letter-spacing:.5px">⚔ ${raidTimeVal} 처치 대상 (${bossTarget.length}마리)</div>`);
+      allBossRows.push(bossTarget.map(it=>bossRow(it,true)).join(''));
     }
+    if(bossAfter.length){
+      allBossRows.push(`<div style="padding:6px 12px;font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,.15);letter-spacing:.5px">⚔ ${raidTimeVal} 이후 리젠</div>`);
+      allBossRows.push(bossAfter.map(it=>bossRow(it,false)).join(''));
+    }
+    if(!bossTarget.length&&!bossAfter.length){
+      allBossRows.push(`<div style="padding:10px 12px;font-size:12px;color:${T3};background:${W}">선택된 보스 없음</div>`);
+    }
+    body+=`<div style="margin-bottom:12px;border-radius:8px;overflow:hidden;border:1px solid ${BD}">
+      <div style="padding:8px 12px;background:#5c3d9e;display:flex;align-items:center;gap:6px">
+        <span style="font-size:12px">⚔</span>
+        <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:.5px;text-transform:uppercase">보스 일정 (${raidTimeVal} 기준)</span>
+      </div>
+      <div style="background:${W}">${allBossRows.join('')}</div>
+    </div>`;
   } else {
     body += section('⚔', '보스', '#8b6914',
       bossTarget.length ? bossTarget.map(it=>bossRow(it,false)).join('') : null,
@@ -2116,31 +2151,27 @@ function renderShotResult(panel){
     const _tmrStr=`${String(_tmrStart.getMonth()+1).padStart(2,'0')}/${String(_tmrStart.getDate()).padStart(2,'0')}`;
     body+=section('🌙', `내일 새벽 일정 (${_tmrStr} 00:00~08:00)`, '#6644aa',
       dawnShot.map(it=>{
-        if(it.type==='boss'){
-          const awkLine=(it.awkEnable&&(it.cnt+1)>=it.awkN)
-            ?`<div style="font-size:10px;font-weight:700;color:#7c5fcf;margin-top:3px;padding:2px 6px;background:#ede8fb;border-radius:3px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`:'';
-          return`<div style="display:flex;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);gap:10px">
-            <div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;background:#b8860b"></div>
-            <div style="flex:1"><div style="font-size:13px;font-weight:600;color:${T1}">${it.name}</div>
-            <div style="font-size:11px;color:${T3}">${it.sub} · <span style="font-weight:600;color:#444">${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span></div>
-            ${awkLine}</div>
-          </div>`;
-        }else{
-          return`<div style="display:flex;align-items:center;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);gap:10px">
-            <div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:${DOT_COLOR[it.cat]||'#8888a8'}"></div>
-            <div style="flex:1"><div style="font-size:13px;font-weight:600;color:${T1}">${it.name}</div>
-            <div style="font-size:11px;color:${T3}">${it.sub} · <span style="font-weight:600;color:#444">${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span></div></div>
-          </div>`;
-        }
+        const dot=it.type==='boss'?'#b8860b':(DOT_COLOR[it.cat]||'#8888a8');
+        const awkLine=(it.type==='boss'&&it.awkEnable&&(it.cnt+1)>=it.awkN)
+          ?`<div style="font-size:10px;font-weight:700;color:#7c5fcf;margin-top:3px;padding:2px 6px;background:#ede8fb;border-radius:3px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`:'';
+        return`<div style="display:flex;align-items:flex-start;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${W}">
+          <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;background:${dot}"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:${T1}">${it.name}</div>
+            <div style="font-size:11px;color:${T3};margin-top:1px">${it.sub} · <span style="font-weight:700;font-size:13px;color:#444">${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span></div>
+            ${awkLine}
+          </div>
+        </div>`;
       }).join(''));
   }
 
-  body += `<div style="margin-top:10px;font-size:10px;color:${T3};text-align:center">프라시아 전기 · 결사 보스 타이머</div></div>`;
+  body += `<div style="margin-top:10px;font-size:10px;color:${T3};text-align:center">프라시아 전기 · 결사 일정 관리</div></div>`;
 
   panel.innerHTML=`
     <div class="shot-content" style="background:transparent;padding:0">${body}</div>
     <div style="font-size:12px;color:#aaaaaa;margin-top:12px;text-align:center">위 화면을 스크린샷하여 결사원들과 공유하세요</div>
-    <div style="display:flex;gap:10px;margin-top:10px;width:100%;max-width:420px">
+    <div style="display:flex;gap:8px;margin-top:10px;width:100%;max-width:420px;flex-wrap:wrap">
+      <button class="shot-close" style="flex:1;background:var(--gold);border-color:var(--gold);color:#1a1200;font-weight:700" onclick="autoSaveShot()">📸 이미지 저장</button>
       <button class="shot-close" style="flex:1" onclick="renderShotSetup(document.getElementById('shot-panel'))">← 다시 설정</button>
       <button class="shot-close" style="flex:1" onclick="_resetShotState();document.getElementById('shot-panel').classList.remove('show')">닫기</button>
     </div>`;
