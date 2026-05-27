@@ -8,9 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="결사 보스 타이머">
 <meta name="application-name" content="결사 보스 타이머">
 <link rel="manifest" href="manifest.json">
-<!-- iOS 홈화면 아이콘 (인라인 SVG를 data URL로) -->
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230f0f1a' rx='80'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='%23c9a84c'%3E%E2%9A%94%3C/text%3E%3C/svg%3E">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#0f0f1a">
 <title>프라시아 전기 · 결사 일정 관리</title>
@@ -30,8 +28,6 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg);color:var(--text);font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;min-height:100vh}
 .app{max-width:560px;margin:0 auto;padding-bottom:90px}
-
-/* Header */
 header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 16px 10px}
 .hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
 .logo-name{font-size:15px;font-weight:700;color:var(--text)}
@@ -39,7 +35,6 @@ header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-
 .clk-box{text-align:right}
 .clk-time{font-size:15px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
 .clk-date{font-size:11px;color:var(--t3);margin-top:1px}
-/* 탭: 가로 스크롤 */
 .tabs{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:2px}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:0 0 auto;padding:7px 14px;text-align:center;font-size:13px;border:none;border-radius:var(--rs);cursor:pointer;background:none;color:var(--t2);transition:all .15s;white-space:nowrap}
@@ -48,8 +43,6 @@ header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-
 .tab.today.on{background:rgba(91,156,240,0.15);color:var(--blue)}
 .tab.tmrw{color:#a8d8a8}
 .tab.tmrw.on{background:rgba(76,175,125,0.12);color:var(--green)}
-
-/* 점검 패널 */
 .maint-wrap{padding:10px 16px 0}
 .maint-panel{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden}
 .maint-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;user-select:none}
@@ -70,15 +63,11 @@ header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-
 .backup-section{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
 .backup-title{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:4px}
 .backup-desc{font-size:11px;color:var(--t3);line-height:1.6;margin-bottom:0}
-
-/* Stats */
 .stats{display:flex;gap:8px;padding:10px 16px}
 .stat{flex:1;background:var(--card);border-radius:var(--rs);padding:8px 0;text-align:center}
 .sv{font-size:20px;font-weight:700}
 .sv.green{color:var(--green)}.sv.amber{color:var(--amber)}.sv.purple{color:var(--purple)}
 .sl{font-size:10px;color:var(--t3);margin-top:2px}
-
-/* Section */
 .sec{padding:10px 16px 0}
 .sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .sec-title{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;font-weight:500}
@@ -87,8 +76,6 @@ header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-
 .sbtn.on{background:var(--bg3);color:var(--t2);border-color:var(--border2)}
 .blist{display:flex;flex-direction:column;gap:8px}
 .empty{text-align:center;padding:40px 16px;color:var(--t3);font-size:14px;line-height:1.8}
-
-/* 오늘/내일 리젠 섹션 */
 .day-section{padding:10px 16px 0}
 .day-hdr{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .day-hdr .day-badge{font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid;text-transform:none;letter-spacing:0}
@@ -104,8 +91,6 @@ header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-
 .di-time{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text)}
 .di-time.past{color:var(--green)}
 .di-label{font-size:10px;color:var(--t3);margin-top:2px}
-
-/* Boss card */
 .bcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .3s}
 .bcard.s-ready{border-color:rgba(76,175,125,.3)}
 .bcard.s-urgent{border-color:rgba(224,154,64,.28)}
@@ -153,12 +138,8 @@ header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-
 .awk-cd.sm{font-size:13px;color:var(--t2)}
 .awk-sub{font-size:10px;color:var(--t3);margin-top:3px;text-align:right}
 .awk-actions{margin-top:8px;display:flex;gap:6px}
-
-/* FAB */
 .fab{position:fixed;bottom:24px;right:20px;width:54px;height:54px;background:var(--gold);border:none;border-radius:50%;cursor:pointer;font-size:26px;color:#1a1200;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(201,168,76,.45);z-index:100;transition:transform .15s}
 .fab:active{transform:scale(.92)}
-
-/* Modal */
 .ovl{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .ovl.on{opacity:1;pointer-events:all}
 .mdl{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r) var(--r) 0 0;padding:20px 16px 40px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;transform:translateY(24px);transition:transform .2s}
@@ -194,7 +175,6 @@ input[type="date"]{color-scheme:dark}
 .mbtn{flex:1;padding:12px;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--t2)}
 .mbtn:active{opacity:.7}
 .mbtn.primary{background:var(--gold);border-color:var(--gold);color:#1a1200}
-/* Confirm modal */
 .confirm-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:24px 20px;width:calc(100% - 32px);max-width:360px;margin:auto;margin-top:auto;margin-bottom:auto}
 .confirm-title{font-size:16px;font-weight:700;margin-bottom:8px}
 .confirm-desc{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:20px}
@@ -205,32 +185,25 @@ input[type="date"]{color-scheme:dark}
 .ccbtn.ok-blue{background:var(--blue-bg);border-color:rgba(91,156,240,.5);color:var(--blue)}
 .ccbtn.ok-amber{background:var(--amber-bg);border-color:rgba(224,154,64,.5);color:var(--amber)}
 .confirm-ovl{align-items:center}
-/* Toast */
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:10px 20px;font-size:13px;color:var(--text);opacity:0;transition:all .25s;pointer-events:none;z-index:300;white-space:nowrap;max-width:88vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.awk{background:var(--purple-bg);border-color:rgba(155,127,232,.4);color:var(--purple2)}
 .toast.maint{background:var(--blue-bg);border-color:rgba(91,156,240,.4);color:var(--blue)}
-/* 일정표 탭 */
 .tab.sched.on{background:rgba(201,168,76,0.15);color:var(--gold2)}
-/* FAB group */
 .fab-group{position:fixed;bottom:24px;right:20px;z-index:100;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
 .fab-menu{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
 .fab-sub{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:9px 18px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.4)}
 .fab-sub:active{opacity:.7}
 .fab.open{background:var(--bg3);color:var(--text);transform:rotate(45deg)}
-/* 요일 피커 */
 .day-picker{display:flex;gap:6px;flex-wrap:wrap}
 .dp-btn{padding:6px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
 .dp-btn.on{background:var(--gold-bg);border-color:var(--gold);color:var(--gold2)}
 .dp-btn[data-d="7"]{border-color:rgba(91,156,240,.3);color:var(--blue)}
 .dp-btn[data-d="7"].on{background:var(--blue-bg);border-color:var(--blue)}
-/* 이벤트 타입 버튼 */
 .ev-type-row{display:flex;gap:8px}
 .ev-type-btn{flex:1;padding:9px 8px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);transition:all .15s}
 .ev-type-btn.on{background:var(--gold-bg);border-color:rgba(201,168,76,.5);color:var(--gold2)}
-/* 기간 이벤트 배지 */
 .ev-period-chip{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(91,156,240,.1);color:var(--blue);border:1px solid rgba(91,156,240,.3)}
-/* 일정표 뷰 */
 .sched-wrap{padding:0 16px 0}
 .sched-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .sched-title{font-size:15px;font-weight:700;color:var(--text)}
@@ -252,7 +225,6 @@ input[type="date"]{color-scheme:dark}
 .sched-row-time.now{color:var(--amber)}
 .sched-row-badge{font-size:10px;margin-top:3px;color:var(--t3)}
 .sched-empty{text-align:center;padding:32px;color:var(--t3);font-size:13px}
-/* 이벤트 카드 (보스 목록용) */
 .ev-list{display:flex;flex-direction:column;gap:8px;padding:10px 16px 0}
 .ev-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px}
 .ev-card-top{display:flex;justify-content:space-between;align-items:flex-start}
@@ -269,34 +241,18 @@ input[type="date"]{color-scheme:dark}
 .ev-time{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text)}
 .ev-memo{font-size:11px;color:var(--t3)}
 .ev-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
-/* 스크린샷 패널 */
 .shot-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;overflow-y:auto;padding:20px}
 .shot-panel.show{display:flex;flex-direction:column;align-items:center}
 .shot-content{background:#1a1a2e;border-radius:16px;padding:20px;width:100%;max-width:420px}
 .shot-close{margin-top:16px;padding:12px 32px;border-radius:20px;background:var(--bg3);border:1px solid var(--border2);color:var(--t2);font-size:14px;cursor:pointer}
-
-/* 보스일정 시작 패널 */
 .raid-panel{background:rgba(155,127,232,.08);border:1px solid rgba(155,127,232,.3);border-radius:var(--r);padding:14px;margin-bottom:12px}
-.raid-panel-title{font-size:12px;font-weight:700;color:var(--purple2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.raid-time-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.raid-time-input{background:var(--bg3);border:1px solid rgba(155,127,232,.4);border-radius:var(--rs);padding:8px 12px;font-size:15px;font-weight:700;color:var(--purple2);outline:none;width:110px;font-variant-numeric:tabular-nums}
-.raid-time-input:focus{border-color:var(--purple)}
 .raid-clear-btn{font-size:11px;padding:5px 10px;border-radius:var(--rs);border:1px solid var(--border2);background:none;color:var(--t3);cursor:pointer}
-.raid-summary{font-size:12px;color:var(--t2);margin-top:8px;line-height:1.7}
-.raid-summary b{color:var(--purple2)}
-/* 토벌 묶음 블록 */
 .sched-blk-hdr.raid{background:rgba(155,127,232,.1);color:var(--purple2)}
-.raid-group-label{padding:6px 14px;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border)}
-.sched-row.raid-target{background:rgba(155,127,232,.04)}
-.sched-row.raid-target .sched-row-name{color:var(--purple2)}
-
 .shot-setup{background:var(--bg2);border-radius:var(--r);padding:20px;width:100%;max-width:420px}
 .shot-setup-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px}
 .shot-setup-date{font-size:12px;color:var(--t3);margin-bottom:4px}
 .shot-section-lbl{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.7px;margin:14px 0 8px}
 .shot-time-row{display:flex;align-items:center;gap:10px}
-.shot-time-inp{background:var(--bg3);border:1px solid rgba(155,127,232,.4);border-radius:var(--rs);padding:8px 12px;font-size:15px;font-weight:700;color:var(--purple2);-webkit-text-fill-color:var(--purple2);outline:none;width:120px;color-scheme:dark}
-.shot-time-hint{font-size:11px;color:var(--t3)}
 .shot-check-list{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto}
 .shot-check-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs);background:var(--bg3);cursor:pointer}
 .shot-check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex-shrink:0}
@@ -304,21 +260,15 @@ input[type="date"]{color-scheme:dark}
 .shot-check-name{font-size:13px;font-weight:600;color:var(--text);flex:1}
 .shot-check-sub{font-size:11px;color:var(--t3)}
 .shot-empty{font-size:12px;color:var(--t3);padding:8px 0}
-.shot-ev-preview{display:flex;flex-direction:column;gap:4px}
-.shot-ev-row{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:6px;padding:3px 0}
 .shot-generate-btn{width:100%;margin-top:16px;padding:13px;border-radius:var(--rs);background:var(--gold);border:none;color:#1a1200;font-size:14px;font-weight:700;cursor:pointer}
 .shot-generate-btn:active{opacity:.8}
-
 .conn-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;border:1px solid;margin-top:3px}
 .conn-badge.online{background:var(--green-bg);color:var(--green);border-color:rgba(76,175,125,.35)}
 .conn-badge.offline{background:var(--red-bg);color:var(--red);border-color:rgba(224,90,90,.35)}
 .conn-badge.connecting{background:var(--amber-bg);color:var(--amber);border-color:rgba(224,154,64,.35)}
-
-/* 보스 타입 선택 */
 .boss-type-row{display:flex;gap:8px;margin-bottom:14px}
 .boss-type-btn{flex:1;padding:9px 8px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);transition:all .15s}
 .boss-type-btn.on{background:var(--gold-bg);border-color:rgba(201,168,76,.5);color:var(--gold2)}
-/* 고정 시간 설정 */
 .fixed-times-wrap{display:flex;flex-direction:column;gap:8px}
 .fixed-time-row{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 10px}
 .fixed-day-sel{background:var(--bg);border:1px solid var(--border2);border-radius:var(--rs);padding:6px 8px;font-size:13px;color:var(--text);outline:none;cursor:pointer;min-width:60px}
@@ -328,37 +278,18 @@ input[type="date"]{color-scheme:dark}
 .fixed-del-btn:active{color:var(--red)}
 .fixed-add-btn{width:100%;padding:8px;border-radius:var(--rs);border:1px dashed var(--border2);background:none;color:var(--t2);font-size:13px;cursor:pointer;margin-top:4px}
 .fixed-add-btn:hover{border-color:var(--gold);color:var(--gold)}
-/* 고정 보스 카드 */
 .b-fixed{background:var(--blue-bg);color:var(--blue);border-color:rgba(91,156,240,.35)}
-.fixed-times-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
-.fixed-time-chip{font-size:11px;padding:3px 8px;border-radius:4px;background:var(--bg3);color:var(--t2);border:1px solid var(--border)}
-.fixed-time-chip.past{background:var(--green-bg);color:var(--green);border-color:rgba(76,175,125,.3)}
-.fixed-time-chip.next{background:var(--gold-bg);color:var(--gold2);border-color:rgba(201,168,76,.35);font-weight:700}
-
 .install-btn{font-size:10px;padding:3px 8px;border-radius:8px;border:1px solid rgba(201,168,76,.4);background:var(--gold-bg);color:var(--gold2);cursor:pointer;margin-top:3px;font-weight:600}
-
-/* 남은 시간 입력 */
 .remain-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .remain-inp{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:9px 10px;font-size:14px;color:var(--text);outline:none;width:70px;text-align:center}
 .remain-inp:focus{border-color:rgba(201,168,76,.5)}
 .remain-unit{font-size:13px;color:var(--t2)}
 .remain-calc-btn{padding:8px 14px;border-radius:var(--rs);background:var(--gold-bg);border:1px solid rgba(201,168,76,.4);color:var(--gold2);font-size:12px;font-weight:600;cursor:pointer}
 .remain-calc-btn:active{opacity:.7}
-.remain-or{font-size:11px;color:var(--t3);margin:8px 0 4px}
-/* 새벽 미리보기 */
 .sched-blk-hdr.dawn{background:rgba(155,127,232,.12);color:var(--purple2)}
 .dawn-badge{font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(155,127,232,.15);color:var(--purple2);border:1px solid rgba(155,127,232,.3);margin-left:6px}
-
-/* 오늘/내일 리젠 탭 각성 알림 */
 .day-item.awk-alert-item{border-color:rgba(155,127,232,.4);background:rgba(155,127,232,.04)}
-.di-awk-alert{
-  font-size:11px;font-weight:600;color:var(--purple2);
-  margin-top:6px;padding:3px 8px;
-  background:var(--purple-bg);
-  border:1px solid rgba(155,127,232,.35);
-  border-radius:4px;display:inline-block;
-  animation:bl 1.2s infinite;
-}
+.di-awk-alert{font-size:11px;font-weight:600;color:var(--purple2);margin-top:6px;padding:3px 8px;background:var(--purple-bg);border:1px solid rgba(155,127,232,.35);border-radius:4px;display:inline-block;animation:bl 1.2s infinite;}
 .di-awk-info{font-size:11px;color:var(--t2);margin-top:4px}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -367,7 +298,6 @@ input[type="date"]{color-scheme:dark}
 </head>
 <body>
 <div class="app">
-
 <header>
   <div class="hdr-top">
     <div>
@@ -389,8 +319,6 @@ input[type="date"]{color-scheme:dark}
     <button class="tab sched" onclick="setTab('sched',this)">📋 일정표</button>
   </div>
 </header>
-
-<!-- 점검 패널 -->
 <div class="maint-wrap">
   <div class="maint-panel">
     <div class="maint-hdr" onclick="togMaint()">
@@ -400,42 +328,28 @@ input[type="date"]{color-scheme:dark}
       <span class="maint-arrow" id="maint-arrow">▼</span>
     </div>
     <div class="maint-body" id="maint-body">
-      <div class="maint-desc">
-        점검 완료 시각 기준으로 <b>전체 보스 리젠 타이머를 일괄 갱신</b>합니다.<br>
-        점검 완료 = 모든 보스 즉시 리젠 기준점이 됩니다.
-      </div>
+      <div class="maint-desc">점검 완료 시각 기준으로 <b>전체 보스 리젠 타이머를 일괄 갱신</b>합니다.<br>점검 완료 = 모든 보스 즉시 리젠 기준점이 됩니다.</div>
       <div class="maint-btns">
-        <button class="maint-btn reg" onclick="confirmMaint('reg')">
-          📅 정기점검<br><span style="font-size:10px;font-weight:400;opacity:.8">오후 10:00 기준 일괄 리젠</span>
-        </button>
-        <button class="maint-btn inst" onclick="confirmMaint('inst')">
-          ⚡ 임시점검<br><span style="font-size:10px;font-weight:400;opacity:.8">현재 시각 기준 즉시 리젠</span>
-        </button>
+        <button class="maint-btn reg" onclick="confirmMaint('reg')">📅 정기점검<br><span style="font-size:10px;font-weight:400;opacity:.8">오후 10:00 기준 일괄 리젠</span></button>
+        <button class="maint-btn inst" onclick="confirmMaint('inst')">⚡ 임시점검<br><span style="font-size:10px;font-weight:400;opacity:.8">현재 시각 기준 즉시 리젠</span></button>
       </div>
       <div class="maint-last" id="maint-last"></div>
       <div class="backup-section">
         <div class="backup-title">💾 데이터 백업 / 복원</div>
         <div class="backup-desc">파일 교체 전 백업을 받아두고, 새 파일에서 복원하세요.<br>보스·처치기록·이벤트 전체가 저장됩니다.</div>
         <div class="maint-btns" style="margin-top:8px">
-          <button class="maint-btn" style="background:rgba(76,175,125,.1);border-color:rgba(76,175,125,.4);color:var(--green)" onclick="exportData()">
-            📤 백업 다운로드<br><span style="font-size:10px;font-weight:400;opacity:.8">JSON 파일로 저장</span>
-          </button>
-          <button class="maint-btn" style="background:rgba(91,156,240,.1);border-color:rgba(91,156,240,.4);color:var(--blue)" onclick="document.getElementById('import-file').click()">
-            📥 백업 복원<br><span style="font-size:10px;font-weight:400;opacity:.8">JSON 파일 불러오기</span>
-          </button>
+          <button class="maint-btn" style="background:rgba(76,175,125,.1);border-color:rgba(76,175,125,.4);color:var(--green)" onclick="exportData()">📤 백업 다운로드<br><span style="font-size:10px;font-weight:400;opacity:.8">JSON 파일로 저장</span></button>
+          <button class="maint-btn" style="background:rgba(91,156,240,.1);border-color:rgba(91,156,240,.4);color:var(--blue)" onclick="document.getElementById('import-file').click()">📥 백업 복원<br><span style="font-size:10px;font-weight:400;opacity:.8">JSON 파일 불러오기</span></button>
         </div>
         <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
       </div>
     </div>
   </div>
 </div>
-
 <div class="stats" style="margin-top:10px">
-  <div class="stat"><div class="sv green"  id="st-ready">0</div><div class="sl">리젠됨</div></div>
-  <div class="stat"><div class="sv amber"  id="st-urgent">0</div><div class="sl">30분 이내</div></div>
+  <div class="stat"><div class="sv green" id="st-ready">0</div><div class="sl">리젠됨</div></div>
+  <div class="stat"><div class="sv amber" id="st-urgent">0</div><div class="sl">30분 이내</div></div>
 </div>
-
-<!-- 보스 목록 (전체/리젠됨/각성) -->
 <div class="sec" id="main-sec">
   <div class="sec-hdr">
     <span class="sec-title" id="sec-title-txt">보스 목록</span>
@@ -446,22 +360,16 @@ input[type="date"]{color-scheme:dark}
   </div>
   <div class="blist" id="blist"></div>
 </div>
-
-<!-- 오늘/내일 리젠 뷰 -->
 <div id="day-view" style="display:none">
   <div class="day-section">
     <div class="day-hdr" id="day-hdr-txt"></div>
     <div class="day-list" id="day-list"></div>
   </div>
 </div>
-
-<!-- 일정표 뷰 -->
 <div id="sched-view" style="display:none">
   <div class="sched-wrap" id="sched-wrap"></div>
 </div>
-
-</div><!-- .app -->
-
+</div>
 <div class="fab-group" id="fab-group">
   <div class="fab-menu" id="fab-menu" style="display:none">
     <button class="fab-sub" onclick="openBossModal()">⚔ 보스 추가</button>
@@ -469,24 +377,13 @@ input[type="date"]{color-scheme:dark}
   </div>
   <button class="fab" id="fab-main" onclick="togFab()">+</button>
 </div>
-
 <!-- 보스 편집 모달 -->
 <div class="ovl" id="ovl" onclick="bgClose(event)">
 <div class="mdl">
   <div class="mdl-title" id="mdl-title">보스 추가</div>
-
   <div class="section-label">기본 정보</div>
-  <div class="fgrp">
-    <label class="flbl">보스 이름</label>
-    <input class="finput" id="f-name" placeholder="예: 세르갈린">
-  </div>
-  <div class="frow">
-    <div class="fgrp">
-      <label class="flbl">구역 / 종류</label>
-      <input class="finput" id="f-zone" placeholder="예: 혼돈보스">
-    </div>
-  </div>
-
+  <div class="fgrp"><label class="flbl">보스 이름</label><input class="finput" id="f-name" placeholder="예: 세르갈린"></div>
+  <div class="frow"><div class="fgrp"><label class="flbl">구역 / 종류</label><input class="finput" id="f-zone" placeholder="예: 혼돈보스"></div></div>
   <div class="fgrp" style="margin-top:4px">
     <label class="flbl">리젠 방식</label>
     <div class="boss-type-row">
@@ -494,16 +391,9 @@ input[type="date"]{color-scheme:dark}
       <button type="button" class="boss-type-btn" id="btype-fixed" onclick="setBossType('fixed')">🕐 고정 시간<br><span style="font-size:10px;font-weight:400;opacity:.7">매주 특정 요일·시각 고정 리젠</span></button>
     </div>
   </div>
-
-  <!-- 처치 기반 필드 -->
   <div id="kill-fields">
-    <div class="fgrp">
-      <label class="flbl">리젠 주기 (시간)</label>
-      <input class="finput" id="f-hours" type="number" min="0.5" max="336" step="0.5" value="48">
-    </div>
+    <div class="fgrp"><label class="flbl">리젠 주기 (시간)</label><input class="finput" id="f-hours" type="number" min="0.5" max="336" step="0.5" value="48"></div>
   </div>
-
-  <!-- 고정 시간 필드 -->
   <div id="fixed-fields" style="display:none">
     <div class="fgrp">
       <label class="flbl">고정 리젠 시각 목록</label>
@@ -512,33 +402,32 @@ input[type="date"]{color-scheme:dark}
       <button type="button" class="fixed-add-btn" onclick="addFixedTimeRow()">+ 시각 추가</button>
     </div>
   </div>
-
   <hr class="divider" id="spawn-hr">
-  <div id="spawn-section"><div class="section-label">리젠 시각 & 처치 기록 수정</div>
-  <div class="fgrp">
-    <label class="flbl">① 남은 시간으로 입력</label>
-    <div class="fdesc">지금부터 몇 시간 몇 분 후에 리젠되는지 입력하세요.</div>
-    <div class="remain-row">
-      <input class="remain-inp" id="f-remain-h" type="number" min="0" max="999" placeholder="0"> <span class="remain-unit">시간</span>
-      <input class="remain-inp" id="f-remain-m" type="number" min="0" max="59" placeholder="0"> <span class="remain-unit">분 후 리젠</span>
-      <button class="remain-calc-btn" onclick="applyRemainTime()">적용</button>
+  <div id="spawn-section">
+    <div class="section-label">리젠 시각 & 처치 기록 수정</div>
+    <div class="fgrp">
+      <label class="flbl">① 남은 시간으로 입력</label>
+      <div class="fdesc">지금부터 몇 시간 몇 분 후에 리젠되는지 입력하세요.</div>
+      <div class="remain-row">
+        <input class="remain-inp" id="f-remain-h" type="number" min="0" max="999" placeholder="0"> <span class="remain-unit">시간</span>
+        <input class="remain-inp" id="f-remain-m" type="number" min="0" max="59" placeholder="0"> <span class="remain-unit">분 후 리젠</span>
+        <button class="remain-calc-btn" onclick="applyRemainTime()">적용</button>
+      </div>
+    </div>
+    <div class="fgrp">
+      <label class="flbl">② 리젠 예정 시각으로 입력</label>
+      <div class="fdesc">날짜와 시각을 직접 지정합니다. 비워두면 현재 기록을 유지합니다.</div>
+      <div class="dt-row">
+        <input class="finput" id="f-spawn-date" type="date">
+        <div class="hm-row"><select class="hm-sel" id="f-spawn-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="f-spawn-m"></select></div>
+      </div>
+    </div>
+    <div class="fgrp" id="cnt-row" style="display:none">
+      <label class="flbl">현재 처치 횟수 (각성 카운터)</label>
+      <div class="fdesc">현재까지 누적된 일반 보스 처치 횟수를 직접 수정합니다.</div>
+      <input class="finput" id="f-cnt" type="number" min="0" max="99" step="1" value="0">
     </div>
   </div>
-  <div class="fgrp">
-    <label class="flbl">② 리젠 예정 시각으로 입력</label>
-    <div class="fdesc">날짜와 시각을 직접 지정합니다. 비워두면 현재 기록을 유지합니다.</div>
-    <div class="dt-row">
-      <input class="finput" id="f-spawn-date" type="date">
-<div class="hm-row"><select class="hm-sel" id="f-spawn-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="f-spawn-m"></select></div>
-    </div>
-  </div>
-  <div class="fgrp" id="cnt-row" style="display:none">
-    <label class="flbl">현재 처치 횟수 (각성 카운터)</label>
-    <div class="fdesc">현재까지 누적된 일반 보스 처치 횟수를 직접 수정합니다.</div>
-    <input class="finput" id="f-cnt" type="number" min="0" max="99" step="1" value="0">
-  </div>
-
-  </div><!-- spawn-section -->
   <hr class="divider">
   <div class="awk-hdr-row">
     <span class="awk-hdr-lbl">⚡ 각성 보스 연계 설정</span>
@@ -550,45 +439,31 @@ input[type="date"]{color-scheme:dark}
       <div class="fdesc">일반 보스를 N번 처치하면 각성 보스가 즉시 출현합니다.</div>
       <input class="finput" id="f-awk-n" type="number" min="1" max="99" step="1" value="4">
     </div>
-    <div class="fgrp">
-      <label class="flbl">각성 보스 이름</label>
-      <input class="finput" id="f-awk-name" placeholder="예: 각성 세르갈린">
-    </div>
+    <div class="fgrp"><label class="flbl">각성 보스 이름</label><input class="finput" id="f-awk-name" placeholder="예: 각성 세르갈린"></div>
     <div class="fgrp">
       <label class="flbl">각성 보스 재리젠 주기 (시간)</label>
       <div class="fdesc">각성 보스 처치 후 재출현까지 걸리는 시간</div>
       <input class="finput" id="f-awk-hours" type="number" min="0.5" max="336" step="0.5" value="48">
     </div>
   </div>
-
   <div class="mdl-footer">
     <button class="mbtn" onclick="closeModal()">취소</button>
     <button class="mbtn primary" onclick="saveBoss()">저장</button>
   </div>
 </div>
 </div>
-
-<!-- 이벤트 추가/편집 모달 -->
+<!-- 이벤트 모달 -->
 <div class="ovl" id="evl" onclick="bgCloseEv(event)">
 <div class="mdl">
   <div class="mdl-title" id="ev-title">이벤트 추가</div>
   <div class="section-label">이벤트 정보</div>
-  <div class="fgrp">
-    <label class="flbl">이벤트 이름</label>
-    <input class="finput" id="ev-name" placeholder="예: 사냥터 오픈, 길드전, 공성전">
-  </div>
-  <div class="fgrp">
-    <label class="flbl">분류</label>
+  <div class="fgrp"><label class="flbl">이벤트 이름</label><input class="finput" id="ev-name" placeholder="예: 사냥터 오픈, 길드전, 공성전"></div>
+  <div class="fgrp"><label class="flbl">분류</label>
     <select class="finput" id="ev-cat">
-      <option value="hunt">사냥</option>
-      <option value="guild">길드</option>
-      <option value="siege">공성</option>
-      <option value="event">이벤트</option>
-      <option value="etc">기타</option>
+      <option value="hunt">사냥</option><option value="guild">길드</option>
+      <option value="siege">공성</option><option value="event">이벤트</option><option value="etc">기타</option>
     </select>
   </div>
-
-  <!-- 이벤트 타입 전환 -->
   <div class="fgrp">
     <label class="flbl">이벤트 유형</label>
     <div class="ev-type-row">
@@ -598,53 +473,25 @@ input[type="date"]{color-scheme:dark}
       <button type="button" class="ev-type-btn" id="ev-type-once" onclick="setEvType('once')">📌 단일 (특정 날짜·시각)</button>
     </div>
   </div>
-
-  <!-- 반복 타입 필드 -->
   <div id="ev-repeat-fields">
     <div class="fgrp">
       <label class="flbl">반복 요일 (복수 선택 가능)</label>
       <div class="day-picker" id="ev-days">
-        <button type="button" class="dp-btn" data-d="0">일</button>
-        <button type="button" class="dp-btn" data-d="1">월</button>
-        <button type="button" class="dp-btn" data-d="2">화</button>
-        <button type="button" class="dp-btn" data-d="3">수</button>
-        <button type="button" class="dp-btn" data-d="4">목</button>
-        <button type="button" class="dp-btn" data-d="5">금</button>
-        <button type="button" class="dp-btn" data-d="6">토</button>
-        <button type="button" class="dp-btn" data-d="7">매일</button>
+        <button type="button" class="dp-btn" data-d="0">일</button><button type="button" class="dp-btn" data-d="1">월</button>
+        <button type="button" class="dp-btn" data-d="2">화</button><button type="button" class="dp-btn" data-d="3">수</button>
+        <button type="button" class="dp-btn" data-d="4">목</button><button type="button" class="dp-btn" data-d="5">금</button>
+        <button type="button" class="dp-btn" data-d="6">토</button><button type="button" class="dp-btn" data-d="7">매일</button>
       </div>
     </div>
     <div class="frow">
-      <div class="fgrp">
-        <label class="flbl">시작 시각</label>
-<div class="hm-row"><select class="hm-sel" id="ev-start-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-start-m"></select></div>
-      </div>
-      <div class="fgrp">
-        <label class="flbl">종료 시각</label>
-<div class="hm-row"><select class="hm-sel" id="ev-end-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-end-m"></select></div>
-      </div>
+      <div class="fgrp"><label class="flbl">시작 시각</label><div class="hm-row"><select class="hm-sel" id="ev-start-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-start-m"></select></div></div>
+      <div class="fgrp"><label class="flbl">종료 시각</label><div class="hm-row"><select class="hm-sel" id="ev-end-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-end-m"></select></div></div>
     </div>
   </div>
-
-  <!-- 기간 타입 필드 -->
   <div id="ev-period-fields" style="display:none">
-    <div class="fgrp">
-      <label class="flbl">시작 날짜·시각</label>
-      <div class="dt-row">
-        <input class="finput" id="ev-pstart-date" type="date">
-<div class="hm-row"><select class="hm-sel" id="ev-pstart-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-pstart-m"></select></div>
-      </div>
-    </div>
-    <div class="fgrp">
-      <label class="flbl">종료 날짜·시각</label>
-      <div class="dt-row">
-        <input class="finput" id="ev-pend-date" type="date">
-<div class="hm-row"><select class="hm-sel" id="ev-pend-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-pend-m"></select></div>
-      </div>
-    </div>
+    <div class="fgrp"><label class="flbl">시작 날짜·시각</label><div class="dt-row"><input class="finput" id="ev-pstart-date" type="date"><div class="hm-row"><select class="hm-sel" id="ev-pstart-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-pstart-m"></select></div></div></div>
+    <div class="fgrp"><label class="flbl">종료 날짜·시각</label><div class="dt-row"><input class="finput" id="ev-pend-date" type="date"><div class="hm-row"><select class="hm-sel" id="ev-pend-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-pend-m"></select></div></div></div>
   </div>
-
-  <!-- 고정 시간 타입 필드 -->
   <div id="ev-fixed-fields" style="display:none">
     <div class="fgrp">
       <label class="flbl">고정 시각 목록</label>
@@ -653,30 +500,16 @@ input[type="date"]{color-scheme:dark}
       <button type="button" class="fixed-add-btn" onclick="addEvFixedTimeRow()">+ 시각 추가</button>
     </div>
   </div>
-
-  <!-- 단일 타입 필드 -->
   <div id="ev-once-fields" style="display:none">
-    <div class="fgrp">
-      <label class="flbl">날짜·시각</label>
-      <div class="fdesc">이 날짜·시각에 한 번만 출현합니다.</div>
-      <div class="dt-row">
-        <input class="finput" id="ev-once-date" type="date">
-<div class="hm-row"><select class="hm-sel" id="ev-once-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-once-m"></select></div>
-      </div>
-    </div>
+    <div class="fgrp"><label class="flbl">날짜·시각</label><div class="fdesc">이 날짜·시각에 한 번만 출현합니다.</div><div class="dt-row"><input class="finput" id="ev-once-date" type="date"><div class="hm-row"><select class="hm-sel" id="ev-once-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-once-m"></select></div></div></div>
   </div>
-
-  <div class="fgrp">
-    <label class="flbl">메모 (선택)</label>
-    <input class="finput" id="ev-memo" placeholder="예: 2층 필드, 파티 필수">
-  </div>
+  <div class="fgrp"><label class="flbl">메모 (선택)</label><input class="finput" id="ev-memo" placeholder="예: 2층 필드, 파티 필수"></div>
   <div class="mdl-footer">
     <button class="mbtn" onclick="closeEventModal()">취소</button>
     <button class="mbtn primary" onclick="saveEvent()">저장</button>
   </div>
 </div>
 </div>
-
 <!-- 점검 확인 모달 -->
 <div class="ovl confirm-ovl" id="conf-ovl" onclick="bgCloseConf(event)">
 <div class="confirm-wrap">
@@ -688,13 +521,9 @@ input[type="date"]{color-scheme:dark}
   </div>
 </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════
-//  기본 데이터
-// ═══════════════════════════════
 function defBosses(){return[
   {id:1,name:'세르갈린',    zone:'혼돈보스',hours:48, awkEnable:true, awkN:2,awkName:'각성 세르갈린',awkHours:48},
   {id:2,name:'고래사자',    zone:'혼돈보스',hours:48, awkEnable:true, awkN:4,awkName:'각성 고래사자',awkHours:48},
@@ -706,11 +535,9 @@ function defBosses(){return[
   {id:8,name:'각성 절멸자', zone:'혼돈보스',hours:96, awkEnable:false,awkN:0,awkName:'',awkHours:0},
 ];}
 
-// kills[id] = { cnt, lastKill, awkActive, awkSpawn, awkKill }
 let bosses=[],kills={},maintLog=[],events=[];
 let curTab='all',curSort='time',editId=null,editEvId=null,pendingMaint=null;
 
-// Firebase 설정
 const firebaseConfig={
   apiKey:"AIzaSyDSoYuNFDUoKkOt3aGS13mGoeETR6ral6E",
   databaseURL:"https://prasia-boss-timer-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -719,70 +546,42 @@ const firebaseConfig={
 };
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
-let _fbReady=false; // Firebase 초기 로드 완료 여부
+let _fbReady=false;
 
-// Firebase 헬퍼
 function toFbObj(arr){const o={};arr.forEach(x=>o[x.id]=x);return o;}
 
-// Firebase 저장
 function save(){
   db.ref('bosses').set(toFbObj(bosses));
   db.ref('kills').set(kills);
   db.ref('events').set(toFbObj(events));
   const mo={};maintLog.forEach((m,i)=>mo[i]=m);
   db.ref('maint').set(mo);
-  // localStorage 백업
   localStorage.setItem('pr_b',JSON.stringify(bosses));
   localStorage.setItem('pr_k',JSON.stringify(kills));
   localStorage.setItem('pr_m',JSON.stringify(maintLog));
   localStorage.setItem('pr_e',JSON.stringify(events));
 }
 
-// Firebase 실시간 리스너 (한 번만 등록)
 function setupFirebase(){
-  // 연결 상태
   db.ref('.info/connected').on('value',snap=>{
     const el=document.getElementById('conn-badge');
     if(snap.val()){el.textContent='● 연결됨';el.className='conn-badge online';}
     else{el.textContent='○ 오프라인';el.className='conn-badge offline';}
   });
-
   let bLoaded=false,kLoaded=false,eLoaded=false,mLoaded=false;
   function checkReady(){
     if(bLoaded&&kLoaded&&eLoaded&&mLoaded&&!_fbReady){
       _fbReady=true;
-      // 최초 기본 보스 없으면 저장
       if(!bosses.length){bosses=defBosses();db.ref('bosses').set(toFbObj(bosses));}
       updateMaintUI();render();tick();setInterval(tick,1000);
     }
   }
-
-  db.ref('bosses').on('value',snap=>{
-    const v=snap.val();
-    bosses=v?Object.values(v):[];
-    if(!bLoaded){bLoaded=true;checkReady();}
-    else if(_fbReady)render();
-  });
-  db.ref('kills').on('value',snap=>{
-    kills=snap.val()||{};
-    if(!kLoaded){kLoaded=true;checkReady();}
-    else if(_fbReady)render();
-  });
-  db.ref('events').on('value',snap=>{
-    const v=snap.val();
-    events=v?Object.values(v):[];
-    if(!eLoaded){eLoaded=true;checkReady();}
-    else if(_fbReady){if(curTab==='sched')buildSchedView();}
-  });
-  db.ref('maint').on('value',snap=>{
-    const v=snap.val();
-    maintLog=v?Object.values(v).sort((a,b)=>b.ts-a.ts):[];
-    if(!mLoaded){mLoaded=true;checkReady();}
-    else if(_fbReady)updateMaintUI();
-  });
+  db.ref('bosses').on('value',snap=>{const v=snap.val();bosses=v?Object.values(v):[];if(!bLoaded){bLoaded=true;checkReady();}else if(_fbReady)render();});
+  db.ref('kills').on('value',snap=>{kills=snap.val()||{};if(!kLoaded){kLoaded=true;checkReady();}else if(_fbReady)render();});
+  db.ref('events').on('value',snap=>{const v=snap.val();events=v?Object.values(v):[];if(!eLoaded){eLoaded=true;checkReady();}else if(_fbReady){if(curTab==='sched')buildSchedView();}});
+  db.ref('maint').on('value',snap=>{const v=snap.val();maintLog=v?Object.values(v).sort((a,b)=>b.ts-a.ts):[];if(!mLoaded){mLoaded=true;checkReady();}else if(_fbReady)updateMaintUI();});
 }
 
-// load: Firebase 오프라인 시 localStorage 폴백
 function load(){
   try{bosses=JSON.parse(localStorage.getItem('pr_b'))||[];}catch{bosses=[];}
   try{kills=JSON.parse(localStorage.getItem('pr_k'))||{};}catch{kills={};}
@@ -797,8 +596,6 @@ function getK(id){
 // ═══════════════════════════════
 //  시간 계산
 // ═══════════════════════════════
-// lastKill = 리젠 기준 시각 - boss.hours*3600000
-// 즉, 리젠 예정 = lastKill + boss.hours*3600000
 function regRemain(boss){
   if(boss.bossType==='fixed'){
     const k=getK(boss.id);
@@ -811,18 +608,21 @@ function regRemain(boss){
   if(!k.lastKill||k.awkActive)return null;
   return Math.max(0,boss.hours*3600-(Date.now()-k.lastKill)/1000);
 }
+
+// ── [수정 A] awkRemain: 각성 보스는 처치 횟수 조건으로만 등장 ──
+// awkKill 기반 시간 타이머 제거 — 처치 후 재등장은 카운터 조건으로만 판단
 function awkRemain(boss){
   const k=getK(boss.id);
   if(!boss.awkEnable)return null;
   if(k.awkActive)return 0;
-  if(k.awkKill!==null)return Math.max(0,boss.awkHours*3600-(Date.now()-k.awkKill)/1000);
+  // 각성 보스는 처치 횟수 조건으로만 등장 — 시간 타이머 없음
   return null;
 }
+
 function getSpawnMs(boss){
   const k=getK(boss.id);
   if(k.awkActive)return null;
   if(k.lastKill)return k.lastKill+boss.hours*3600000;
-  if(k.awkKill!==null)return k.awkKill+boss.awkHours*3600000;
   return null;
 }
 function getState(boss){
@@ -845,7 +645,6 @@ function killBoss(id){
   const boss=bosses.find(b=>b.id===id),k=getK(id);
   if(k.awkActive){showToast('각성 보스를 먼저 처치해 주세요!');return;}
   k.cnt++;k.lastKill=Date.now();
-  // 고정 보스: 처치 기록만 남기고 타이머는 고정 시간 기준 유지
   if(boss.awkEnable&&k.cnt>=boss.awkN){
     k.awkActive=true;k.awkSpawn=Date.now();k.awkKill=null;
     showToast(`⚡ ${boss.awkName} 각성 출현!`,'awk');
@@ -864,9 +663,6 @@ function killAwaken(id){
 
 // ═══════════════════════════════
 //  점검 처리
-//  핵심: 리젠 기준 시각 = 점검 완료 시각
-//  → lastKill = 점검완료시각 - boss.hours*3600000
-//  → regRemain = 0 → 즉시 리젠됨
 // ═══════════════════════════════
 function confirmMaint(type){
   pendingMaint=type;
@@ -880,10 +676,7 @@ function confirmMaint(type){
     ts=Date.now();tsStr=`현재 시각 ${fmtHHMM(ts)} — 즉시 전체 리젠됨`;
   }
   document.getElementById('conf-title').textContent=isReg?'정기점검 처리':'임시점검 처리';
-  document.getElementById('conf-desc').innerHTML=
-    `기준 시각: <b>${tsStr}</b><br><br>`+
-    `전체 <b>${bosses.length}개</b> 보스의 리젠 타이머가 이 시각 기준으로 갱신됩니다.<br>`+
-    `각성 처치 카운터는 변경되지 않습니다.`;
+  document.getElementById('conf-desc').innerHTML=`기준 시각: <b>${tsStr}</b><br><br>전체 <b>${bosses.length}개</b> 보스의 리젠 타이머가 이 시각 기준으로 갱신됩니다.<br>각성 처치 카운터는 변경되지 않습니다.`;
   const ok=document.getElementById('conf-ok');
   ok.textContent=isReg?'정기점검 적용':'임시점검 적용';
   ok.className='ccbtn '+(isReg?'ok-blue':'ok-amber');
@@ -891,20 +684,13 @@ function confirmMaint(type){
 }
 function execMaint(){
   const isReg=(pendingMaint==='reg');
-  let refTs; // 점검 완료(=리젠 기준) 시각
+  let refTs;
   if(isReg){const d=new Date();d.setHours(22,0,0,0);refTs=d.getTime();}
   else{refTs=Date.now();}
-
   bosses.forEach(boss=>{
     const k=getK(boss.id);
-    // 리젠 기준점 역산: lastKill = refTs - hours*ms → regRemain = max(0, hours - (now-lastKill)/s)
-    // now=refTs이면 remain=0, now<refTs이면 remain>0 (정기점검 미래 시각)
     k.lastKill=refTs-boss.hours*3600000;
-    if(k.awkActive){
-      // 각성 보스 활성 중이었으면 점검으로 처치된 것으로 처리
-      k.awkActive=false;
-      k.awkKill=refTs-boss.awkHours*3600000; // 각성 보스도 즉시 리젠
-    }
+    if(k.awkActive){k.awkActive=false;k.awkKill=refTs-boss.awkHours*3600000;}
   });
   maintLog.unshift({type:pendingMaint,ts:refTs});
   if(maintLog.length>10)maintLog.pop();
@@ -933,17 +719,9 @@ function fmtSec(sec){
   const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);
   return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 }
-function fmtHHMM(ms){
-  const d=new Date(ms);return`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
-function fmtFull(ms){
-  const d=new Date(ms);
-  return`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${fmtHHMM(ms)}`;
-}
-function fmtSpawnHint(ms,addH){
-  if(!ms)return'';
-  return`${fmtFull(ms+addH*3600000)} 리젠 예정`;
-}
+function fmtHHMM(ms){const d=new Date(ms);return`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
+function fmtFull(ms){const d=new Date(ms);return`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${fmtHHMM(ms)}`;}
+function fmtSpawnHint(ms,addH){if(!ms)return'';return`${fmtFull(ms+addH*3600000)} 리젠 예정`;}
 function fmtHours(h){return h>=24&&h%24===0?`${h/24}일`:`${h}시간`;}
 
 // ═══════════════════════════════
@@ -957,6 +735,8 @@ function buildPips(boss){
   for(let i=0;i<boss.awkN;i++)h+=`<div class="pip ${i<filled?(k.awkActive?'awakened':'done'):''}"></div>`;
   return`<div class="pips">${h}<span class="pip-lbl">${k.awkActive?'각성 출현 중!':k.cnt+'/'+boss.awkN+'회'}</span></div>`;
 }
+
+// ── [수정 B,C] buildCard: 각성 보스 재리젠 타이머 표시 제거 ──
 function buildCard(boss){
   const k=getK(boss.id),state=getState(boss),rr=regRemain(boss),ar=awkRemain(boss);
   let cdHtml='';
@@ -964,23 +744,15 @@ function buildCard(boss){
   else if(rr===null&&ar===null)cdHtml=`<div class="cdwn sm">기록 없음</div>`;
   else if(rr===0)cdHtml=`<div class="cdwn ready">리젠됨</div>`;
   else if(rr>0)cdHtml=`<div class="cdwn${rr<1800?' urgent':''}" id="cd-${boss.id}">${fmtSec(rr)}</div><div class="spawn-hint" id="hint-${boss.id}">${fmtSpawnHint(k.lastKill,boss.hours)}</div>`;
-  else if(ar===0)cdHtml=`<div class="cdwn ready">각성 리젠됨</div>`;
-  else if(ar>0)cdHtml=`<div class="cdwn${ar<1800?' urgent':''}" id="ar-${boss.id}">${fmtSec(ar)}</div><div class="spawn-hint">${fmtSpawnHint(k.awkKill,boss.awkHours)}</div>`;
+  // [수정B] ar===0, ar>0 케이스 제거 — 각성 보스는 처치 횟수 조건으로만 등장
 
   let strip='';
   if(boss.awkEnable&&k.awkActive){
     strip=`<div class="awk-strip"><div class="awk-hdr">⚡ 각성 출현 <span>— ${boss.awkName}</span></div>
       <div class="awk-row"><div class="awk-name">${boss.awkName}</div><div><div class="awk-cd ready">리젠됨</div><div class="awk-sub">처치 후 카운터 초기화</div></div></div>
       <div class="awk-actions"><button class="cbtn awk-kill" onclick="killAwaken(${boss.id})">각성 보스 처치 완료</button></div></div>`;
-  }else if(boss.awkEnable&&!k.awkActive&&ar===0){
-    strip=`<div class="awk-strip"><div class="awk-hdr">⚡ 각성 재출현 <span>— ${boss.awkName}</span></div>
-      <div class="awk-row"><div class="awk-name">${boss.awkName}</div><div class="awk-cd ready">리젠됨</div></div>
-      <div class="awk-actions"><button class="cbtn awk-kill" onclick="killAwaken(${boss.id})">각성 보스 처치 완료</button></div></div>`;
-  }else if(boss.awkEnable&&!k.awkActive&&ar>0){
-    strip=`<div class="awk-strip"><div class="awk-hdr">⚡ 각성 재리젠 대기 <span>— ${boss.awkName}</span></div>
-      <div class="awk-row"><div class="awk-name">${boss.awkName}</div>
-      <div><div class="awk-cd${ar<1800?' urgent':' sm'}" id="ar2-${boss.id}">${fmtSec(ar)}</div><div class="awk-sub">${fmtSpawnHint(k.awkKill,boss.awkHours)}</div></div></div></div>`;
   }
+  // [수정C] 각성 재출현/재리젠 대기 블록 제거 — 조건 기반 등장이므로 타이머 불필요
   const killLabel=!k.awkActive?(boss.awkEnable?`처치 (${k.cnt+1}번째)`:'처치'):null;
   return`<div class="bcard s-${state}" id="bc-${boss.id}">
     <div class="bcard-body">
@@ -1012,57 +784,33 @@ function buildDayView(isToday){
   if(!isToday)refDate.setDate(refDate.getDate()+1);
   const label=isToday?'오늘':'내일';
   const now=Date.now();
-
-  // 각 보스의 리젠 예정 시각 수집
   const items=[];
   bosses.forEach(boss=>{
     const k=getK(boss.id);
-    // 일반 보스 리젠
     if(k.lastKill&&!k.awkActive){
       const spawnMs=k.lastKill+boss.hours*3600000;
       if(sameDay(spawnMs,refDate))items.push({name:boss.name,zone:boss.zone,spawnMs,type:'normal',past:spawnMs<=now,id:boss.id,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
     }
-    // 각성 보스 재리젠
-    if(boss.awkEnable&&k.awkKill!==null&&!k.awkActive){
-      const spawnMs=k.awkKill+boss.awkHours*3600000;
-      if(sameDay(spawnMs,refDate))items.push({name:boss.awkName,zone:boss.zone,spawnMs,type:'awaken',past:spawnMs<=now,id:boss.id});
-    }
-    // 각성 보스 현재 활성
     if(boss.awkEnable&&k.awkActive&&isToday)items.push({name:boss.awkName,zone:boss.zone,spawnMs:now-1,type:'awaken',past:true,id:boss.id});
   });
   items.sort((a,b)=>a.spawnMs-b.spawnMs);
-
   const hdrEl=document.getElementById('day-hdr-txt');
   const today=new Date();const tstr=`${String(today.getMonth()+1).padStart(2,'0')}/${String(today.getDate()).padStart(2,'0')}`;
   const tmr=new Date(today);tmr.setDate(tmr.getDate()+1);const tmrstr=`${String(tmr.getMonth()+1).padStart(2,'0')}/${String(tmr.getDate()).padStart(2,'0')}`;
   hdrEl.innerHTML=`${label} 리젠 목록 <span class="day-badge ${isToday?'today-b':'tmrw-b'}">${isToday?tstr:tmrstr}</span>`;
-
   const listEl=document.getElementById('day-list');
   if(!items.length){listEl.innerHTML=`<div class="empty">${label} 리젠 예정 보스가 없습니다.</div>`;return;}
   listEl.innerHTML=items.map(it=>{
-    // 각성 알림 계산
     let awkHtml='';
     if(it.type==='normal'&&it.awkEnable){
       const afterKill=it.cnt+1;
-      if(afterKill>=it.awkN){
-        awkHtml=`<div class="di-awk-alert">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`;
-      }else{
-        awkHtml=`<div class="di-awk-info">각성까지 ${it.awkN-afterKill}회 남음 (${afterKill}/${it.awkN})</div>`;
-      }
-    }else if(it.type==='awaken'){
-      awkHtml=`<div class="di-awk-info" style="color:var(--purple2)">각성 보스</div>`;
-    }
+      if(afterKill>=it.awkN){awkHtml=`<div class="di-awk-alert">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`;}
+      else{awkHtml=`<div class="di-awk-info">각성까지 ${it.awkN-afterKill}회 남음 (${afterKill}/${it.awkN})</div>`;}
+    }else if(it.type==='awaken'){awkHtml=`<div class="di-awk-info" style="color:var(--purple2)">각성 보스</div>`;}
     const isAwkAlert=it.type==='normal'&&it.awkEnable&&(it.cnt+1)>=it.awkN;
     return`<div class="day-item${it.past?' ready-item':''}${isAwkAlert?' awk-alert-item':''}">
-      <div class="di-left">
-        <div class="di-name">${it.name}</div>
-        <div class="di-meta">${it.zone}</div>
-        ${awkHtml}
-      </div>
-      <div class="di-right">
-        <div class="di-time${it.past?' past':''}">${it.past?'리젠됨':fmtHHMM(it.spawnMs)}</div>
-        <div class="di-label">${it.past?'처치 가능':'리젠 예정'}</div>
-      </div>
+      <div class="di-left"><div class="di-name">${it.name}</div><div class="di-meta">${it.zone}</div>${awkHtml}</div>
+      <div class="di-right"><div class="di-time${it.past?' past':''}">${it.past?'리젠됨':fmtHHMM(it.spawnMs)}</div><div class="di-label">${it.past?'처치 가능':'리젠 예정'}</div></div>
     </div>`;
   }).join('');
 }
@@ -1085,7 +833,6 @@ function getSorted(){
     return ra-rb;
   });
 }
-
 function render(){
   const isDayTab=(curTab==='today'||curTab==='tmrw');
   const isSchedTab=(curTab==='sched');
@@ -1101,8 +848,8 @@ function render(){
   updateStats();
 }
 function updateStats(){
-  let r=0,u=0,a=0;
-  bosses.forEach(b=>{const s=getState(b),k=getK(b.id);if(s==='ready')r++;if(s==='urgent')u++;if(k.awkActive||(b.awkEnable&&awkRemain(b)===0))a++;});
+  let r=0,u=0;
+  bosses.forEach(b=>{const s=getState(b);if(s==='ready')r++;if(s==='urgent')u++;});
   document.getElementById('st-ready').textContent=r;
   document.getElementById('st-urgent').textContent=u;
 }
@@ -1118,86 +865,31 @@ function tick(){
   if(curTab==='sched'){buildSchedView();updateStats();return;}
   let rerender=false;
   bosses.forEach(boss=>{
-    const rr=regRemain(boss),ar=awkRemain(boss);
+    const rr=regRemain(boss);
     const cd=document.getElementById('cd-'+boss.id);
     if(cd&&rr!==null){if(rr<=0){rerender=true;return;}cd.textContent=fmtSec(rr);cd.className='cdwn'+(rr<1800?' urgent':'');}
-    const ar1=document.getElementById('ar-'+boss.id)||document.getElementById('ar2-'+boss.id);
-    if(ar1&&ar!==null){if(ar<=0){rerender=true;return;}ar1.textContent=fmtSec(ar);ar1.className=ar<1800?'awk-cd urgent':'awk-cd sm';}
   });
   if(rerender)render();
   updateStats();
 }
 
-// ═══════════════════════════════
-//  탭 / 정렬
-// ═══════════════════════════════
 function setTab(t,el){curTab=t;document.querySelectorAll('.tab').forEach(e=>e.classList.remove('on'));el.classList.add('on');render();}
 function setSort(s,el){curSort=s;document.querySelectorAll('.sbtn').forEach(e=>e.classList.remove('on'));el.classList.add('on');render();}
 
 // ═══════════════════════════════
 //  모달 (보스 편집)
 // ═══════════════════════════════
-// ms → "YYYY-MM-DD"
-function toDatePart(ms){
-  if(!ms)return'';
-  const d=new Date(ms);
-  return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-// ms → "HH:MM"
-function toTimePart(ms){
-  if(!ms)return'';
-  const d=new Date(ms);
-  return`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
-// "YYYY-MM-DD" + "HH:MM" → ms (빈값이면 null)
-function dtToMs(datePart, timePart){
-  if(!datePart||!timePart)return null;
-  return new Date(`${datePart}T${timePart}:00`).getTime();
-}
+function toDatePart(ms){if(!ms)return'';const d=new Date(ms);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function toTimePart(ms){if(!ms)return'';const d=new Date(ms);return`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
+function dtToMs(datePart,timePart){if(!datePart||!timePart)return null;return new Date(`${datePart}T${timePart}:00`).getTime();}
+function fillHour(id,val){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML='';for(let i=0;i<24;i++){const v=String(i).padStart(2,'0');sel.innerHTML+=`<option value="${v}"${(val&&parseInt(val)===i)?'selected':''}>${v}</option>`;}}
+function fillMin(id,val){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML='';for(let i=0;i<60;i++){const v=String(i).padStart(2,'0');sel.innerHTML+=`<option value="${v}"${(val&&parseInt(val)===i)?'selected':''}>${v}</option>`;}}
+function fillHM(hId,mId,hm){const [hv,mv]=(hm||'00:00').split(':');fillHour(hId,hv||'00');fillMin(mId,mv||'00');}
+function getSelHM(hId,mId){const h=document.getElementById(hId)?.value||'00';const m=document.getElementById(mId)?.value||'00';return`${h}:${m}`;}
+function hmDateToMs(datePart,hId,mId){if(!datePart)return null;const hm=getSelHM(hId,mId);return new Date(`${datePart}T${hm}:00`).getTime();}
+function msToHHMM(ms){return fmtHHMM(ms);}
+function stripSec(s){return s?s.slice(0,5):s;}
 
-// select 옵션 채우기
-function fillHour(id, val){
-  const sel=document.getElementById(id); if(!sel)return;
-  sel.innerHTML='';
-  for(let i=0;i<24;i++){
-    const v=String(i).padStart(2,'0');
-    sel.innerHTML+=`<option value="${v}"${(val&&parseInt(val)===i)?'selected':''}>${v}</option>`;
-  }
-}
-function fillMin(id, val){
-  const sel=document.getElementById(id); if(!sel)return;
-  sel.innerHTML='';
-  for(let i=0;i<60;i++){
-    const v=String(i).padStart(2,'0');
-    sel.innerHTML+=`<option value="${v}"${(val&&parseInt(val)===i)?'selected':''}>${v}</option>`;
-  }
-}
-// HH:MM 문자열에서 시/분 분리 채우기
-function fillHM(hId, mId, hm){
-  const [hv,mv]=(hm||'00:00').split(':');
-  fillHour(hId, hv||'00');
-  fillMin(mId, mv||'00');
-}
-// 두 select에서 "HH:MM" 읽기
-function getSelHM(hId, mId){
-  const h=document.getElementById(hId)?.value||'00';
-  const m=document.getElementById(mId)?.value||'00';
-  return`${h}:${m}`;
-}
-// "HH:MM" + date → ms
-function hmDateToMs(datePart, hId, mId){
-  if(!datePart)return null;
-  const hm=getSelHM(hId,mId);
-  return new Date(`${datePart}T${hm}:00`).getTime();
-}
-// ms에서 초 없는 HH:MM만 추출
-function msToHHMM(ms){ return fmtHHMM(ms); }
-// 문자열에서 초 제거 ("HH:MM:SS" → "HH:MM")
-function stripSec(s){ return s?s.slice(0,5):s; }
-
-// ═══════════════════════════════
-//  고정 시간 보스 헬퍼
-// ═══════════════════════════════
 const DAY_KR2=['일','월','화','수','목','금','토'];
 
 function setBossType(type){
@@ -1205,12 +897,10 @@ function setBossType(type){
   document.getElementById('btype-fixed').classList.toggle('on',type==='fixed');
   document.getElementById('kill-fields').style.display=type==='kill'?'block':'none';
   document.getElementById('fixed-fields').style.display=type==='fixed'?'block':'none';
-  // 리젠 시각 섹션 표시 여부
   const spawnSec=document.getElementById('spawn-section');
   if(spawnSec)spawnSec.style.display=type==='kill'?'block':'none';
 }
-
-function addFixedTimeRow(day=1, hh='20', mm='00'){
+function addFixedTimeRow(day=1,hh='20',mm='00'){
   const wrap=document.getElementById('fixed-times-wrap');
   const idx=Date.now()+Math.random();
   const dayOpts=DAY_KR2.map((d,i)=>`<option value="${i}"${i===day?'selected':''}>${d}</option>`).join('');
@@ -1218,66 +908,40 @@ function addFixedTimeRow(day=1, hh='20', mm='00'){
   for(let i=0;i<24;i++){const v=String(i).padStart(2,'0');hOpts+=`<option value="${v}"${v===hh?'selected':''}>${v}</option>`;}
   for(let i=0;i<60;i++){const v=String(i).padStart(2,'0');mOpts+=`<option value="${v}"${v===mm?'selected':''}>${v}</option>`;}
   const row=document.createElement('div');
-  row.className='fixed-time-row';
-  row.dataset.idx=idx;
-  row.innerHTML=`<select class="fixed-day-sel">${dayOpts}</select>
-    <span class="fixed-time-sep">요일</span>
-    <select class="fixed-hm-sel hh">${hOpts}</select>
-    <span class="hm-colon">:</span>
-    <select class="fixed-hm-sel mm">${mOpts}</select>
-    <button type="button" class="fixed-del-btn" onclick="this.parentElement.remove()">✕</button>`;
+  row.className='fixed-time-row';row.dataset.idx=idx;
+  row.innerHTML=`<select class="fixed-day-sel">${dayOpts}</select><span class="fixed-time-sep">요일</span><select class="fixed-hm-sel hh">${hOpts}</select><span class="hm-colon">:</span><select class="fixed-hm-sel mm">${mOpts}</select><button type="button" class="fixed-del-btn" onclick="this.parentElement.remove()">✕</button>`;
   wrap.appendChild(row);
 }
-
 function getFixedTimes(){
   const rows=document.querySelectorAll('#fixed-times-wrap .fixed-time-row');
   const times=[];
-  rows.forEach(row=>{
-    const day=parseInt(row.querySelector('.fixed-day-sel').value);
-    const hh=row.querySelector('.hh').value;
-    const mm=row.querySelector('.mm').value;
-    times.push({day,hh,mm});
-  });
+  rows.forEach(row=>{const day=parseInt(row.querySelector('.fixed-day-sel').value);const hh=row.querySelector('.hh').value;const mm=row.querySelector('.mm').value;times.push({day,hh,mm});});
   return times;
 }
-
-// 고정 보스: 현재 시각 기준 다음 리젠 ms 계산
 function getNextFixedMs(boss){
   if(boss.bossType!=='fixed'||!boss.fixedTimes||!boss.fixedTimes.length)return null;
-  const now=new Date(), nowMs=now.getTime();
+  const now=new Date(),nowMs=now.getTime();
   let nearest=null;
-  // 오늘부터 7일 후까지 순회하여 가장 가까운 미래 시각 찾기
   for(let dayOffset=0;dayOffset<=7;dayOffset++){
     const ref=new Date(nowMs+dayOffset*86400000);
     const dow=ref.getDay();
     boss.fixedTimes.forEach(ft=>{
       if(ft.day!==dow)return;
-      const candidate=new Date(ref);
-      candidate.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);
+      const candidate=new Date(ref);candidate.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);
       const ms=candidate.getTime();
-      if(ms>nowMs){
-        if(nearest===null||ms<nearest)nearest=ms;
-      }
+      if(ms>nowMs){if(nearest===null||ms<nearest)nearest=ms;}
     });
     if(nearest!==null)break;
   }
   return nearest;
 }
-
-// 고정 보스: 오늘 날짜의 모든 리젠 시각 목록 반환
 function getTodayFixedSpawns(boss){
   if(boss.bossType!=='fixed'||!boss.fixedTimes||!boss.fixedTimes.length)return[];
-  const now=new Date(), dow=now.getDay();
+  const now=new Date(),dow=now.getDay();
   const spawns=[];
-  boss.fixedTimes.forEach(ft=>{
-    if(ft.day!==dow)return;
-    const d=new Date();d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);
-    spawns.push(d.getTime());
-  });
-  spawns.sort((a,b)=>a-b);
-  return spawns;
+  boss.fixedTimes.forEach(ft=>{if(ft.day!==dow)return;const d=new Date();d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);spawns.push(d.getTime());});
+  spawns.sort((a,b)=>a-b);return spawns;
 }
-
 function applyRemainTime(){
   const h=parseInt(document.getElementById('f-remain-h').value)||0;
   const m=parseInt(document.getElementById('f-remain-m').value)||0;
@@ -1297,42 +961,30 @@ function openModal(boss=null){
   document.getElementById('f-name').value=boss?.name||'';
   document.getElementById('f-zone').value=boss?.zone||'혼돈보스';
   document.getElementById('f-hours').value=boss?.hours??48;
-  // 보스 타입 설정
   const btype=boss?.bossType||'kill';
   setBossType(btype);
-  // 고정 시간 목록 초기화
   document.getElementById('fixed-times-wrap').innerHTML='';
-  if(btype==='fixed'&&boss?.fixedTimes?.length){
-    boss.fixedTimes.forEach(ft=>addFixedTimeRow(ft.day,ft.hh,ft.mm));
-  }else if(btype==='fixed'){
-    addFixedTimeRow();
-  }
-  // 리젠 시각 섹션: 고정 시간 보스는 불필요하므로 숨김
+  if(btype==='fixed'&&boss?.fixedTimes?.length){boss.fixedTimes.forEach(ft=>addFixedTimeRow(ft.day,ft.hh,ft.mm));}
+  else if(btype==='fixed'){addFixedTimeRow();}
   const spawnSec=document.getElementById('spawn-section');
   const spawnHr=document.getElementById('spawn-hr');
   if(spawnSec)spawnSec.style.display=btype==='kill'?'block':'none';
   if(spawnHr)spawnHr.style.display=btype==='kill'?'block':'none';
-
-  // 리젠 예정 시각: 기존 lastKill이 있으면 계산, 없으면 빈값
   const cntRow=document.getElementById('cnt-row');
   if(boss){
     const k=getK(boss.id);
     const spawnMs=k.lastKill?k.lastKill+boss.hours*3600000:null;
-    document.getElementById('f-remain-h').value='';
-    document.getElementById('f-remain-m').value='';
+    document.getElementById('f-remain-h').value='';document.getElementById('f-remain-m').value='';
     document.getElementById('f-spawn-date').value=spawnMs?toDatePart(spawnMs):'';
     fillHM('f-spawn-h','f-spawn-m',spawnMs?toTimePart(spawnMs):'00:00');
     document.getElementById('f-cnt').value=k.cnt;
     cntRow.style.display=boss.awkEnable?'block':'none';
   }else{
-    document.getElementById('f-remain-h').value='';
-    document.getElementById('f-remain-m').value='';
+    document.getElementById('f-remain-h').value='';document.getElementById('f-remain-m').value='';
     document.getElementById('f-spawn-date').value='';
     fillHM('f-spawn-h','f-spawn-m','00:00');
-    document.getElementById('f-cnt').value=0;
-    cntRow.style.display='none';
+    document.getElementById('f-cnt').value=0;cntRow.style.display='none';
   }
-
   const on=boss?.awkEnable||false;
   document.getElementById('awk-tog').classList.toggle('on',on);
   document.getElementById('awk-fields').classList.toggle('show',on);
@@ -1360,10 +1012,7 @@ function saveBoss(){
   const awkN=parseInt(document.getElementById('f-awk-n').value)||4;
   const awkName=document.getElementById('f-awk-name').value.trim()||(name+' (각성)');
   const awkHours=parseFloat(document.getElementById('f-awk-hours').value)||48;
-
   if(bossType==='fixed'&&!fixedTimes.length){alert('리젠 시각을 하나 이상 추가해 주세요.');return;}
-
-  // 리젠 예정 시각 처리 (처치 기반만)
   let newLastKill=null;
   if(bossType==='kill'){
     const spawnDate=document.getElementById('f-spawn-date').value;
@@ -1372,7 +1021,6 @@ function saveBoss(){
     newLastKill=spawnMs?spawnMs-hours*3600000:null;
   }
   const newCnt=parseInt(document.getElementById('f-cnt').value)||0;
-
   if(editId){
     bosses=bosses.map(b=>b.id===editId?{...b,name,zone,hours,bossType,fixedTimes,awkEnable,awkN,awkName,awkHours}:b);
     const k=getK(editId);
@@ -1392,13 +1040,6 @@ function delBoss(id){
   bosses=bosses.filter(x=>x.id!==id);delete kills[id];save();render();
 }
 
-// ═══════════════════════════════
-//  토스트
-// ═══════════════════════════════
-
-// ═══════════════════════════════
-//  FAB 토글
-// ═══════════════════════════════
 let fabOpen=false;
 function togFab(){
   fabOpen=!fabOpen;
@@ -1413,9 +1054,6 @@ document.addEventListener('click',e=>{
   }
 });
 
-// ═══════════════════════════════
-//  이벤트 모달
-// ═══════════════════════════════
 const CAT_LABEL={hunt:'사냥',guild:'길드',siege:'공성',event:'이벤트',etc:'기타'};
 const CAT_CLS={hunt:'cat-hunt',guild:'cat-guild',siege:'cat-siege',event:'cat-event',etc:'cat-etc'};
 const DAY_KR=['일','월','화','수','목','금','토','매일'];
@@ -1430,47 +1068,25 @@ function setEvType(type){
   document.getElementById('ev-type-fixed').classList.toggle('on',type==='fixed');
   document.getElementById('ev-type-period').classList.toggle('on',type==='period');
   document.getElementById('ev-type-once').classList.toggle('on',type==='once');
-  // 타입 전환 시 해당 타입의 시간 select 옵션 채우기 (비어있으면)
-  if(type==='repeat'){
-    if(!document.getElementById('ev-start-h')?.options.length){fillHM('ev-start-h','ev-start-m','20:00');}
-    if(!document.getElementById('ev-end-h')?.options.length){fillHM('ev-end-h','ev-end-m','22:00');}
-  }else if(type==='period'){
-    if(!document.getElementById('ev-pstart-h')?.options.length){fillHM('ev-pstart-h','ev-pstart-m','00:00');}
-    if(!document.getElementById('ev-pend-h')?.options.length){fillHM('ev-pend-h','ev-pend-m','00:00');}
-  }else if(type==='once'){
-    if(!document.getElementById('ev-once-h')?.options.length){fillHM('ev-once-h','ev-once-m','20:00');}
-  }else if(type==='fixed'){
-    if(!document.getElementById('ev-fixed-times-wrap')?.children.length){addEvFixedTimeRow();}
-  }
+  if(type==='repeat'){if(!document.getElementById('ev-start-h')?.options.length){fillHM('ev-start-h','ev-start-m','20:00');}if(!document.getElementById('ev-end-h')?.options.length){fillHM('ev-end-h','ev-end-m','22:00');}}
+  else if(type==='period'){if(!document.getElementById('ev-pstart-h')?.options.length){fillHM('ev-pstart-h','ev-pstart-m','00:00');}if(!document.getElementById('ev-pend-h')?.options.length){fillHM('ev-pend-h','ev-pend-m','00:00');}}
+  else if(type==='once'){if(!document.getElementById('ev-once-h')?.options.length){fillHM('ev-once-h','ev-once-m','20:00');}}
+  else if(type==='fixed'){if(!document.getElementById('ev-fixed-times-wrap')?.children.length){addEvFixedTimeRow();}}
 }
-
-// 고정 시간 이벤트 행 추가
-function addEvFixedTimeRow(day=1, hh='20', mm='00'){
+function addEvFixedTimeRow(day=1,hh='20',mm='00'){
   const wrap=document.getElementById('ev-fixed-times-wrap');
   const dayOpts=DAY_KR2.map((d,i)=>`<option value="${i}"${i===day?'selected':''}>${d}</option>`).join('');
   let hOpts='',mOpts='';
   for(let i=0;i<24;i++){const v=String(i).padStart(2,'0');hOpts+=`<option value="${v}"${v===hh?'selected':''}>${v}</option>`;}
   for(let i=0;i<60;i++){const v=String(i).padStart(2,'0');mOpts+=`<option value="${v}"${v===mm?'selected':''}>${v}</option>`;}
-  const row=document.createElement('div');
-  row.className='fixed-time-row';
-  row.innerHTML=`<select class="fixed-day-sel">${dayOpts}</select>
-    <span class="fixed-time-sep">요일</span>
-    <select class="fixed-hm-sel hh">${hOpts}</select>
-    <span class="hm-colon">:</span>
-    <select class="fixed-hm-sel mm">${mOpts}</select>
-    <button type="button" class="fixed-del-btn" onclick="this.parentElement.remove()">✕</button>`;
+  const row=document.createElement('div');row.className='fixed-time-row';
+  row.innerHTML=`<select class="fixed-day-sel">${dayOpts}</select><span class="fixed-time-sep">요일</span><select class="fixed-hm-sel hh">${hOpts}</select><span class="hm-colon">:</span><select class="fixed-hm-sel mm">${mOpts}</select><button type="button" class="fixed-del-btn" onclick="this.parentElement.remove()">✕</button>`;
   wrap.appendChild(row);
 }
-
 function getEvFixedTimes(){
   const rows=document.querySelectorAll('#ev-fixed-times-wrap .fixed-time-row');
   const times=[];
-  rows.forEach(row=>{
-    const day=parseInt(row.querySelector('.fixed-day-sel').value);
-    const hh=row.querySelector('.hh').value;
-    const mm=row.querySelector('.mm').value;
-    times.push({day,hh,mm});
-  });
+  rows.forEach(row=>{const day=parseInt(row.querySelector('.fixed-day-sel').value);const hh=row.querySelector('.hh').value;const mm=row.querySelector('.mm').value;times.push({day,hh,mm});});
   return times;
 }
 function openEventModal(ev=null){
@@ -1480,18 +1096,14 @@ function openEventModal(ev=null){
   document.getElementById('ev-name').value=ev?.name||'';
   document.getElementById('ev-cat').value=ev?.cat||'hunt';
   document.getElementById('ev-memo').value=ev?.memo||'';
-
   const evType=ev?.evType||'repeat';
   setEvType(evType);
-
   if(evType==='fixed'){
     document.getElementById('ev-fixed-times-wrap').innerHTML='';
-    if(ev?.fixedTimes?.length){ev.fixedTimes.forEach(ft=>addEvFixedTimeRow(ft.day,ft.hh,ft.mm));}
-    else{addEvFixedTimeRow();}
+    if(ev?.fixedTimes?.length){ev.fixedTimes.forEach(ft=>addEvFixedTimeRow(ft.day,ft.hh,ft.mm));}else{addEvFixedTimeRow();}
     document.querySelectorAll('.dp-btn').forEach(btn=>{btn.classList.remove('on');btn.onclick=()=>btn.classList.toggle('on');});
   }else if(evType==='period'){
-    const ps=ev?.pstart?new Date(ev.pstart):null;
-    const pe=ev?.pend?new Date(ev.pend):null;
+    const ps=ev?.pstart?new Date(ev.pstart):null,pe=ev?.pend?new Date(ev.pend):null;
     document.getElementById('ev-pstart-date').value=ps?toDatePart(ps.getTime()):'';
     fillHM('ev-pstart-h','ev-pstart-m',ps?toTimePart(ps.getTime()):'00:00');
     document.getElementById('ev-pend-date').value=pe?toDatePart(pe.getTime()):'';
@@ -1505,11 +1117,7 @@ function openEventModal(ev=null){
   }else{
     fillHM('ev-start-h','ev-start-m',stripSec(ev?.start)||'20:00');
     fillHM('ev-end-h','ev-end-m',stripSec(ev?.end)||'22:00');
-    document.querySelectorAll('.dp-btn').forEach(btn=>{
-      const d=parseInt(btn.dataset.d);
-      btn.classList.toggle('on',ev?ev.days.includes(d):false);
-      btn.onclick=()=>btn.classList.toggle('on');
-    });
+    document.querySelectorAll('.dp-btn').forEach(btn=>{const d=parseInt(btn.dataset.d);btn.classList.toggle('on',ev?ev.days.includes(d):false);btn.onclick=()=>btn.classList.toggle('on');});
   }
   document.getElementById('evl').classList.add('on');
 }
@@ -1522,7 +1130,6 @@ function saveEvent(){
   const memo=document.getElementById('ev-memo').value.trim();
   const activeType=['repeat','fixed','period','once'].find(t=>document.getElementById('ev-type-'+t).classList.contains('on'))||'repeat';
   let evData={id:editEvId||Date.now(),name,cat,memo,evType:activeType};
-
   if(activeType==='fixed'){
     const fixedTimes=getEvFixedTimes();
     if(!fixedTimes.length){alert('시각을 하나 이상 추가해 주세요.');return;}
@@ -1532,22 +1139,18 @@ function saveEvent(){
     const pendMs=hmDateToMs(document.getElementById('ev-pend-date').value,'ev-pend-h','ev-pend-m');
     if(!pstartMs||!pendMs){alert('시작/종료 날짜·시각을 모두 입력해 주세요.');return;}
     if(pendMs<=pstartMs){alert('종료 시각이 시작 시각보다 늦어야 합니다.');return;}
-    const pstart=new Date(pstartMs).toISOString(),pend=new Date(pendMs).toISOString();
-    evData={...evData,pstart,pend,days:[],start:'',end:'',onceDt:''};
+    evData={...evData,pstart:new Date(pstartMs).toISOString(),pend:new Date(pendMs).toISOString(),days:[],start:'',end:'',onceDt:''};
   }else if(activeType==='once'){
     const onceDtMs=hmDateToMs(document.getElementById('ev-once-date').value,'ev-once-h','ev-once-m');
     if(!onceDtMs){alert('날짜·시각을 입력해 주세요.');return;}
-    const onceDt=new Date(onceDtMs).toISOString();
-    evData={...evData,onceDt,days:[],start:'',end:'',pstart:'',pend:''};
+    evData={...evData,onceDt:new Date(onceDtMs).toISOString(),days:[],start:'',end:'',pstart:'',pend:''};
   }else{
-    const start=getSelHM('ev-start-h','ev-start-m');
-    const end=getSelHM('ev-end-h','ev-end-m');
+    const start=getSelHM('ev-start-h','ev-start-m'),end=getSelHM('ev-end-h','ev-end-m');
     const days=[...document.querySelectorAll('.dp-btn.on')].map(b=>parseInt(b.dataset.d));
     if(!days.length){alert('요일을 하나 이상 선택해 주세요.');return;}
     evData={...evData,start,end,days,pstart:'',pend:'',onceDt:''};
   }
-  if(editEvId){events=events.map(e=>e.id===editEvId?evData:e);}
-  else{events.push(evData);}
+  if(editEvId){events=events.map(e=>e.id===editEvId?evData:e);}else{events.push(evData);}
   save();closeEventModal();
   if(curTab==='sched')buildSchedView();
   showToast(editEvId?'이벤트 수정 완료':'이벤트 추가 완료');
@@ -1558,26 +1161,14 @@ function delEvent(id){
   if(curTab==='sched')buildSchedView();
   showToast('이벤트 삭제 완료');
 }
-
-// 오늘 해당 이벤트 필터 (반복 + 기간 모두)
 function todayEvents(){
-  const now=new Date();
-  const dow=now.getDay();
+  const now=new Date(),dow=now.getDay();
   const todayStart=new Date(now);todayStart.setHours(0,0,0,0);
   const todayEnd=new Date(now);todayEnd.setHours(23,59,59,999);
   return events.filter(ev=>{
-    if(ev.evType==='period'){
-      const ps=new Date(ev.pstart),pe=new Date(ev.pend);
-      return ps<=todayEnd&&pe>=todayStart;
-    }
-    if(ev.evType==='once'){
-      const od=new Date(ev.onceDt);
-      return od>=todayStart&&od<=todayEnd;
-    }
-    if(ev.evType==='fixed'){
-      // 오늘 요일에 해당하는 고정 시각이 있으면 포함
-      return ev.fixedTimes?.some(ft=>ft.day===dow);
-    }
+    if(ev.evType==='period'){const ps=new Date(ev.pstart),pe=new Date(ev.pend);return ps<=todayEnd&&pe>=todayStart;}
+    if(ev.evType==='once'){const od=new Date(ev.onceDt);return od>=todayStart&&od<=todayEnd;}
+    if(ev.evType==='fixed'){return ev.fixedTimes?.some(ft=>ft.day===dow);}
     return ev.days.includes(7)||ev.days.includes(dow);
   });
 }
@@ -1585,7 +1176,6 @@ function todayEvents(){
 // ═══════════════════════════════
 //  일정표 뷰 빌드
 // ═══════════════════════════════
-// 공통: 오늘 보스 아이템 수집
 function getTodayBossItems(){
   const now=new Date(),nowMs=now.getTime();
   const today=new Date();today.setHours(0,0,0,0);
@@ -1593,19 +1183,14 @@ function getTodayBossItems(){
   const items=[];
   bosses.forEach(boss=>{
     const k=getK(boss.id);
-    if(k.awkActive){
-      items.push({bossId:boss.id,name:boss.awkName,sub:boss.zone+' · 각성 출현',timeMs:0,isPast:true,state:'awaken'});
-      return;
-    }
+    if(k.awkActive){items.push({bossId:boss.id,name:boss.awkName,sub:boss.zone+' · 각성 출현',timeMs:0,isPast:true,state:'awaken'});return;}
     if(boss.bossType==='fixed'){
-      // 고정 보스: 오늘의 모든 리젠 시각 각각 추가
       const spawns=getTodayFixedSpawns(boss);
       const next=getNextFixedMs(boss);
       spawns.forEach(sm=>{
         const isPast=sm<=nowMs;
-        const isNext=next&&Math.abs(sm-next)<60000&&sm>nowMs;
         const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
-        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':(isNext?'wait':'wait'),isFixed:true,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
+        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':'wait',isFixed:true,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
       });
       return;
     }
@@ -1621,66 +1206,40 @@ function getTodayBossItems(){
   items.sort((a,b)=>a.timeMs-b.timeMs);
   return items;
 }
-
-// 고정 패널 (입력창) 렌더 — 최초 1회 또는 탭 전환 시만 호출
-function buildSchedView(){
-  buildSchedContent();
-}
-
+function buildSchedView(){buildSchedContent();}
 function buildSchedContent(){
-  const now=new Date();
-  const nowMs=now.getTime();
-  const dow=now.getDay();
+  const now=new Date(),nowMs=now.getTime(),dow=now.getDay();
   const dateStr=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
   const bossItems=getTodayBossItems();
-
-  // 오늘 이벤트 수집
   const evItems=[];
   todayEvents().forEach(ev=>{
     let startMs,endMs,timeLabel;
     if(ev.evType==='period'){
-      startMs=new Date(ev.pstart).getTime();
-      endMs=new Date(ev.pend).getTime();
+      startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();
       const ps=new Date(ev.pstart),pe=new Date(ev.pend);
       const fmtDT=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
       timeLabel=`${fmtDT(ps)} ~ ${fmtDT(pe)}`;
     }else if(ev.evType==='once'){
-      startMs=new Date(ev.onceDt).getTime();
-      endMs=startMs+3600000; // 단일은 1시간 폭으로 처리 (진행중 판정용)
+      startMs=new Date(ev.onceDt).getTime();endMs=startMs+3600000;
       const od=new Date(ev.onceDt);
       timeLabel=`${String(od.getMonth()+1).padStart(2,'0')}/${String(od.getDate()).padStart(2,'0')} ${String(od.getHours()).padStart(2,'0')}:${String(od.getMinutes()).padStart(2,'0')}`;
     }else{
-      const [sh,sm2]=ev.start.split(':').map(Number);
-      const [eh,em]=ev.end.split(':').map(Number);
-      startMs=new Date().setHours(sh,sm2,0,0);
-      endMs=new Date().setHours(eh,em,0,0);
+      const [sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);
+      startMs=new Date().setHours(sh,sm2,0,0);endMs=new Date().setHours(eh,em,0,0);
       timeLabel=`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;
     }
-    const isPast=endMs<=nowMs;
-    const isNow=startMs<=nowMs&&nowMs<endMs;
-    evItems.push({...ev,startMs,endMs,timeLabel,isPast,isNow});
+    evItems.push({...ev,startMs,endMs,timeLabel,isPast:endMs<=nowMs,isNow:startMs<=nowMs&&nowMs<endMs});
   });
   evItems.sort((a,b)=>a.startMs-b.startMs);
-
   const wrap=document.getElementById('sched-wrap');
-  let html=`<div class="sched-top">
-    <div><div class="sched-title">오늘의 결사 일정</div><div class="sched-date">${dateStr}</div></div>
-    <button class="sched-shot-btn" onclick="openShotPanel()">📷 스크린샷용</button>
-  </div>`;
-
-  // ── 보스일정 시작 시간 패널 ──
-  // 시작 시간까지 리젠되는 보스들 계산
-  // 보스 블록
-  html+=`<div class="sched-block">
-    <div class="sched-blk-hdr boss">⚔ 보스 리젠 (오늘)</div>`;
-  if(!bossItems.length){
-    html+=`<div class="sched-empty">오늘 리젠 예정 보스가 없습니다.</div>`;
-  }else{
+  let html=`<div class="sched-top"><div><div class="sched-title">오늘의 결사 일정</div><div class="sched-date">${dateStr}</div></div><button class="sched-shot-btn" onclick="openShotPanel()">📷 스크린샷용</button></div>`;
+  html+=`<div class="sched-block"><div class="sched-blk-hdr boss">⚔ 보스 리젠 (오늘)</div>`;
+  if(!bossItems.length){html+=`<div class="sched-empty">오늘 리젠 예정 보스가 없습니다.</div>`;}
+  else{
     bossItems.forEach(it=>{
       const dot=it.state==='awaken'?'#9b7fe8':it.state==='ready'?'#4caf7d':'#c9a84c';
       const timeStr=it.timeMs?fmtHHMM(it.timeMs):'현재';
       const timeCls=it.isPast?' past':'';
-      // 각성 알림
       let awkHtml='';
       if(it.awkEnable&&it.state!=='awaken'){
         const afterKill=it.cnt+1;
@@ -1689,168 +1248,81 @@ function buildSchedContent(){
       }
       html+=`<div class="sched-row" style="${it.awkEnable&&(it.cnt+1)>=it.awkN&&it.state!=='awaken'?'background:rgba(155,127,232,.04);border-left:2px solid var(--purple);':''}">
         <div class="sched-dot" style="background:${dot}"></div>
-        <div class="sched-row-left">
-          <div class="sched-row-name">${it.name}</div>
-          <div class="sched-row-sub">${it.sub}</div>
-          ${awkHtml}
-        </div>
-        <div class="sched-row-right">
-          <div class="sched-row-time${timeCls}">${it.isPast&&it.state!=='awaken'?'리젠됨':timeStr}</div>
-          <div class="sched-row-badge">${it.state==='awaken'?'각성 출현 중':it.isPast?'처치 가능':'리젠 예정'}</div>
-        </div>
+        <div class="sched-row-left"><div class="sched-row-name">${it.name}</div><div class="sched-row-sub">${it.sub}</div>${awkHtml}</div>
+        <div class="sched-row-right"><div class="sched-row-time${timeCls}">${it.isPast&&it.state!=='awaken'?'리젠됨':timeStr}</div><div class="sched-row-badge">${it.state==='awaken'?'각성 출현 중':it.isPast?'처치 가능':'리젠 예정'}</div></div>
       </div>`;
     });
   }
   html+=`</div>`;
-
-  // 이벤트 블록
-  html+=`<div class="sched-block">
-    <div class="sched-blk-hdr event">📅 오늘의 이벤트</div>`;
-  if(!evItems.length){
-    html+=`<div class="sched-empty">오늘 등록된 이벤트가 없습니다.<br>+ 버튼으로 추가해 주세요.</div>`;
-  }else{
+  html+=`<div class="sched-block"><div class="sched-blk-hdr event">📅 오늘의 이벤트</div>`;
+  if(!evItems.length){html+=`<div class="sched-empty">오늘 등록된 이벤트가 없습니다.<br>+ 버튼으로 추가해 주세요.</div>`;}
+  else{
     evItems.forEach(ev=>{
       const dot=DOT_COLOR[ev.cat]||'#8888a8';
       const timeCls=ev.isPast?' past':ev.isNow?' now':'';
       const badge=ev.isPast?'종료':ev.isNow?'진행 중':'예정';
       const periodMark=ev.evType==='period'?` <span class="ev-period-chip">기간</span>`:'';
-      html+=`<div class="sched-row">
-        <div class="sched-dot" style="background:${dot}"></div>
-        <div class="sched-row-left">
-          <div class="sched-row-name">${ev.name}${periodMark}</div>
-          <div class="sched-row-sub">${CAT_LABEL[ev.cat]}${ev.memo?' · '+ev.memo:''}</div>
-        </div>
-        <div class="sched-row-right">
-          <div class="sched-row-time${timeCls}" style="font-size:${ev.evType==='period'?'11':'14'}px">${ev.timeLabel}</div>
-          <div class="sched-row-badge">${badge}</div>
-        </div>
+      html+=`<div class="sched-row"><div class="sched-dot" style="background:${dot}"></div>
+        <div class="sched-row-left"><div class="sched-row-name">${ev.name}${periodMark}</div><div class="sched-row-sub">${CAT_LABEL[ev.cat]}${ev.memo?' · '+ev.memo:''}</div></div>
+        <div class="sched-row-right"><div class="sched-row-time${timeCls}" style="font-size:${ev.evType==='period'?'11':'14'}px">${ev.timeLabel}</div><div class="sched-row-badge">${badge}</div></div>
       </div>`;
     });
   }
   html+=`</div>`;
-
-  // ── 내일 새벽 일정 (00:00~07:59) ──
   const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+1);tmrStart.setHours(0,0,0,0);
   const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+1);tmrEnd.setHours(8,0,0,0);
-  const tmrStartMs=tmrStart.getTime(),tmrEndMs=tmrEnd.getTime();
+  const tmrStartMs=tmrStart.getTime(),tmrEndMs=tmrEnd.getTime(),tmrDow=tmrStart.getDay();
   const dawnItems=[];
-
-  // 내일 새벽 보스
   bosses.forEach(boss=>{
     const k=getK(boss.id);
     if(boss.bossType==='fixed'){
-      boss.fixedTimes?.forEach(ft=>{
-        const tmrDow=tmrStart.getDay();
-        if(ft.day!==tmrDow)return;
-        const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);
-        const ms=d.getTime();
-        if(ms>=tmrStartMs&&ms<tmrEndMs){
-          const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
-          dawnItems.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:ms});
-        }
-      });
+      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:ms});}});
     }else if(k.lastKill&&!k.awkActive){
       const sm=k.lastKill+boss.hours*3600000;
-      if(sm>=tmrStartMs&&sm<tmrEndMs){
-        const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
-        dawnItems.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:sm});
-      }
+      if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:sm});}
     }
   });
-
-  // 내일 새벽 이벤트
-  const tmrDow=tmrStart.getDay();
   events.forEach(ev=>{
-    if(ev.evType==='period'){
-      const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();
-      if(ps<tmrEndMs&&pe>tmrStartMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});
-    }else if(ev.evType==='fixed'){
-      ev.fixedTimes?.forEach(ft=>{
-        if(ft.day!==tmrDow)return;
-        const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);
-        const ms=d.getTime();
-        if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
-      });
-    }else if(ev.evType==='once'){
-      const ms=new Date(ev.onceDt).getTime();
-      if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
-    }else if(ev.evType==='repeat'){
-      if(ev.days.includes(7)||ev.days.includes(tmrDow)){
-        const[sh,sm2]=ev.start.split(':').map(Number);
-        const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);
-        const ms=d.getTime();
-        if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
-      }
-    }
+    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<tmrEndMs&&pe>tmrStartMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});}
+    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});});}
+    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
+    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
   });
   dawnItems.sort((a,b)=>a.timeMs-b.timeMs);
-
   if(dawnItems.length){
     const tmrDateStr=`${String(tmrStart.getMonth()+1).padStart(2,'0')}/${String(tmrStart.getDate()).padStart(2,'0')}`;
-    html+=`<div class="sched-block">
-      <div class="sched-blk-hdr dawn">🌙 내일 새벽 일정 <span class="dawn-badge">${tmrDateStr} 00:00~08:00</span></div>`;
+    html+=`<div class="sched-block"><div class="sched-blk-hdr dawn">🌙 내일 새벽 일정 <span class="dawn-badge">${tmrDateStr} 00:00~08:00</span></div>`;
     dawnItems.forEach(it=>{
       const dot=it.type==='boss'?'#c9a84c':(DOT_COLOR[it.cat]||'#8888a8');
-      html+=`<div class="sched-row">
-        <div class="sched-dot" style="background:${dot}"></div>
-        <div class="sched-row-left">
-          <div class="sched-row-name">${it.name}</div>
-          <div class="sched-row-sub">${it.sub}</div>
-        </div>
-        <div class="sched-row-right">
-          <div class="sched-row-time">${fmtHHMM(it.timeMs)}</div>
-          <div class="sched-row-badge">${it.type==='boss'?'리젠 예정':'예정'}</div>
-        </div>
+      html+=`<div class="sched-row"><div class="sched-dot" style="background:${dot}"></div>
+        <div class="sched-row-left"><div class="sched-row-name">${it.name}</div><div class="sched-row-sub">${it.sub}</div></div>
+        <div class="sched-row-right"><div class="sched-row-time">${fmtHHMM(it.timeMs)}</div><div class="sched-row-badge">${it.type==='boss'?'리젠 예정':'예정'}</div></div>
       </div>`;
     });
     html+=`</div>`;
   }
-
-  // 이벤트 관리 목록
-  html+=`<div style="margin-top:16px">
-    <div class="sec-hdr"><span class="sec-title">등록된 이벤트 목록</span></div>
-    <div class="ev-list" id="ev-manage">`;
-  if(!events.length){
-    html+=`<div class="empty">등록된 이벤트가 없습니다.</div>`;
-  }else{
+  html+=`<div style="margin-top:16px"><div class="sec-hdr"><span class="sec-title">등록된 이벤트 목록</span></div><div class="ev-list" id="ev-manage">`;
+  if(!events.length){html+=`<div class="empty">등록된 이벤트가 없습니다.</div>`;}
+  else{
     events.forEach(ev=>{
       const isPeriod=ev.evType==='period';
       let schedInfo='';
       if(ev.evType==='fixed'){
-        const grouped={};
-        (ev.fixedTimes||[]).forEach(ft=>{
-          if(!grouped[ft.day])grouped[ft.day]=[];
-          grouped[ft.day].push(`${ft.hh}:${ft.mm}`);
-        });
+        const grouped={};(ev.fixedTimes||[]).forEach(ft=>{if(!grouped[ft.day])grouped[ft.day]=[];grouped[ft.day].push(`${ft.hh}:${ft.mm}`);});
         const rows=Object.entries(grouped).map(([d,times])=>`<span class="ev-day-chip">${DAY_KR2[d]} ${times.join('·')}</span>`).join('');
-        schedInfo=`<div class="ev-days-row"><span class="ev-period-chip" style="background:rgba(91,156,240,.1);color:var(--blue);border-color:rgba(91,156,240,.3)">🕐 고정</span></div>
-          <div class="ev-days-row">${rows}</div>
-          <div class="ev-time-row"><span class="ev-memo">${ev.memo||''}</span></div>`;
+        schedInfo=`<div class="ev-days-row"><span class="ev-period-chip" style="background:rgba(91,156,240,.1);color:var(--blue);border-color:rgba(91,156,240,.3)">🕐 고정</span></div><div class="ev-days-row">${rows}</div><div class="ev-time-row"><span class="ev-memo">${ev.memo||''}</span></div>`;
       }else if(ev.evType==='once'){
         const od=new Date(ev.onceDt);
         const fmtDT2=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-        schedInfo=`<div class="ev-days-row"><span class="ev-period-chip" style="background:rgba(224,90,90,.1);color:var(--red);border-color:rgba(224,90,90,.3)">📌 단일</span></div>
-          <div class="ev-time-row"><span class="ev-time" style="font-size:12px">${fmtDT2(od)}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
+        schedInfo=`<div class="ev-days-row"><span class="ev-period-chip" style="background:rgba(224,90,90,.1);color:var(--red);border-color:rgba(224,90,90,.3)">📌 단일</span></div><div class="ev-time-row"><span class="ev-time" style="font-size:12px">${fmtDT2(od)}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
       }else if(isPeriod){
         const fmtDT=s=>{const d=new Date(s);return`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;};
-        schedInfo=`<div class="ev-days-row"><span class="ev-period-chip">📆 기간</span></div>
-          <div class="ev-time-row"><span class="ev-time" style="font-size:12px">${fmtDT(ev.pstart)} ~ ${fmtDT(ev.pend)}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
+        schedInfo=`<div class="ev-days-row"><span class="ev-period-chip">📆 기간</span></div><div class="ev-time-row"><span class="ev-time" style="font-size:12px">${fmtDT(ev.pstart)} ~ ${fmtDT(ev.pend)}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
       }else{
         const dayStr=ev.days.includes(7)?'매일':ev.days.map(d=>DAY_KR[d]).join('·');
-        schedInfo=`<div class="ev-days-row"><span class="ev-day-chip">${dayStr}</span></div>
-          <div class="ev-time-row"><span class="ev-time">${ev.start} ~ ${ev.end}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
+        schedInfo=`<div class="ev-days-row"><span class="ev-day-chip">${dayStr}</span></div><div class="ev-time-row"><span class="ev-time">${ev.start} ~ ${ev.end}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
       }
-      html+=`<div class="ev-card">
-        <div class="ev-card-top">
-          <span class="ev-name">${ev.name}</span>
-          <span class="ev-cat-badge ${CAT_CLS[ev.cat]}">${CAT_LABEL[ev.cat]}</span>
-        </div>
-        ${schedInfo}
-        <div class="ev-actions">
-          <button class="cbtn" onclick="openEventModal(events.find(e=>e.id===${ev.id}))">편집</button>
-          <button class="cbtn danger" onclick="delEvent(${ev.id})">삭제</button>
-        </div>
-      </div>`;
+      html+=`<div class="ev-card"><div class="ev-card-top"><span class="ev-name">${ev.name}</span><span class="ev-cat-badge ${CAT_CLS[ev.cat]}">${CAT_LABEL[ev.cat]}</span></div>${schedInfo}<div class="ev-actions"><button class="cbtn" onclick="openEventModal(events.find(e=>e.id===${ev.id}))">편집</button><button class="cbtn danger" onclick="delEvent(${ev.id})">삭제</button></div></div>`;
     });
   }
   html+=`</div></div>`;
@@ -1862,139 +1334,72 @@ function buildSchedContent(){
 // ═══════════════════════════════
 function openShotPanel(){
   let panel=document.getElementById('shot-panel');
-  if(!panel){
-    panel=document.createElement('div');
-    panel.id='shot-panel';
-    panel.className='shot-panel';
-    document.body.appendChild(panel);
-  }
-  renderShotSetup(panel);
-  panel.classList.add('show');
+  if(!panel){panel=document.createElement('div');panel.id='shot-panel';panel.className='shot-panel';document.body.appendChild(panel);}
+  renderShotSetup(panel);panel.classList.add('show');
 }
-
-// 설정 상태 전역 보관 (다시 설정 시 복원용)
-let _shotState = { raidTime:'', bossChecks:null, evChecks:null };
-
+let _shotState={raidTime:'',bossChecks:null,evChecks:null};
 function renderShotSetup(panel){
   const now=new Date(),nowMs=now.getTime(),dow=now.getDay();
   const dateStr=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
   const bossItems=getTodayBossItems();
-
-  // 이벤트 목록 수집
   const evItems=_buildEvItems(nowMs);
-
-  // 체크 상태 초기화 (처음 열 때만)
-  if(_shotState.bossChecks===null) _shotState.bossChecks=new Set(bossItems.map((_,i)=>i));
-  if(_shotState.evChecks===null)   _shotState.evChecks=new Set(evItems.map((_,i)=>i));
-
-  const bossCheckRows = bossItems.length
-    ? bossItems.map((it,i)=>`
-        <label class="shot-check-row">
-          <input type="checkbox" class="shot-boss-chk" data-idx="${i}" ${_shotState.bossChecks.has(i)?'checked':''}>
-          <span class="shot-check-dot" style="background:${it.state==='awaken'?'#9b7fe8':it.isPast?'#4caf7d':'#c9a84c'}"></span>
-          <span class="shot-check-name">${it.name}</span>
-          <span class="shot-check-sub">${it.sub}${it.timeMs>0?` · 리젠 ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}`:''}</span>
-        </label>`).join('')
-    : '<div class="shot-empty">오늘 리젠 예정 보스 없음</div>';
-
-  const evCheckRows = evItems.length
-    ? evItems.map((ev,i)=>`
-        <label class="shot-check-row">
-          <input type="checkbox" class="shot-ev-chk" data-idx="${i}" ${_shotState.evChecks.has(i)?'checked':''}>
-          <span class="shot-check-dot" style="background:${DOT_COLOR[ev.cat]||'#8888a8'}"></span>
-          <span class="shot-check-name">${ev.name}</span>
-          <span class="shot-check-sub">${ev.timeLabel}</span>
-        </label>`).join('')
-    : '<div class="shot-empty">오늘 이벤트 없음</div>';
-
-  panel.innerHTML=`
-    <div class="shot-setup">
-      <div class="shot-setup-title">📋 일정표 생성</div>
-      <div class="shot-setup-date">${dateStr}</div>
-
-      <div class="shot-section-lbl">결사 일정 시작 시간 <span style="font-size:10px;font-weight:400;color:var(--t3)">(선택 — 입력 시 그룹 분리)</span></div>
-      <div class="shot-time-row">
-<div class="hm-row"><select class="shot-hm-sel" id="shot-time-h" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select><span class="hm-colon" style="color:var(--purple2)">:</span><select class="shot-hm-sel" id="shot-time-m" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select></div>
-        ${_shotState.raidTime?`<button class="raid-clear-btn" onclick="_shotState.raidTime='';fillHM('shot-time-h','shot-time-m','00:00')">초기화</button>`:''}
-      </div>
-
-      <div class="shot-section-lbl">⚔ 보스 선택</div>
-      <div class="shot-check-list" id="shot-boss-list">${bossCheckRows}</div>
-
-      <div class="shot-section-lbl">📅 이벤트 선택</div>
-      <div class="shot-check-list" id="shot-ev-list">${evCheckRows}</div>
-
-      <button class="shot-generate-btn" onclick="_saveShotChecks();renderShotResult(document.getElementById('shot-panel'))">일정표 생성 →</button>
-      <button class="shot-close" style="width:100%;margin-top:8px" onclick="_resetShotState();document.getElementById('shot-panel').classList.remove('show')">닫기</button>
-    </div>`;
-  // innerHTML 교체 후 select 옵션 채우기
+  if(_shotState.bossChecks===null)_shotState.bossChecks=new Set(bossItems.map((_,i)=>i));
+  if(_shotState.evChecks===null)_shotState.evChecks=new Set(evItems.map((_,i)=>i));
+  const bossCheckRows=bossItems.length
+    ?bossItems.map((it,i)=>`<label class="shot-check-row"><input type="checkbox" class="shot-boss-chk" data-idx="${i}" ${_shotState.bossChecks.has(i)?'checked':''}><span class="shot-check-dot" style="background:${it.state==='awaken'?'#9b7fe8':it.isPast?'#4caf7d':'#c9a84c'}"></span><span class="shot-check-name">${it.name}</span><span class="shot-check-sub">${it.sub}${it.timeMs>0?` · 리젠 ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}`:''}</span></label>`).join('')
+    :'<div class="shot-empty">오늘 리젠 예정 보스 없음</div>';
+  const evCheckRows=evItems.length
+    ?evItems.map((ev,i)=>`<label class="shot-check-row"><input type="checkbox" class="shot-ev-chk" data-idx="${i}" ${_shotState.evChecks.has(i)?'checked':''}><span class="shot-check-dot" style="background:${DOT_COLOR[ev.cat]||'#8888a8'}"></span><span class="shot-check-name">${ev.name}</span><span class="shot-check-sub">${ev.timeLabel}</span></label>`).join('')
+    :'<div class="shot-empty">오늘 이벤트 없음</div>';
+  panel.innerHTML=`<div class="shot-setup">
+    <div class="shot-setup-title">📋 일정표 생성</div><div class="shot-setup-date">${dateStr}</div>
+    <div class="shot-section-lbl">결사 일정 시작 시간 <span style="font-size:10px;font-weight:400;color:var(--t3)">(선택 — 입력 시 그룹 분리)</span></div>
+    <div class="shot-time-row"><div class="hm-row"><select class="shot-hm-sel" id="shot-time-h" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select><span class="hm-colon" style="color:var(--purple2)">:</span><select class="shot-hm-sel" id="shot-time-m" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select></div>${_shotState.raidTime?`<button class="raid-clear-btn" onclick="_shotState.raidTime='';fillHM('shot-time-h','shot-time-m','00:00')">초기화</button>`:''}</div>
+    <div class="shot-section-lbl">⚔ 보스 선택</div><div class="shot-check-list" id="shot-boss-list">${bossCheckRows}</div>
+    <div class="shot-section-lbl">📅 이벤트 선택</div><div class="shot-check-list" id="shot-ev-list">${evCheckRows}</div>
+    <button class="shot-generate-btn" onclick="_saveShotChecks();renderShotResult(document.getElementById('shot-panel'))">일정표 생성 →</button>
+    <button class="shot-close" style="width:100%;margin-top:8px" onclick="_resetShotState();document.getElementById('shot-panel').classList.remove('show')">닫기</button>
+  </div>`;
   const [_sh,_sm]=(stripSec(_shotState.raidTime)||'00:00').split(':');
-  fillHour('shot-time-h', _sh||'00');
-  fillMin('shot-time-m', _sm||'00');
+  fillHour('shot-time-h',_sh||'00');fillMin('shot-time-m',_sm||'00');
 }
-
-
-
 function _saveShotChecks(){
-  _shotState.bossChecks = new Set(
-    [...document.querySelectorAll('.shot-boss-chk:checked')].map(el=>parseInt(el.dataset.idx))
-  );
-  _shotState.evChecks = new Set(
-    [...document.querySelectorAll('.shot-ev-chk:checked')].map(el=>parseInt(el.dataset.idx))
-  );
-  _shotState.raidTime = getSelHM('shot-time-h','shot-time-m');
+  _shotState.bossChecks=new Set([...document.querySelectorAll('.shot-boss-chk:checked')].map(el=>parseInt(el.dataset.idx)));
+  _shotState.evChecks=new Set([...document.querySelectorAll('.shot-ev-chk:checked')].map(el=>parseInt(el.dataset.idx)));
+  _shotState.raidTime=getSelHM('shot-time-h','shot-time-m');
 }
-
-function _resetShotState(){
-  _shotState = { raidTime:'', bossChecks:null, evChecks:null };
-}
-
+function _resetShotState(){_shotState={raidTime:'',bossChecks:null,evChecks:null};}
 function _buildEvItems(nowMs){
   const items=[];
   todayEvents().forEach(ev=>{
     let startMs,endMs,timeLabel;
-    if(ev.evType==='period'){
-      startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();
-      const fmtDT=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-      timeLabel=`${fmtDT(new Date(ev.pstart))} ~ ${fmtDT(new Date(ev.pend))}`;
-    }else if(ev.evType==='once'){
-      const od=new Date(ev.onceDt);startMs=od.getTime();endMs=startMs+3600000;
-      timeLabel=`${String(od.getMonth()+1).padStart(2,'0')}/${String(od.getDate()).padStart(2,'0')} ${String(od.getHours()).padStart(2,'0')}:${String(od.getMinutes()).padStart(2,'0')}`;
-    }else{
-      const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);
-      startMs=new Date().setHours(sh,sm2,0,0);endMs=new Date().setHours(eh,em,0,0);
-      timeLabel=`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;
-    }
+    if(ev.evType==='period'){startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();const fmtDT=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;timeLabel=`${fmtDT(new Date(ev.pstart))} ~ ${fmtDT(new Date(ev.pend))}`;}
+    else if(ev.evType==='once'){const od=new Date(ev.onceDt);startMs=od.getTime();endMs=startMs+3600000;timeLabel=`${String(od.getMonth()+1).padStart(2,'0')}/${String(od.getDate()).padStart(2,'0')} ${String(od.getHours()).padStart(2,'0')}:${String(od.getMinutes()).padStart(2,'0')}`;}
+    else{const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);startMs=new Date().setHours(sh,sm2,0,0);endMs=new Date().setHours(eh,em,0,0);timeLabel=`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;}
     items.push({...ev,startMs,endMs,timeLabel,isPast:endMs<=nowMs,isNow:startMs<=nowMs&&nowMs<endMs});
   });
-  items.sort((a,b)=>a.startMs-b.startMs);
-  return items;
+  items.sort((a,b)=>a.startMs-b.startMs);return items;
 }
 
+// ── [수정 D,E,F] renderShotResult: 스크린샷 시간 표시 시인성 개선 ──
 function renderShotResult(panel){
   const now=new Date(),nowMs=now.getTime(),dow=now.getDay();
   const dateStr=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
+  const raidTimeVal=stripSec(_shotState.raidTime)||'';
+  let raidMs=null;
+  if(raidTimeVal){const[rh,rm]=raidTimeVal.split(':').map(Number);raidMs=new Date().setHours(rh,rm,0,0);}
+  const allBoss=getTodayBossItems();
+  const selBoss=allBoss.filter((_,i)=>(_shotState.bossChecks||new Set()).has(i));
+  const allEv=_buildEvItems(nowMs);
+  const selEv=allEv.filter((_,i)=>(_shotState.evChecks||new Set()).has(i));
+  const bossTarget=raidMs?selBoss.filter(it=>it.state==='awaken'||it.timeMs<=raidMs):selBoss;
+  const bossAfter=raidMs?selBoss.filter(it=>it.state!=='awaken'&&it.timeMs>raidMs):[];
 
-  // 상태에서 읽기 (DOM 교체 이전에 이미 _saveShotChecks로 저장됨)
-  const raidTimeVal = stripSec(_shotState.raidTime) || '';
-  let raidMs = null;
-  if(raidTimeVal){ const[rh,rm]=raidTimeVal.split(':').map(Number); raidMs=new Date().setHours(rh,rm,0,0); }
+  const W='#ffffff',BG='#f4f4f0',BD='rgba(0,0,0,.08)';
+  const T1='#1a1a2e',T2='#444455',T3='#888899';
 
-  const allBoss = getTodayBossItems();
-  const selBoss = allBoss.filter((_,i)=>(_shotState.bossChecks||new Set()).has(i));
-
-  const allEv  = _buildEvItems(nowMs);
-  const selEv  = allEv.filter((_,i)=>(_shotState.evChecks||new Set()).has(i));
-
-  const bossTarget = raidMs ? selBoss.filter(it=>it.state==='awaken'||it.timeMs<=raidMs) : selBoss;
-  const bossAfter  = raidMs ? selBoss.filter(it=>it.state!=='awaken'&&it.timeMs>raidMs)  : [];
-
-  // ── 밝은 테마 렌더 ──
-  const W='#ffffff', BG='#f4f4f0', BD='rgba(0,0,0,.08)';
-  const T1='#1a1a2e', T2='#444455', T3='#888899';
-
+  // [수정D] 보스 리젠 시간을 뱃지 스타일로 — 밝은 배경에서도 잘 보이도록
   const bossRow=(it,showBadge)=>{
-    // 각성 알림 라인
     const awkLine=(it.awkEnable&&it.state!=='awaken')
       ?((it.cnt+1)>=it.awkN
         ?`<div style="font-size:10px;font-weight:700;color:#7c5fcf;margin-top:4px;padding:2px 8px;background:#ede8fb;border:1px solid #c4b0f8;border-radius:4px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`
@@ -2005,13 +1410,14 @@ function renderShotResult(panel){
       <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${it.state==='awaken'?'#7c5fcf':it.isPast?'#2e9e5b':'#b8860b'}"></div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:700;color:${T1}">${it.name}</div>
-        <div style="font-size:11px;color:${T3};margin-top:1px">${it.sub}${it.timeMs>0?` · <span style="color:${it.isPast?'#2e9e5b':T2};font-weight:600">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</span>`:''}</div>
+        <div style="font-size:11px;color:${T3};margin-top:1px">${it.sub}${it.timeMs>0?` · <span style="background:${it.isPast?'#d4edda':'#fff3cd'};color:${it.isPast?'#155724':'#7a4f00'};font-weight:700;padding:2px 7px;border-radius:5px;font-size:12px;border:1px solid ${it.isPast?'rgba(21,87,36,.25)':'rgba(122,79,0,.25)'}">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</span>`:''}</div>
         ${awkLine}
       </div>
       ${showBadge?`<div style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;background:${it.isPast||it.state==='awaken'?'#e8f7ee':'#ede8fb'};color:${it.isPast||it.state==='awaken'?'#2e9e5b':'#7c5fcf'}">${it.isPast||it.state==='awaken'?'처치 가능':'시작 전'}</div>`:''}
     </div>`;
   };
 
+  // [수정E] 이벤트 시간을 뱃지 스타일로 — 상태별 색상 구분
   const evRow=(ev)=>`
     <div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${W}">
       <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${DOT_COLOR[ev.cat]||'#888899'}"></div>
@@ -2020,7 +1426,7 @@ function renderShotResult(panel){
         <div style="font-size:11px;color:${T3};margin-top:1px">${CAT_LABEL[ev.cat]}${ev.memo?' · '+ev.memo:''}</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
-        <div style="font-size:12px;font-weight:600;color:${ev.isPast?T3:ev.isNow?'#b86a00':T1}">${ev.timeLabel}</div>
+        <div style="font-size:12px;font-weight:700;background:${ev.isPast?'#e9ecef':ev.isNow?'#fff3cd':'#e8f0fe'};color:${ev.isPast?'#495057':ev.isNow?'#7a4f00':'#1a4a8a'};padding:3px 9px;border-radius:5px;display:inline-block;border:1px solid ${ev.isPast?'rgba(0,0,0,.1)':ev.isNow?'rgba(122,79,0,.2)':'rgba(26,74,138,.2)'}">${ev.timeLabel}</div>
         <div style="font-size:10px;color:${T3};margin-top:2px">${ev.isPast?'종료':ev.isNow?'진행 중':'예정'}</div>
       </div>
     </div>`;
@@ -2039,107 +1445,53 @@ function renderShotResult(panel){
       <div style="font-size:16px;font-weight:800;color:${T1}">⚔ 결사 오늘 일정</div>
       <div style="font-size:12px;font-weight:600;color:${T2}">${dateStr}</div>
     </div>
-    ${raidTimeVal?`<div style="display:flex;align-items:baseline;gap:8px;padding:8px 0;margin-bottom:14px;border-bottom:1.5px solid #b09ae8">
-      <div style="font-size:12px;color:#7c5fcf;font-weight:700;white-space:nowrap">결사 일정 시작 시간</div>
-      <div style="font-size:31px;font-weight:900;color:#5c3d9e;letter-spacing:3px;font-family:monospace;line-height:1">${raidTimeVal}</div>
-    </div>`:''}`;
+    ${raidTimeVal?`<div style="display:flex;align-items:baseline;gap:8px;padding:8px 0;margin-bottom:14px;border-bottom:1.5px solid #b09ae8"><div style="font-size:12px;color:#7c5fcf;font-weight:700;white-space:nowrap">결사 일정 시작 시간</div><div style="font-size:31px;font-weight:900;color:#5c3d9e;letter-spacing:3px;font-family:monospace;line-height:1">${raidTimeVal}</div></div>`:''}`;
 
   if(raidMs){
-    // 처치 대상 + 이후 리젠을 하나의 박스로
     const allBossRows=[];
-    if(bossTarget.length) allBossRows.push(bossTarget.map(it=>bossRow(it,true)).join(''));
-    if(bossAfter.length)  allBossRows.push(bossAfter.map(it=>bossRow(it,false)).join(''));
-    if(!bossTarget.length&&!bossAfter.length){
-      allBossRows.push(`<div style="padding:10px 12px;font-size:12px;color:${T3};background:${W}">선택된 보스 없음</div>`);
-    }
-    body+=`<div style="margin-bottom:12px;border-radius:8px;overflow:hidden;border:1px solid ${BD}">
-      <div style="padding:8px 12px;background:#5c3d9e;display:flex;align-items:center;gap:6px">
-        <span style="font-size:12px">⚔</span>
-        <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:.5px;text-transform:uppercase">보스 일정 (${raidTimeVal} 기준)</span>
-      </div>
-      <div style="background:${W}">${allBossRows.join('')}</div>
-    </div>`;
-  } else {
-    body += section('⚔', '보스', '#8b6914',
-      bossTarget.length ? bossTarget.map(it=>bossRow(it,false)).join('') : null,
-      '선택된 보스 없음');
+    if(bossTarget.length)allBossRows.push(bossTarget.map(it=>bossRow(it,true)).join(''));
+    if(bossAfter.length)allBossRows.push(bossAfter.map(it=>bossRow(it,false)).join(''));
+    if(!bossTarget.length&&!bossAfter.length){allBossRows.push(`<div style="padding:10px 12px;font-size:12px;color:${T3};background:${W}">선택된 보스 없음</div>`);}
+    body+=`<div style="margin-bottom:12px;border-radius:8px;overflow:hidden;border:1px solid ${BD}"><div style="padding:8px 12px;background:#5c3d9e;display:flex;align-items:center;gap:6px"><span style="font-size:12px">⚔</span><span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:.5px;text-transform:uppercase">보스 일정 (${raidTimeVal} 기준)</span></div><div style="background:${W}">${allBossRows.join('')}</div></div>`;
+  }else{
+    body+=section('⚔','보스','#8b6914',bossTarget.length?bossTarget.map(it=>bossRow(it,false)).join(''):null,'선택된 보스 없음');
   }
+  if(selEv.length){body+=section('📅','이벤트','#1a5fa8',selEv.map(evRow).join(''),null);}
 
-  if(selEv.length){
-    body += section('📅', '이벤트', '#1a5fa8',
-      selEv.map(evRow).join(''), null);
-  }
-
-  // ── 내일 새벽 일정 ──
+  // [수정F] 새벽 일정 시간을 뱃지 스타일로
   const _tmrStart=new Date();_tmrStart.setDate(_tmrStart.getDate()+1);_tmrStart.setHours(0,0,0,0);
   const _tmrEnd=new Date();_tmrEnd.setDate(_tmrEnd.getDate()+1);_tmrEnd.setHours(8,0,0,0);
-  const _tmrStartMs=_tmrStart.getTime(),_tmrEndMs=_tmrEnd.getTime();
-  const _tmrDow=_tmrStart.getDay();
+  const _tmrStartMs=_tmrStart.getTime(),_tmrEndMs=_tmrEnd.getTime(),_tmrDow=_tmrStart.getDay();
   const dawnShot=[];
-
   bosses.forEach(boss=>{
     const k=getK(boss.id);
-    if(boss.bossType==='fixed'){
-      boss.fixedTimes?.forEach(ft=>{
-        if(ft.day!==_tmrDow)return;
-        const d=new Date(_tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);
-        const ms=d.getTime();
-        if(ms>=_tmrStartMs&&ms<_tmrEndMs){
-          const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
-          dawnShot.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:ms,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
-        }
-      });
-    }else if(k.lastKill&&!k.awkActive){
-      const sm=k.lastKill+boss.hours*3600000;
-      if(sm>=_tmrStartMs&&sm<_tmrEndMs){
-        const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
-        dawnShot.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:sm,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
-      }
-    }
+    if(boss.bossType==='fixed'){boss.fixedTimes?.forEach(ft=>{if(ft.day!==_tmrDow)return;const d=new Date(_tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';dawnShot.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:ms,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}});}
+    else if(k.lastKill&&!k.awkActive){const sm=k.lastKill+boss.hours*3600000;if(sm>=_tmrStartMs&&sm<_tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';dawnShot.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:sm,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}}
   });
   events.forEach(ev=>{
-    if(ev.evType==='period'){
-      const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();
-      if(ps<_tmrEndMs&&pe>_tmrStartMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});
-    }else if(ev.evType==='fixed'){
-      ev.fixedTimes?.forEach(ft=>{
-        if(ft.day!==_tmrDow)return;
-        const d=new Date(_tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);
-        const ms=d.getTime();
-        if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
-      });
-    }else if(ev.evType==='once'){
-      const ms=new Date(ev.onceDt).getTime();
-      if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
-    }else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(_tmrDow))){
-      const[sh,sm2]=ev.start.split(':').map(Number);
-      const d=new Date(_tmrStart);d.setHours(sh,sm2,0,0);
-      const ms=d.getTime();
-      if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});
-    }
+    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<_tmrEndMs&&pe>_tmrStartMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});}
+    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==_tmrDow)return;const d=new Date(_tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});});}
+    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
+    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(_tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(_tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
   });
   dawnShot.sort((a,b)=>a.timeMs-b.timeMs);
-
   if(dawnShot.length){
     const _tmrStr=`${String(_tmrStart.getMonth()+1).padStart(2,'0')}/${String(_tmrStart.getDate()).padStart(2,'0')}`;
-    body+=section('🌙', `내일 새벽 일정 (${_tmrStr} 00:00~08:00)`, '#6644aa',
+    body+=section('🌙',`내일 새벽 일정 (${_tmrStr} 00:00~08:00)`,'#6644aa',
       dawnShot.map(it=>{
         const dot=it.type==='boss'?'#b8860b':(DOT_COLOR[it.cat]||'#8888a8');
-        const awkLine=(it.type==='boss'&&it.awkEnable&&(it.cnt+1)>=it.awkN)
-          ?`<div style="font-size:10px;font-weight:700;color:#7c5fcf;margin-top:3px;padding:2px 6px;background:#ede8fb;border-radius:3px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`:'';
+        const awkLine=(it.type==='boss'&&it.awkEnable&&(it.cnt+1)>=it.awkN)?`<div style="font-size:10px;font-weight:700;color:#7c5fcf;margin-top:3px;padding:2px 6px;background:#ede8fb;border-radius:3px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`:'';
         return`<div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${W}">
           <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${dot}"></div>
           <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:700;color:${T1}">${it.name}</div>
-            <div style="font-size:11px;color:${T3};margin-top:1px">${it.sub} · <span style="font-weight:700;font-size:13px;color:#444">${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span></div>
+            <div style="font-size:11px;color:${T3};margin-top:1px">${it.sub} · <span style="background:#e8e0fb;color:#4a2c8a;font-weight:800;font-size:14px;padding:2px 7px;border-radius:4px;border:1px solid rgba(74,44,138,.25)">${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span></div>
             ${awkLine}
           </div>
         </div>`;
       }).join(''));
   }
-
-  body += `<div style="margin-top:10px;font-size:10px;color:${T3};text-align:center">프라시아 전기 · 결사 일정 관리</div></div>`;
-
+  body+=`<div style="margin-top:10px;font-size:10px;color:${T3};text-align:center">프라시아 전기 · 결사 일정 관리</div></div>`;
   panel.innerHTML=`
     <div class="shot-content" style="background:transparent;padding:0">${body}</div>
     <div style="font-size:12px;color:#aaaaaa;margin-top:12px;text-align:center">위 화면을 스크린샷하여 결사원들과 공유하세요</div>
@@ -2154,36 +1506,25 @@ function renderShotResult(panel){
 // ═══════════════════════════════
 function exportData(){
   const d=new Date();
-  const data={
-    b:localStorage.getItem('pr_b'),
-    k:localStorage.getItem('pr_k'),
-    m:localStorage.getItem('pr_m'),
-    e:localStorage.getItem('pr_e'),
-    exportedAt:d.toISOString()
-  };
+  const data={b:localStorage.getItem('pr_b'),k:localStorage.getItem('pr_k'),m:localStorage.getItem('pr_m'),e:localStorage.getItem('pr_e'),exportedAt:d.toISOString()};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   const fname=`보스타이머_백업_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}.json`;
-  a.href=url;a.download=fname;a.click();
-  URL.revokeObjectURL(url);
+  a.href=url;a.download=fname;a.click();URL.revokeObjectURL(url);
   showToast('백업 파일이 다운로드되었습니다.');
 }
 function importData(event){
-  const file=event.target.files[0];
-  if(!file)return;
+  const file=event.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=e=>{
     try{
       const data=JSON.parse(e.target.result);
       if(!data.b&&!data.k){showToast('올바른 백업 파일이 아닙니다.');return;}
       if(!confirm('현재 데이터를 백업 파일로 덮어씁니다. 계속하시겠습니까?'))return;
-      if(data.b)localStorage.setItem('pr_b',data.b);
-      if(data.k)localStorage.setItem('pr_k',data.k);
-      if(data.m)localStorage.setItem('pr_m',data.m);
-      if(data.e)localStorage.setItem('pr_e',data.e);
-      load();save();updateMaintUI();render();
-      showToast('데이터가 복원되었습니다.');
+      if(data.b)localStorage.setItem('pr_b',data.b);if(data.k)localStorage.setItem('pr_k',data.k);
+      if(data.m)localStorage.setItem('pr_m',data.m);if(data.e)localStorage.setItem('pr_e',data.e);
+      load();save();updateMaintUI();render();showToast('데이터가 복원되었습니다.');
     }catch(err){showToast('파일 읽기 실패. 올바른 백업 파일인지 확인해 주세요.');}
     event.target.value='';
   };
@@ -2197,42 +1538,15 @@ function showToast(msg,cls=''){
   clearTimeout(tT);tT=setTimeout(()=>el.classList.remove('show'),3200);
 }
 
-// ═══════════════════════════════
-//  초기화
-// ═══════════════════════════════
+let _deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_deferredPrompt=e;const btn=document.getElementById('install-btn');if(btn)btn.style.display='inline-block';});
+window.addEventListener('appinstalled',()=>{_deferredPrompt=null;const btn=document.getElementById('install-btn');if(btn)btn.style.display='none';showToast('앱이 설치되었습니다!');});
+function installPWA(){if(!_deferredPrompt)return;_deferredPrompt.prompt();_deferredPrompt.userChoice.then(()=>{_deferredPrompt=null;});}
 
-// ═══════════════════════════════
-//  PWA 설치
-// ═══════════════════════════════
-let _deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  _deferredPrompt = e;
-  const btn = document.getElementById('install-btn');
-  if(btn) btn.style.display = 'inline-block';
-});
-window.addEventListener('appinstalled', () => {
-  _deferredPrompt = null;
-  const btn = document.getElementById('install-btn');
-  if(btn) btn.style.display = 'none';
-  showToast('앱이 설치되었습니다!');
-});
-function installPWA(){
-  if(!_deferredPrompt) return;
-  _deferredPrompt.prompt();
-  _deferredPrompt.userChoice.then(()=>{ _deferredPrompt = null; });
-}
-
-// Firebase 연결 시작 (로드 완료 시 render/tick 자동 호출)
 setupFirebase();
 </script>
-
 <script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
-  });
-}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
 </script>
 </body>
 </html>
