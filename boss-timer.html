@@ -258,7 +258,7 @@ input[type="date"]{color-scheme:dark}
 .shot-check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex-shrink:0}
 .shot-check-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .shot-check-name{font-size:13px;font-weight:600;color:var(--text);flex:1}
-.shot-check-sub{font-size:11px;color:var(--t3)}
+.shot-check-sub{font-size:11px;color:var(--t2)}
 .shot-empty{font-size:12px;color:var(--t3);padding:8px 0}
 .shot-generate-btn{width:100%;margin-top:16px;padding:13px;border-radius:var(--rs);background:var(--gold);border:none;color:#1a1200;font-size:14px;font-weight:700;cursor:pointer}
 .shot-generate-btn:active{opacity:.8}
@@ -1346,10 +1346,10 @@ function renderShotSetup(panel){
   if(_shotState.bossChecks===null)_shotState.bossChecks=new Set(bossItems.map((_,i)=>i));
   if(_shotState.evChecks===null)_shotState.evChecks=new Set(evItems.map((_,i)=>i));
   const bossCheckRows=bossItems.length
-    ?bossItems.map((it,i)=>`<label class="shot-check-row"><input type="checkbox" class="shot-boss-chk" data-idx="${i}" ${_shotState.bossChecks.has(i)?'checked':''}><span class="shot-check-dot" style="background:${it.state==='awaken'?'#9b7fe8':it.isPast?'#4caf7d':'#c9a84c'}"></span><span class="shot-check-name">${it.name}</span><span class="shot-check-sub">${it.sub}${it.timeMs>0?` · 리젠 ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}`:''}</span></label>`).join('')
+    ?bossItems.map((it,i)=>`<label class="shot-check-row"><input type="checkbox" class="shot-boss-chk" data-idx="${i}" ${_shotState.bossChecks.has(i)?'checked':''}><span class="shot-check-dot" style="background:${it.state==='awaken'?'#9b7fe8':it.isPast?'#4caf7d':'#c9a84c'}"></span><span class="shot-check-name">${it.name}</span><span class="shot-check-sub">${it.sub}${it.timeMs>0?` · <span style="color:var(--gold2);font-weight:700">리젠 ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span>`:''}</span></label>`).join('')
     :'<div class="shot-empty">오늘 리젠 예정 보스 없음</div>';
   const evCheckRows=evItems.length
-    ?evItems.map((ev,i)=>`<label class="shot-check-row"><input type="checkbox" class="shot-ev-chk" data-idx="${i}" ${_shotState.evChecks.has(i)?'checked':''}><span class="shot-check-dot" style="background:${DOT_COLOR[ev.cat]||'#8888a8'}"></span><span class="shot-check-name">${ev.name}</span><span class="shot-check-sub">${ev.timeLabel}</span></label>`).join('')
+    ?evItems.map((ev,i)=>`<label class="shot-check-row"><input type="checkbox" class="shot-ev-chk" data-idx="${i}" ${_shotState.evChecks.has(i)?'checked':''}><span class="shot-check-dot" style="background:${DOT_COLOR[ev.cat]||'#8888a8'}"></span><span class="shot-check-name">${ev.name}</span><span class="shot-check-sub" style="color:var(--gold2);font-weight:700">${ev.timeLabel}</span></label>`).join('')
     :'<div class="shot-empty">오늘 이벤트 없음</div>';
   panel.innerHTML=`<div class="shot-setup">
     <div class="shot-setup-title">📋 일정표 생성</div><div class="shot-setup-date">${dateStr}</div>
