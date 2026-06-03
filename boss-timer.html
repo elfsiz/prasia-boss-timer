@@ -291,6 +291,10 @@ input[type="date"]{color-scheme:dark}
 .day-item.awk-alert-item{border-color:rgba(155,127,232,.4);background:rgba(155,127,232,.04)}
 .di-awk-alert{font-size:11px;font-weight:600;color:var(--purple2);margin-top:6px;padding:3px 8px;background:var(--purple-bg);border:1px solid rgba(155,127,232,.35);border-radius:4px;display:inline-block;animation:bl 1.2s infinite;}
 .di-awk-info{font-size:11px;color:var(--t2);margin-top:4px}
+/* 매월 날짜 피커 */
+.month-day-picker{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.mdp-btn{padding:5px 0;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;width:36px;text-align:center}
+.mdp-btn.on{background:var(--gold-bg);border-color:var(--gold);color:var(--gold2)}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -409,6 +413,7 @@ input[type="date"]{color-scheme:dark}
       <label class="flbl">① 남은 시간으로 입력</label>
       <div class="fdesc">지금부터 몇 시간 몇 분 후에 리젠되는지 입력하세요.</div>
       <div class="remain-row">
+        <input class="remain-inp" id="f-remain-d" type="number" min="0" max="99" placeholder="0"> <span class="remain-unit">일</span>
         <input class="remain-inp" id="f-remain-h" type="number" min="0" max="999" placeholder="0"> <span class="remain-unit">시간</span>
         <input class="remain-inp" id="f-remain-m" type="number" min="0" max="59" placeholder="0"> <span class="remain-unit">분 후 리젠</span>
         <button class="remain-calc-btn" onclick="applyRemainTime()">적용</button>
@@ -440,11 +445,6 @@ input[type="date"]{color-scheme:dark}
       <input class="finput" id="f-awk-n" type="number" min="1" max="99" step="1" value="4">
     </div>
     <div class="fgrp"><label class="flbl">각성 보스 이름</label><input class="finput" id="f-awk-name" placeholder="예: 각성 세르갈린"></div>
-    <div class="fgrp">
-      <label class="flbl">각성 보스 재리젠 주기 (시간)</label>
-      <div class="fdesc">각성 보스 처치 후 재출현까지 걸리는 시간</div>
-      <input class="finput" id="f-awk-hours" type="number" min="0.5" max="336" step="0.5" value="48">
-    </div>
   </div>
   <div class="mdl-footer">
     <button class="mbtn" onclick="closeModal()">취소</button>
@@ -468,8 +468,9 @@ input[type="date"]{color-scheme:dark}
     <label class="flbl">이벤트 유형</label>
     <div class="ev-type-row">
       <button type="button" class="ev-type-btn on" id="ev-type-repeat" onclick="setEvType('repeat')">🔁 반복 (요일)</button>
+      <button type="button" class="ev-type-btn" id="ev-type-monthly" onclick="setEvType('monthly')">📆 매월 (날짜)</button>
       <button type="button" class="ev-type-btn" id="ev-type-fixed" onclick="setEvType('fixed')">🕐 고정 시간</button>
-      <button type="button" class="ev-type-btn" id="ev-type-period" onclick="setEvType('period')">📆 기간 (날짜 지정)</button>
+      <button type="button" class="ev-type-btn" id="ev-type-period" onclick="setEvType('period')">📅 기간 (날짜 지정)</button>
       <button type="button" class="ev-type-btn" id="ev-type-once" onclick="setEvType('once')">📌 단일 (특정 날짜·시각)</button>
     </div>
   </div>
@@ -502,6 +503,18 @@ input[type="date"]{color-scheme:dark}
   </div>
   <div id="ev-once-fields" style="display:none">
     <div class="fgrp"><label class="flbl">날짜·시각</label><div class="fdesc">이 날짜·시각에 한 번만 출현합니다.</div><div class="dt-row"><input class="finput" id="ev-once-date" type="date"><div class="hm-row"><select class="hm-sel" id="ev-once-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-once-m"></select></div></div></div>
+  </div>
+  <!-- 매월 날짜 타입 필드 -->
+  <div id="ev-monthly-fields" style="display:none">
+    <div class="fgrp">
+      <label class="flbl">날짜 선택 (매월 반복)</label>
+      <div class="fdesc">매월 해당 일자에 반복됩니다. 복수 선택 가능합니다.</div>
+      <div class="month-day-picker" id="ev-month-days"></div>
+    </div>
+    <div class="frow">
+      <div class="fgrp"><label class="flbl">시작 시각</label><div class="hm-row"><select class="hm-sel" id="ev-mstart-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-mstart-m"></select></div></div>
+      <div class="fgrp"><label class="flbl">종료 시각</label><div class="hm-row"><select class="hm-sel" id="ev-mend-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-mend-m"></select></div></div>
+    </div>
   </div>
   <div class="fgrp"><label class="flbl">메모 (선택)</label><input class="finput" id="ev-memo" placeholder="예: 2층 필드, 파티 필수"></div>
   <div class="mdl-footer">
@@ -943,16 +956,21 @@ function getTodayFixedSpawns(boss){
   spawns.sort((a,b)=>a-b);return spawns;
 }
 function applyRemainTime(){
+  const d=parseInt(document.getElementById('f-remain-d').value)||0;
   const h=parseInt(document.getElementById('f-remain-h').value)||0;
   const m=parseInt(document.getElementById('f-remain-m').value)||0;
-  if(h===0&&m===0){showToast('시간 또는 분을 입력해 주세요.');return;}
-  const spawnMs=Date.now()+(h*3600+m*60)*1000;
-  const d=new Date(spawnMs);
+  if(d===0&&h===0&&m===0){showToast('일, 시간, 분 중 하나를 입력해 주세요.');return;}
+  const spawnMs=Date.now()+(d*86400+h*3600+m*60)*1000;
+  const dt=new Date(spawnMs);
   document.getElementById('f-spawn-date').value=toDatePart(spawnMs);
   fillHM('f-spawn-h','f-spawn-m',toTimePart(spawnMs));
+  document.getElementById('f-remain-d').value='';
   document.getElementById('f-remain-h').value='';
   document.getElementById('f-remain-m').value='';
-  showToast(`리젠 시각 ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} 으로 설정됨`);
+  const dStr=d>0?`${d}일 `:'';
+  const hStr=h>0?`${h}시간 `:'';
+  const mStr=m>0?`${m}분 `:'';
+  showToast(`${dStr}${hStr}${mStr}후 리젠 → ${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`);
 }
 function openBossModal(){openModal(null);}
 function openModal(boss=null){
@@ -990,7 +1008,6 @@ function openModal(boss=null){
   document.getElementById('awk-fields').classList.toggle('show',on);
   document.getElementById('f-awk-n').value=boss?.awkN??4;
   document.getElementById('f-awk-name').value=boss?.awkName||'';
-  document.getElementById('f-awk-hours').value=boss?.awkHours??48;
   document.getElementById('ovl').classList.add('on');
 }
 function closeModal(){document.getElementById('ovl').classList.remove('on');}
@@ -1011,7 +1028,7 @@ function saveBoss(){
   const awkEnable=document.getElementById('awk-tog').classList.contains('on');
   const awkN=parseInt(document.getElementById('f-awk-n').value)||4;
   const awkName=document.getElementById('f-awk-name').value.trim()||(name+' (각성)');
-  const awkHours=parseFloat(document.getElementById('f-awk-hours').value)||48;
+  const awkHours=0;
   if(bossType==='fixed'&&!fixedTimes.length){alert('리젠 시각을 하나 이상 추가해 주세요.');return;}
   let newLastKill=null;
   if(bossType==='kill'){
@@ -1064,14 +1081,30 @@ function setEvType(type){
   document.getElementById('ev-fixed-fields').style.display=type==='fixed'?'block':'none';
   document.getElementById('ev-period-fields').style.display=type==='period'?'block':'none';
   document.getElementById('ev-once-fields').style.display=type==='once'?'block':'none';
+  document.getElementById('ev-monthly-fields').style.display=type==='monthly'?'block':'none';
   document.getElementById('ev-type-repeat').classList.toggle('on',type==='repeat');
   document.getElementById('ev-type-fixed').classList.toggle('on',type==='fixed');
   document.getElementById('ev-type-period').classList.toggle('on',type==='period');
   document.getElementById('ev-type-once').classList.toggle('on',type==='once');
+  document.getElementById('ev-type-monthly').classList.toggle('on',type==='monthly');
   if(type==='repeat'){if(!document.getElementById('ev-start-h')?.options.length){fillHM('ev-start-h','ev-start-m','20:00');}if(!document.getElementById('ev-end-h')?.options.length){fillHM('ev-end-h','ev-end-m','22:00');}}
   else if(type==='period'){if(!document.getElementById('ev-pstart-h')?.options.length){fillHM('ev-pstart-h','ev-pstart-m','00:00');}if(!document.getElementById('ev-pend-h')?.options.length){fillHM('ev-pend-h','ev-pend-m','00:00');}}
   else if(type==='once'){if(!document.getElementById('ev-once-h')?.options.length){fillHM('ev-once-h','ev-once-m','20:00');}}
   else if(type==='fixed'){if(!document.getElementById('ev-fixed-times-wrap')?.children.length){addEvFixedTimeRow();}}
+  else if(type==='monthly'){
+    // 1~31 날짜 버튼 생성 (비어있을 때만)
+    const wrap=document.getElementById('ev-month-days');
+    if(!wrap.children.length){
+      for(let i=1;i<=31;i++){
+        const btn=document.createElement('button');
+        btn.type='button';btn.className='mdp-btn';btn.textContent=i;btn.dataset.d=i;
+        btn.onclick=()=>btn.classList.toggle('on');
+        wrap.appendChild(btn);
+      }
+    }
+    if(!document.getElementById('ev-mstart-h')?.options.length){fillHM('ev-mstart-h','ev-mstart-m','20:00');}
+    if(!document.getElementById('ev-mend-h')?.options.length){fillHM('ev-mend-h','ev-mend-m','22:00');}
+  }
 }
 function addEvFixedTimeRow(day=1,hh='20',mm='00'){
   const wrap=document.getElementById('ev-fixed-times-wrap');
@@ -1098,7 +1131,17 @@ function openEventModal(ev=null){
   document.getElementById('ev-memo').value=ev?.memo||'';
   const evType=ev?.evType||'repeat';
   setEvType(evType);
-  if(evType==='fixed'){
+  if(evType==='monthly'){
+    setEvType('monthly');
+    // 날짜 버튼 생성 후 선택 복원
+    const wrap=document.getElementById('ev-month-days');
+    if(!wrap.children.length){
+      for(let i=1;i<=31;i++){const btn=document.createElement('button');btn.type='button';btn.className='mdp-btn';btn.textContent=i;btn.dataset.d=i;btn.onclick=()=>btn.classList.toggle('on');wrap.appendChild(btn);}
+    }
+    wrap.querySelectorAll('.mdp-btn').forEach(btn=>{btn.classList.toggle('on',ev?.monthDays?.includes(parseInt(btn.dataset.d))||false);});
+    fillHM('ev-mstart-h','ev-mstart-m',stripSec(ev?.start)||'20:00');
+    fillHM('ev-mend-h','ev-mend-m',stripSec(ev?.end)||'22:00');
+  } else if(evType==='fixed'){
     document.getElementById('ev-fixed-times-wrap').innerHTML='';
     if(ev?.fixedTimes?.length){ev.fixedTimes.forEach(ft=>addEvFixedTimeRow(ft.day,ft.hh,ft.mm));}else{addEvFixedTimeRow();}
     document.querySelectorAll('.dp-btn').forEach(btn=>{btn.classList.remove('on');btn.onclick=()=>btn.classList.toggle('on');});
@@ -1128,9 +1171,14 @@ function saveEvent(){
   if(!name){alert('이벤트 이름을 입력해 주세요.');return;}
   const cat=document.getElementById('ev-cat').value;
   const memo=document.getElementById('ev-memo').value.trim();
-  const activeType=['repeat','fixed','period','once'].find(t=>document.getElementById('ev-type-'+t).classList.contains('on'))||'repeat';
+  const activeType=['repeat','fixed','period','once','monthly'].find(t=>document.getElementById('ev-type-'+t).classList.contains('on'))||'repeat';
   let evData={id:editEvId||Date.now(),name,cat,memo,evType:activeType};
-  if(activeType==='fixed'){
+  if(activeType==='monthly'){
+    const monthDays=[...document.querySelectorAll('#ev-month-days .mdp-btn.on')].map(b=>parseInt(b.dataset.d));
+    if(!monthDays.length){alert('날짜를 하나 이상 선택해 주세요.');return;}
+    const start=getSelHM('ev-mstart-h','ev-mstart-m'),end=getSelHM('ev-mend-h','ev-mend-m');
+    evData={...evData,monthDays,start,end,days:[],pstart:'',pend:'',onceDt:'',fixedTimes:[]};
+  } else if(activeType==='fixed'){
     const fixedTimes=getEvFixedTimes();
     if(!fixedTimes.length){alert('시각을 하나 이상 추가해 주세요.');return;}
     evData={...evData,fixedTimes,days:[],start:'',end:'',pstart:'',pend:'',onceDt:''};
@@ -1169,6 +1217,7 @@ function todayEvents(){
     if(ev.evType==='period'){const ps=new Date(ev.pstart),pe=new Date(ev.pend);return ps<=todayEnd&&pe>=todayStart;}
     if(ev.evType==='once'){const od=new Date(ev.onceDt);return od>=todayStart&&od<=todayEnd;}
     if(ev.evType==='fixed'){return ev.fixedTimes?.some(ft=>ft.day===dow);}
+    if(ev.evType==='monthly'){return ev.monthDays?.includes(now.getDate());}
     return ev.days.includes(7)||ev.days.includes(dow);
   });
 }
@@ -1286,6 +1335,7 @@ function buildSchedContent(){
     if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<tmrEndMs&&pe>tmrStartMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});}
     else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});});}
     else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
+    else if(ev.evType==='monthly'&&ev.monthDays?.includes(tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
     else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
   });
   dawnItems.sort((a,b)=>a.timeMs-b.timeMs);
@@ -1307,7 +1357,10 @@ function buildSchedContent(){
     events.forEach(ev=>{
       const isPeriod=ev.evType==='period';
       let schedInfo='';
-      if(ev.evType==='fixed'){
+      if(ev.evType==='monthly'){
+        const dayStr=(ev.monthDays||[]).sort((a,b)=>a-b).map(d=>d+'일').join('·');
+        schedInfo=`<div class="ev-days-row"><span class="ev-day-chip" style="background:var(--gold-bg);color:var(--gold2);border-color:rgba(201,168,76,.4)">📆 매월</span><span class="ev-day-chip">${dayStr}</span></div><div class="ev-time-row"><span class="ev-time">${ev.start} ~ ${ev.end}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
+      } else if(ev.evType==='fixed'){
         const grouped={};(ev.fixedTimes||[]).forEach(ft=>{if(!grouped[ft.day])grouped[ft.day]=[];grouped[ft.day].push(`${ft.hh}:${ft.mm}`);});
         const rows=Object.entries(grouped).map(([d,times])=>`<span class="ev-day-chip">${DAY_KR2[d]} ${times.join('·')}</span>`).join('');
         schedInfo=`<div class="ev-days-row"><span class="ev-period-chip" style="background:rgba(91,156,240,.1);color:var(--blue);border-color:rgba(91,156,240,.3)">🕐 고정</span></div><div class="ev-days-row">${rows}</div><div class="ev-time-row"><span class="ev-memo">${ev.memo||''}</span></div>`;
@@ -1375,6 +1428,7 @@ function _buildEvItems(nowMs){
     let startMs,endMs,timeLabel;
     if(ev.evType==='period'){startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();const fmtDT=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;timeLabel=`${fmtDT(new Date(ev.pstart))} ~ ${fmtDT(new Date(ev.pend))}`;}
     else if(ev.evType==='once'){const od=new Date(ev.onceDt);startMs=od.getTime();endMs=startMs+3600000;timeLabel=`${String(od.getMonth()+1).padStart(2,'0')}/${String(od.getDate()).padStart(2,'0')} ${String(od.getHours()).padStart(2,'0')}:${String(od.getMinutes()).padStart(2,'0')}`;}
+    else if(ev.evType==='monthly'){const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);startMs=new Date().setHours(sh,sm2,0,0);endMs=new Date().setHours(eh,em,0,0);timeLabel=`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;}
     else{const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);startMs=new Date().setHours(sh,sm2,0,0);endMs=new Date().setHours(eh,em,0,0);timeLabel=`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;}
     items.push({...ev,startMs,endMs,timeLabel,isPast:endMs<=nowMs,isNow:startMs<=nowMs&&nowMs<endMs});
   });
@@ -1472,6 +1526,7 @@ function renderShotResult(panel){
     if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<_tmrEndMs&&pe>_tmrStartMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});}
     else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==_tmrDow)return;const d=new Date(_tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});});}
     else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
+    else if(ev.evType==='monthly'&&ev.monthDays?.includes(_tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(_tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
     else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(_tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(_tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
   });
   dawnShot.sort((a,b)=>a.timeMs-b.timeMs);
