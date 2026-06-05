@@ -669,7 +669,7 @@ function killBoss(id){
 }
 function killAwaken(id){
   const boss=bosses.find(b=>b.id===id),k=getK(id);
-  k.awkActive=false;k.awkKill=Date.now();k.cnt=0;k.lastKill=null;
+  k.awkActive=false;k.awkKill=Date.now();k.cnt=0;k.lastKill=Date.now();
   showToast(`${boss.awkName} 처치 · 카운터 초기화`);
   save();render();
 }
@@ -1390,7 +1390,7 @@ function openShotPanel(){
   if(!panel){panel=document.createElement('div');panel.id='shot-panel';panel.className='shot-panel';document.body.appendChild(panel);}
   renderShotSetup(panel);panel.classList.add('show');
 }
-let _shotState={raidTime:'',bossChecks:null,evChecks:null};
+let _shotState={raidTime:'',bossChecks:null,evChecks:null,dawnChecks:null};
 function renderShotSetup(panel){
   const now=new Date(),nowMs=now.getTime(),dow=now.getDay();
   const dateStr=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
@@ -1398,6 +1398,9 @@ function renderShotSetup(panel){
   const evItems=_buildEvItems(nowMs);
   if(_shotState.bossChecks===null)_shotState.bossChecks=new Set(bossItems.map((_,i)=>i));
   if(_shotState.evChecks===null)_shotState.evChecks=new Set(evItems.map((_,i)=>i));
+  // 새벽 일정 아이템
+  const {items:dawnItems,tmrStart}=_buildDawnItems();
+  if(_shotState.dawnChecks===null)_shotState.dawnChecks=new Set(dawnItems.map((_,i)=>i));
   const bossCheckRows=bossItems.length
     ?bossItems.map((it,i)=>`<label class="shot-check-row"><input type="checkbox" class="shot-boss-chk" data-idx="${i}" ${_shotState.bossChecks.has(i)?'checked':''}><span class="shot-check-dot" style="background:${it.state==='awaken'?'#9b7fe8':it.isPast?'#4caf7d':'#c9a84c'}"></span><span class="shot-check-name">${it.name}</span><span class="shot-check-sub">${it.sub}${it.timeMs>0?` · <span style="color:var(--gold2);font-weight:700">리젠 ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span>`:''}</span></label>`).join('')
     :'<div class="shot-empty">오늘 리젠 예정 보스 없음</div>';
@@ -1410,6 +1413,8 @@ function renderShotSetup(panel){
     <div class="shot-time-row"><div class="hm-row"><select class="shot-hm-sel" id="shot-time-h" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select><span class="hm-colon" style="color:var(--purple2)">:</span><select class="shot-hm-sel" id="shot-time-m" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select></div>${_shotState.raidTime?`<button class="raid-clear-btn" onclick="_shotState.raidTime='';fillHM('shot-time-h','shot-time-m','00:00')">초기화</button>`:''}</div>
     <div class="shot-section-lbl">⚔ 보스 선택</div><div class="shot-check-list" id="shot-boss-list">${bossCheckRows}</div>
     <div class="shot-section-lbl">📅 이벤트 선택</div><div class="shot-check-list" id="shot-ev-list">${evCheckRows}</div>
+    ${dawnItems.length?`<div class="shot-section-lbl">🌙 새벽 일정 선택 <span style="font-size:10px;font-weight:400;color:var(--t3)">(${String(tmrStart.getMonth()+1).padStart(2,'0')}/${String(tmrStart.getDate()).padStart(2,'0')} 00:00~08:00)</span></div>
+    <div class="shot-check-list" id="shot-dawn-list">${dawnItems.map((it,i)=>`<label class="shot-check-row"><input type="checkbox" class="shot-dawn-chk" data-idx="${i}" ${_shotState.dawnChecks.has(i)?'checked':''}><span class="shot-check-dot" style="background:${it.type==='boss'?'#c9a84c':(DOT_COLOR[it.cat]||'#8888a8')}"></span><span class="shot-check-name">${it.name}</span><span class="shot-check-sub" style="color:var(--gold2);font-weight:700">${it.sub} · ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span></label>`).join('')}</div>`:''}
     <button class="shot-generate-btn" onclick="_saveShotChecks();renderShotResult(document.getElementById('shot-panel'))">일정표 생성 →</button>
     <button class="shot-close" style="width:100%;margin-top:8px" onclick="_resetShotState();document.getElementById('shot-panel').classList.remove('show')">닫기</button>
   </div>`;
@@ -1419,9 +1424,36 @@ function renderShotSetup(panel){
 function _saveShotChecks(){
   _shotState.bossChecks=new Set([...document.querySelectorAll('.shot-boss-chk:checked')].map(el=>parseInt(el.dataset.idx)));
   _shotState.evChecks=new Set([...document.querySelectorAll('.shot-ev-chk:checked')].map(el=>parseInt(el.dataset.idx)));
+  _shotState.dawnChecks=new Set([...document.querySelectorAll('.shot-dawn-chk:checked')].map(el=>parseInt(el.dataset.idx)));
   _shotState.raidTime=getSelHM('shot-time-h','shot-time-m');
 }
-function _resetShotState(){_shotState={raidTime:'',bossChecks:null,evChecks:null};}
+function _resetShotState(){_shotState={raidTime:'',bossChecks:null,evChecks:null,dawnChecks:null};}
+// 새벽 일정 아이템 계산 공통 함수 (설정 패널 + 결과 패널 공용)
+function _buildDawnItems(){
+  const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+1);tmrStart.setHours(0,0,0,0);
+  const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+1);tmrEnd.setHours(8,0,0,0);
+  const tmrStartMs=tmrStart.getTime(),tmrEndMs=tmrEnd.getTime(),tmrDow=tmrStart.getDay();
+  const items=[];
+  bosses.forEach(boss=>{
+    const k=getK(boss.id);
+    if(boss.bossType==='fixed'){
+      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:ms,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}});
+    }else if(k.lastKill&&!k.awkActive){
+      const sm=k.lastKill+boss.hours*3600000;
+      if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:sm,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}
+    }
+  });
+  events.forEach(ev=>{
+    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<tmrEndMs&&pe>tmrStartMs)items.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});}
+    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});});}
+    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
+    else if(ev.evType==='monthly'&&ev.monthDays?.includes(tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
+    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
+  });
+  items.sort((a,b)=>a.timeMs-b.timeMs);
+  return{items,tmrStart};
+}
+
 function _buildEvItems(nowMs){
   const items=[];
   todayEvents().forEach(ev=>{
@@ -1512,24 +1544,9 @@ function renderShotResult(panel){
   }
   if(selEv.length){body+=section('📅','이벤트','#1a5fa8',selEv.map(evRow).join(''),null);}
 
-  // [수정F] 새벽 일정 시간을 뱃지 스타일로
-  const _tmrStart=new Date();_tmrStart.setDate(_tmrStart.getDate()+1);_tmrStart.setHours(0,0,0,0);
-  const _tmrEnd=new Date();_tmrEnd.setDate(_tmrEnd.getDate()+1);_tmrEnd.setHours(8,0,0,0);
-  const _tmrStartMs=_tmrStart.getTime(),_tmrEndMs=_tmrEnd.getTime(),_tmrDow=_tmrStart.getDay();
-  const dawnShot=[];
-  bosses.forEach(boss=>{
-    const k=getK(boss.id);
-    if(boss.bossType==='fixed'){boss.fixedTimes?.forEach(ft=>{if(ft.day!==_tmrDow)return;const d=new Date(_tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';dawnShot.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:ms,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}});}
-    else if(k.lastKill&&!k.awkActive){const sm=k.lastKill+boss.hours*3600000;if(sm>=_tmrStartMs&&sm<_tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';dawnShot.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:sm,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}}
-  });
-  events.forEach(ev=>{
-    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<_tmrEndMs&&pe>_tmrStartMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});}
-    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==_tmrDow)return;const d=new Date(_tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});});}
-    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
-    else if(ev.evType==='monthly'&&ev.monthDays?.includes(_tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(_tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
-    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(_tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(_tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=_tmrStartMs&&ms<_tmrEndMs)dawnShot.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
-  });
-  dawnShot.sort((a,b)=>a.timeMs-b.timeMs);
+  // 새벽 일정 — 공통 함수 사용 + dawnChecks 필터 적용
+  const {items:allDawn,tmrStart:_tmrStart}=_buildDawnItems();
+  const dawnShot=allDawn.filter((_,i)=>(_shotState.dawnChecks||new Set(allDawn.map((_,j)=>j))).has(i));
   if(dawnShot.length){
     const _tmrStr=`${String(_tmrStart.getMonth()+1).padStart(2,'0')}/${String(_tmrStart.getDate()).padStart(2,'0')}`;
     body+=section('🌙',`내일 새벽 일정 (${_tmrStr} 00:00~08:00)`,'#6644aa',
