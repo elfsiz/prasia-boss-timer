@@ -1570,9 +1570,9 @@ function renderShotResult(panel){
     if(bossTarget.length)allBossRows.push(bossTarget.map(it=>bossRow(it,true)).join(''));
     if(bossAfter.length)allBossRows.push(bossAfter.map(it=>bossRow(it,false)).join(''));
     if(!bossTarget.length&&!bossAfter.length){allBossRows.push(`<div style="padding:10px 12px;font-size:12px;color:${T3};background:${W}">선택된 보스 없음</div>`);}
-    body+=`<div style="margin-bottom:12px;border-radius:8px;overflow:hidden;border:1px solid ${BD}"><div style="padding:8px 12px;background:#5c3d9e;display:flex;align-items:center;gap:6px"><span style="font-size:12px">⚔</span><span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:.5px;text-transform:uppercase">보스 일정 (${raidTimeVal} 기준)</span></div><div style="background:${W}">${allBossRows.join('')}</div></div>`;
+    body+=`<div style="margin-bottom:12px;border-radius:8px;overflow:hidden;border:1px solid ${BD}"><div style="padding:8px 12px;background:#5c3d9e;display:flex;align-items:center;gap:6px"><span style="font-size:12px">⚔</span><span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:.5px;text-transform:uppercase">보스 일정 순서 (${raidTimeVal} 기준)</span></div><div style="background:${W}">${allBossRows.join('')}</div></div>`;
   }else{
-    body+=section('⚔','보스','#8b6914',bossTarget.length?bossTarget.map(it=>bossRow(it,false)).join(''):null,'선택된 보스 없음');
+    body+=section('⚔','보스 일정 순서','#8b6914',bossTarget.length?bossTarget.map(it=>bossRow(it,false)).join(''):null,'선택된 보스 없음');
   }
   if(selEv.length){body+=section('📅','이벤트','#1a5fa8',selEv.map(evRow).join(''),null);}
 
