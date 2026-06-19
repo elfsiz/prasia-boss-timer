@@ -260,6 +260,11 @@ input[type="date"]{color-scheme:dark}
 .shot-check-name{font-size:13px;font-weight:600;color:var(--text);flex:1}
 .shot-check-sub{font-size:11px;color:var(--t2)}
 .shot-empty{font-size:12px;color:var(--t3);padding:8px 0}
+.shot-order-btns{display:flex;flex-direction:column;gap:2px;margin-left:auto;flex-shrink:0}
+.shot-order-btn{width:22px;height:18px;border-radius:4px;border:1px solid var(--border2);background:var(--bg);color:var(--t2);font-size:10px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
+.shot-order-btn:active{opacity:.6}
+.shot-order-btn:disabled{opacity:.25;cursor:default}
+.shot-order-num{font-size:11px;font-weight:700;color:var(--gold2);width:18px;text-align:center;flex-shrink:0}
 .shot-generate-btn{width:100%;margin-top:16px;padding:13px;border-radius:var(--rs);background:var(--gold);border:none;color:#1a1200;font-size:14px;font-weight:700;cursor:pointer}
 .shot-generate-btn:active{opacity:.8}
 .conn-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;border:1px solid;margin-top:3px}
@@ -1390,7 +1395,7 @@ function openShotPanel(){
   if(!panel){panel=document.createElement('div');panel.id='shot-panel';panel.className='shot-panel';document.body.appendChild(panel);}
   renderShotSetup(panel);panel.classList.add('show');
 }
-let _shotState={raidTime:'',bossChecks:null,evChecks:null,dawnChecks:null};
+let _shotState={raidTime:'',bossChecks:null,evChecks:null,dawnChecks:null,bossOrder:null};
 function renderShotSetup(panel){
   const now=new Date(),nowMs=now.getTime(),dow=now.getDay();
   const dateStr=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
@@ -1398,11 +1403,19 @@ function renderShotSetup(panel){
   const evItems=_buildEvItems(nowMs);
   if(_shotState.bossChecks===null)_shotState.bossChecks=new Set(bossItems.map((_,i)=>i));
   if(_shotState.evChecks===null)_shotState.evChecks=new Set(evItems.map((_,i)=>i));
+  // 보스 일정 순서 배열 (원본 bossItems 인덱스 기준) — 개수가 바뀌면 재초기화
+  if(!_shotState.bossOrder||_shotState.bossOrder.length!==bossItems.length){
+    _shotState.bossOrder=bossItems.map((_,i)=>i);
+  }
   // 새벽 일정 아이템
   const {items:dawnItems,tmrStart}=_buildDawnItems();
   if(_shotState.dawnChecks===null)_shotState.dawnChecks=new Set(dawnItems.map((_,i)=>i));
+  const bossOrder=_shotState.bossOrder;
   const bossCheckRows=bossItems.length
-    ?bossItems.map((it,i)=>`<label class="shot-check-row"><input type="checkbox" class="shot-boss-chk" data-idx="${i}" ${_shotState.bossChecks.has(i)?'checked':''}><span class="shot-check-dot" style="background:${it.state==='awaken'?'#9b7fe8':it.isPast?'#4caf7d':'#c9a84c'}"></span><span class="shot-check-name">${it.name}</span><span class="shot-check-sub">${it.sub}${it.timeMs>0?` · <span style="color:var(--gold2);font-weight:700">리젠 ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span>`:''}</span></label>`).join('')
+    ?bossOrder.map((i,pos)=>{
+      const it=bossItems[i];
+      return`<label class="shot-check-row"><input type="checkbox" class="shot-boss-chk" data-idx="${i}" ${_shotState.bossChecks.has(i)?'checked':''}><span class="shot-order-num">${pos+1}</span><span class="shot-check-dot" style="background:${it.state==='awaken'?'#9b7fe8':it.isPast?'#4caf7d':'#c9a84c'}"></span><span class="shot-check-name">${it.name}</span><span class="shot-check-sub">${it.sub}${it.timeMs>0?` · <span style="color:var(--gold2);font-weight:700">리젠 ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span>`:''}</span><div class="shot-order-btns"><button type="button" class="shot-order-btn" onclick="_moveBossOrder(${pos},-1)" ${pos===0?'disabled':''}>▲</button><button type="button" class="shot-order-btn" onclick="_moveBossOrder(${pos},1)" ${pos===bossOrder.length-1?'disabled':''}>▼</button></div></label>`;
+    }).join('')
     :'<div class="shot-empty">오늘 리젠 예정 보스 없음</div>';
   const evCheckRows=evItems.length
     ?evItems.map((ev,i)=>`<label class="shot-check-row"><input type="checkbox" class="shot-ev-chk" data-idx="${i}" ${_shotState.evChecks.has(i)?'checked':''}><span class="shot-check-dot" style="background:${DOT_COLOR[ev.cat]||'#8888a8'}"></span><span class="shot-check-name">${ev.name}</span><span class="shot-check-sub" style="color:var(--gold2);font-weight:700">${ev.timeLabel}</span></label>`).join('')
@@ -1411,7 +1424,7 @@ function renderShotSetup(panel){
     <div class="shot-setup-title">📋 일정표 생성</div><div class="shot-setup-date">${dateStr}</div>
     <div class="shot-section-lbl">결사 일정 시작 시간 <span style="font-size:10px;font-weight:400;color:var(--t3)">(선택 — 입력 시 그룹 분리)</span></div>
     <div class="shot-time-row"><div class="hm-row"><select class="shot-hm-sel" id="shot-time-h" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select><span class="hm-colon" style="color:var(--purple2)">:</span><select class="shot-hm-sel" id="shot-time-m" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select></div>${_shotState.raidTime?`<button class="raid-clear-btn" onclick="_shotState.raidTime='';fillHM('shot-time-h','shot-time-m','00:00')">초기화</button>`:''}</div>
-    <div class="shot-section-lbl">⚔ 보스 선택</div><div class="shot-check-list" id="shot-boss-list">${bossCheckRows}</div>
+    <div class="shot-section-lbl">⚔ 보스 일정 순서 <span style="font-size:10px;font-weight:400;color:var(--t3)">(▲▼로 동선에 맞게 순서 조정)</span></div><div class="shot-check-list" id="shot-boss-list">${bossCheckRows}</div>
     <div class="shot-section-lbl">📅 이벤트 선택</div><div class="shot-check-list" id="shot-ev-list">${evCheckRows}</div>
     ${dawnItems.length?`<div class="shot-section-lbl">🌙 새벽 일정 선택 <span style="font-size:10px;font-weight:400;color:var(--t3)">(${String(tmrStart.getMonth()+1).padStart(2,'0')}/${String(tmrStart.getDate()).padStart(2,'0')} 00:00~08:00)</span></div>
     <div class="shot-check-list" id="shot-dawn-list">${dawnItems.map((it,i)=>`<label class="shot-check-row"><input type="checkbox" class="shot-dawn-chk" data-idx="${i}" ${_shotState.dawnChecks.has(i)?'checked':''}><span class="shot-check-dot" style="background:${it.type==='boss'?'#c9a84c':(DOT_COLOR[it.cat]||'#8888a8')}"></span><span class="shot-check-name">${it.name}</span><span class="shot-check-sub" style="color:var(--gold2);font-weight:700">${it.sub} · ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}</span></label>`).join('')}</div>`:''}
@@ -1421,13 +1434,26 @@ function renderShotSetup(panel){
   const [_sh,_sm]=(stripSec(_shotState.raidTime)||'00:00').split(':');
   fillHour('shot-time-h',_sh||'00');fillMin('shot-time-m',_sm||'00');
 }
+function _captureBossChecks(){
+  const boxes=document.querySelectorAll('.shot-boss-chk');
+  if(boxes.length){_shotState.bossChecks=new Set([...boxes].filter(el=>el.checked).map(el=>parseInt(el.dataset.idx)));}
+}
+function _moveBossOrder(pos,dir){
+  const arr=_shotState.bossOrder;
+  if(!arr)return;
+  const newPos=pos+dir;
+  if(newPos<0||newPos>=arr.length)return;
+  _captureBossChecks();
+  [arr[pos],arr[newPos]]=[arr[newPos],arr[pos]];
+  renderShotSetup(document.getElementById('shot-panel'));
+}
 function _saveShotChecks(){
   _shotState.bossChecks=new Set([...document.querySelectorAll('.shot-boss-chk:checked')].map(el=>parseInt(el.dataset.idx)));
   _shotState.evChecks=new Set([...document.querySelectorAll('.shot-ev-chk:checked')].map(el=>parseInt(el.dataset.idx)));
   _shotState.dawnChecks=new Set([...document.querySelectorAll('.shot-dawn-chk:checked')].map(el=>parseInt(el.dataset.idx)));
   _shotState.raidTime=getSelHM('shot-time-h','shot-time-m');
 }
-function _resetShotState(){_shotState={raidTime:'',bossChecks:null,evChecks:null,dawnChecks:null};}
+function _resetShotState(){_shotState={raidTime:'',bossChecks:null,evChecks:null,dawnChecks:null,bossOrder:null};}
 // 새벽 일정 아이템 계산 공통 함수 (설정 패널 + 결과 패널 공용)
 function _buildDawnItems(){
   const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+1);tmrStart.setHours(0,0,0,0);
@@ -1475,7 +1501,13 @@ function renderShotResult(panel){
   let raidMs=null;
   if(raidTimeVal){const[rh,rm]=raidTimeVal.split(':').map(Number);raidMs=new Date().setHours(rh,rm,0,0);}
   const allBoss=getTodayBossItems();
-  const selBoss=allBoss.filter((_,i)=>(_shotState.bossChecks||new Set()).has(i));
+  const orderArr=_shotState.bossOrder&&_shotState.bossOrder.length===allBoss.length?_shotState.bossOrder:allBoss.map((_,i)=>i);
+  const orderPos=idx=>{const p=orderArr.indexOf(idx);return p===-1?idx:p;};
+  const selBoss=allBoss
+    .map((it,i)=>({it,i}))
+    .filter(x=>(_shotState.bossChecks||new Set()).has(x.i))
+    .sort((a,b)=>orderPos(a.i)-orderPos(b.i))
+    .map(x=>x.it);
   const allEv=_buildEvItems(nowMs);
   const selEv=allEv.filter((_,i)=>(_shotState.evChecks||new Set()).has(i));
   const bossTarget=raidMs?selBoss.filter(it=>it.state==='awaken'||it.timeMs<=raidMs):selBoss;
