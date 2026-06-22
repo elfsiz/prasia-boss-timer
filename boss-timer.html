@@ -1673,13 +1673,15 @@ function _buildDawnItems(){
 
 // ── [수정 D,E,F] renderShotResult: 스크린샷 시간 표시 시인성 개선 ──
 function renderShotResult(panel){
-  const now=new Date(),nowMs=now.getTime(),dow=now.getDay();
-  const dateStr=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
+  const dayOffset=panel._dayOffset||0;
+  const targetDate=new Date();if(dayOffset>0)targetDate.setDate(targetDate.getDate()+dayOffset);
+  const now=new Date(),nowMs=now.getTime(),dow=targetDate.getDay();
+  const dateStr=`${targetDate.getFullYear()}.${String(targetDate.getMonth()+1).padStart(2,'0')}.${String(targetDate.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
   const raidTimeVal=stripSec(_shotState.raidTime)||'';
   const raidMemoVal=_shotState.raidMemo||'';
   let raidMs=null;
-  if(raidTimeVal){const[rh,rm]=raidTimeVal.split(':').map(Number);raidMs=new Date().setHours(rh,rm,0,0);}
-  const allBoss=getTodayBossItems();
+  if(raidTimeVal){const[rh,rm]=raidTimeVal.split(':').map(Number);raidMs=new Date(targetDate).setHours(rh,rm,0,0);}
+  const allBoss=getBossItemsForDate(targetDate);
   const orderArr=_shotState.bossOrder&&_shotState.bossOrder.length===allBoss.length?_shotState.bossOrder:allBoss.map((_,i)=>i);
   const orderPos=idx=>{const p=orderArr.indexOf(idx);return p===-1?idx:p;};
   const selBoss=allBoss
@@ -1687,7 +1689,7 @@ function renderShotResult(panel){
     .filter(x=>(_shotState.bossChecks||new Set()).has(x.i))
     .sort((a,b)=>orderPos(a.i)-orderPos(b.i))
     .map(x=>x.it);
-  const allEv=_buildEvItems(nowMs);
+  const allEv=_buildEvItemsForDate(nowMs,targetDate);
   const selEv=allEv.filter((_,i)=>(_shotState.evChecks||new Set()).has(i));
   const bossTarget=raidMs?selBoss.filter(it=>it.state==='awaken'||it.timeMs<=raidMs):selBoss;
   const bossAfter=raidMs?selBoss.filter(it=>it.state!=='awaken'&&it.timeMs>raidMs):[];
@@ -1745,8 +1747,7 @@ function renderShotResult(panel){
 
   let body=`<div id="shot-body" style="background:${BG};border-radius:14px;padding:16px;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:420px;margin:0 auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${raidTimeVal?'10px':'14px'};padding-bottom:10px;border-bottom:2px solid ${BD}">
-      <div style="font-size:16px;font-weight:800;color:${T1}">⚔ 결사 오늘 일정</div>
-      <div style="font-size:12px;font-weight:600;color:${T2}">${dateStr}</div>
+      <div style="font-size:14px;font-weight:800;color:${T1}">${dateStr} 결사 일정</div>
     </div>
     ${raidTimeVal?`<div style="display:flex;align-items:center;gap:12px;padding:8px 0;margin-bottom:14px;border-bottom:1.5px solid #b09ae8"><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><div style="font-size:11px;color:#7c5fcf;font-weight:700;line-height:1.4;text-align:right">결사 일정<br>시작 시간</div><div style="font-size:31px;font-weight:900;color:#5c3d9e;letter-spacing:3px;font-family:monospace;line-height:1">${raidTimeVal}</div></div>${raidMemoVal?`<div style="font-size:13px;color:#4a3080;font-weight:600;padding:4px 10px;background:rgba(155,127,232,.1);border-radius:6px;border:1px solid rgba(155,127,232,.25);flex:1;min-width:0">${raidMemoVal}</div>`:''}</div>`:''}`;
 
