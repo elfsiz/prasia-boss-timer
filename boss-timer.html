@@ -1389,9 +1389,18 @@ function buildSchedContent(dayOffset=0){
   const evItems=[];
   getEventsForDate(targetDate).forEach(ev=>{
     let startMs,endMs,timeLabel;
+    if(ev.evType==='period'){
+      startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();
+      const ps=new Date(ev.pstart),pe=new Date(ev.pend);
+      const fmtDT=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      timeLabel=`${fmtDT(ps)} ~ ${fmtDT(pe)}`;
+    }else if(ev.evType==='once'){
+      startMs=new Date(ev.onceDt).getTime();endMs=startMs+3600000;
+      const od=new Date(ev.onceDt);
+      timeLabel=`${String(od.getMonth()+1).padStart(2,'0')}/${String(od.getDate()).padStart(2,'0')} ${String(od.getHours()).padStart(2,'0')}:${String(od.getMinutes()).padStart(2,'0')}`;
     }else{
       const [sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);
-      startMs=new Date().setHours(sh,sm2,0,0);endMs=new Date().setHours(eh,em,0,0);
+      startMs=new Date(targetDate).setHours(sh,sm2,0,0);endMs=new Date(targetDate).setHours(eh,em,0,0);
       timeLabel=`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;
     }
     evItems.push({...ev,startMs,endMs,timeLabel,isPast:endMs<=nowMs,isNow:startMs<=nowMs&&nowMs<endMs});
