@@ -296,6 +296,20 @@ input[type="date"]{color-scheme:dark}
 .day-item.awk-alert-item{border-color:rgba(155,127,232,.4);background:rgba(155,127,232,.04)}
 .di-awk-alert{font-size:11px;font-weight:600;color:var(--purple2);margin-top:6px;padding:3px 8px;background:var(--purple-bg);border:1px solid rgba(155,127,232,.35);border-radius:4px;display:inline-block;animation:bl 1.2s infinite;}
 .di-awk-info{font-size:11px;color:var(--t2);margin-top:4px}
+/* 룻 순환 */
+.loot-hdr-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.loot-hdr-lbl{font-size:13px;font-weight:600;color:var(--gold2)}
+.loot-fields{display:none}.loot-fields.show{display:block}
+.loot-guild-row{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:7px 10px;margin-bottom:6px}
+.loot-guild-num{font-size:11px;color:var(--t3);width:18px;text-align:center;flex-shrink:0}
+.loot-guild-inp{flex:1;background:transparent;border:none;font-size:13px;color:var(--text);outline:none}
+.loot-guild-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px;padding:0 4px}
+.loot-guild-del:active{color:var(--red)}
+.loot-badge{font-size:10px;padding:2px 7px;border-radius:4px;background:var(--gold-bg);color:var(--gold2);border:1px solid rgba(201,168,76,.4);font-weight:600;white-space:nowrap}
+/* 오늘/내일 토글 */
+.sched-day-toggle{display:flex;gap:4px}
+.sched-day-btn{font-size:12px;padding:4px 12px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--bg3);color:var(--t2);cursor:pointer;font-weight:600}
+.sched-day-btn.on{background:var(--gold-bg);border-color:var(--gold);color:var(--gold2)}
 /* 매월 날짜 피커 */
 .month-day-picker{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
 .mdp-btn{padding:5px 0;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;width:36px;text-align:center}
@@ -450,6 +464,24 @@ input[type="date"]{color-scheme:dark}
       <input class="finput" id="f-awk-n" type="number" min="1" max="99" step="1" value="4">
     </div>
     <div class="fgrp"><label class="flbl">각성 보스 이름</label><input class="finput" id="f-awk-name" placeholder="예: 각성 세르갈린"></div>
+  </div>
+  <hr class="divider">
+  <div class="loot-hdr-row">
+    <span class="loot-hdr-lbl">🏆 룻 순환 설정</span>
+    <div class="toggle" id="loot-tog" onclick="togLoot()"></div>
+  </div>
+  <div class="loot-fields" id="loot-fields">
+    <div class="fgrp">
+      <label class="flbl">참여 결사 순서</label>
+      <div class="fdesc">처치 시마다 자동으로 다음 결사로 넘어갑니다.</div>
+      <div id="loot-guild-wrap"></div>
+      <button type="button" class="fixed-add-btn" onclick="addLootGuildRow('')">+ 결사 추가</button>
+    </div>
+    <div class="fgrp">
+      <label class="flbl">현재 차례 (이번 처치 시 룻)</label>
+      <div class="fdesc">지금 당장 이번 처치를 하면 어느 결사의 룻인지 선택하세요.</div>
+      <select class="finput" id="loot-idx-sel"></select>
+    </div>
   </div>
   <div class="mdl-footer">
     <button class="mbtn" onclick="closeModal()">취소</button>
@@ -659,16 +691,32 @@ function sameDay(ms,refDate){
 // ═══════════════════════════════
 //  처치 액션
 // ═══════════════════════════════
-function killBoss(id){
+function killBoss(id,overrideGuildIdx=null){
   const boss=bosses.find(b=>b.id===id),k=getK(id);
   if(k.awkActive){showToast('각성 보스를 먼저 처치해 주세요!');return;}
   k.cnt++;k.lastKill=Date.now();
-  if(boss.awkEnable&&k.cnt>=boss.awkN){
-    k.awkActive=true;k.awkSpawn=Date.now();k.awkKill=null;
-    showToast(`⚡ ${boss.awkName} 각성 출현!`,'awk');
+  // 룻 순환 처리
+  if(boss.lootEnable&&boss.lootGuilds?.length){
+    const gIdx=overrideGuildIdx!=null?overrideGuildIdx:boss.lootIdx;
+    const gName=boss.lootGuilds[gIdx]||'';
+    const nextIdx=(boss.lootIdx+1)%boss.lootGuilds.length;
+    bosses=bosses.map(b=>b.id===id?{...b,lootIdx:nextIdx}:b);
+    if(boss.awkEnable&&k.cnt>=boss.awkN){
+      k.awkActive=true;k.awkSpawn=Date.now();k.awkKill=null;
+      showToast(`⚡ ${boss.awkName} 각성 출현! (룻: ${gName})`,'awk');
+    }else{
+      const left=boss.awkEnable?(boss.awkN-k.cnt):null;
+      const lootMsg=gName?` · 룻: ${gName}`:'';
+      showToast(left!==null?`${boss.name} 처치 (${k.cnt}/${boss.awkN})${lootMsg}  → 다음 룻: ${boss.lootGuilds[nextIdx]||''}` : `${boss.name} 처치${lootMsg}`);
+    }
   }else{
-    const left=boss.awkEnable?(boss.awkN-k.cnt):null;
-    showToast(left!==null?`${boss.name} 처치 (${k.cnt}/${boss.awkN}) · 각성까지 ${left}회`:`${boss.name} 처치 완료`);
+    if(boss.awkEnable&&k.cnt>=boss.awkN){
+      k.awkActive=true;k.awkSpawn=Date.now();k.awkKill=null;
+      showToast(`⚡ ${boss.awkName} 각성 출현!`,'awk');
+    }else{
+      const left=boss.awkEnable?(boss.awkN-k.cnt):null;
+      showToast(left!==null?`${boss.name} 처치 (${k.cnt}/${boss.awkN}) · 각성까지 ${left}회`:`${boss.name} 처치 완료`);
+    }
   }
   save();render();
 }
@@ -772,6 +820,8 @@ function buildCard(boss){
   }
   // [수정C] 각성 재출현/재리젠 대기 블록 제거 — 조건 기반 등장이므로 타이머 불필요
   const killLabel=!k.awkActive?(boss.awkEnable?`처치 (${k.cnt+1}번째)`:'처치'):null;
+  const lootGuild=boss.lootEnable&&boss.lootGuilds?.length?boss.lootGuilds[boss.lootIdx%boss.lootGuilds.length]:null;
+  const nextLoot=boss.lootEnable&&boss.lootGuilds?.length?boss.lootGuilds[(boss.lootIdx+1)%boss.lootGuilds.length]:null;
   return`<div class="bcard s-${state}" id="bc-${boss.id}">
     <div class="bcard-body">
       <div class="bcard-main">
@@ -782,12 +832,14 @@ function buildCard(boss){
             ${state==='ready'||state==='awaken'?`<span class="badge b-go">${state==='awaken'?'각성!':'리젠!'}</span>`:''}
           </div>
           <div class="bmeta">리젠 ${fmtHours(boss.hours)}${boss.awkEnable?` · ${boss.awkN}회 처치 시 각성`:''}</div>
+          ${lootGuild?`<div style="margin-top:5px;display:flex;align-items:center;gap:5px"><span class="loot-badge">🏆 이번 룻: ${lootGuild}</span>${nextLoot?`<span style="font-size:10px;color:var(--t3)">→ 다음: ${nextLoot}</span>`:''}</div>`:''}
           ${buildPips(boss)}
         </div>
         <div class="bright">${cdHtml}</div>
       </div>
       <div class="card-actions">
         ${killLabel?`<button class="cbtn kill" onclick="killBoss(${boss.id})">${killLabel}</button>`:''}
+        ${boss.lootEnable&&boss.lootGuilds?.length&&!k.awkActive?`<button class="cbtn" style="border-color:rgba(201,168,76,.3);color:var(--gold)" onclick="openLootOverride(${boss.id})">임시 변경</button>`:''}
         <button class="cbtn right" onclick="editBoss(${boss.id})">편집</button>
         <button class="cbtn danger" onclick="delBoss(${boss.id})">삭제</button>
       </div>
@@ -1014,9 +1066,47 @@ function openModal(boss=null){
   document.getElementById('f-awk-n').value=boss?.awkN??4;
   document.getElementById('f-awk-name').value=boss?.awkName||'';
   document.getElementById('ovl').classList.add('on');
+  // 룻 순환 복원
+  const lootOn=boss?.lootEnable||false;
+  document.getElementById('loot-tog').classList.toggle('on',lootOn);
+  document.getElementById('loot-fields').classList.toggle('show',lootOn);
+  document.getElementById('loot-guild-wrap').innerHTML='';
+  if(lootOn&&boss?.lootGuilds?.length){boss.lootGuilds.forEach(g=>addLootGuildRow(g));}
+  else if(lootOn){addLootGuildRow('');}
+  // lootIdx select 복원
+  setTimeout(()=>{
+    updateLootIdxSel();
+    const sel=document.getElementById('loot-idx-sel');
+    if(sel&&boss?.lootIdx!=null)sel.value=boss.lootIdx;
+  },0);
 }
 function closeModal(){document.getElementById('ovl').classList.remove('on');}
 function bgClose(e){if(e.target===document.getElementById('ovl'))closeModal();}
+function togLoot(){
+  const t=document.getElementById('loot-tog');t.classList.toggle('on');
+  const on=t.classList.contains('on');
+  document.getElementById('loot-fields').classList.toggle('show',on);
+  if(on&&!document.getElementById('loot-guild-wrap').children.length)addLootGuildRow('');
+}
+function addLootGuildRow(name){
+  const wrap=document.getElementById('loot-guild-wrap');
+  const idx=wrap.children.length+1;
+  const row=document.createElement('div');row.className='loot-guild-row';
+  row.innerHTML=`<span class="loot-guild-num">${idx}</span><input class="loot-guild-inp" placeholder="결사 이름" value="${name}"><button type="button" class="loot-guild-del" onclick="this.parentElement.remove();updateLootIdxSel()">✕</button>`;
+  row.querySelector('.loot-guild-inp').addEventListener('input',updateLootIdxSel);
+  wrap.appendChild(row);updateLootIdxSel();
+}
+function getLootGuilds(){
+  return [...document.querySelectorAll('.loot-guild-inp')].map(el=>el.value.trim()).filter(v=>v);
+}
+function updateLootIdxSel(){
+  const sel=document.getElementById('loot-idx-sel');if(!sel)return;
+  const guilds=getLootGuilds();
+  const cur=parseInt(sel.value)||0;
+  sel.innerHTML=guilds.length
+    ?guilds.map((g,i)=>`<option value="${i}"${i===cur?'selected':''}>${i+1}번째 · ${g}</option>`).join('')
+    :'<option value="0">결사를 먼저 추가하세요</option>';
+}
 function togAwk(){
   const t=document.getElementById('awk-tog');t.classList.toggle('on');
   const on=t.classList.contains('on');
@@ -1043,17 +1133,38 @@ function saveBoss(){
     newLastKill=spawnMs?spawnMs-hours*3600000:null;
   }
   const newCnt=parseInt(document.getElementById('f-cnt').value)||0;
+  const lootEnable=document.getElementById('loot-tog').classList.contains('on');
+  const lootGuilds=lootEnable?getLootGuilds():[];
+  const lootIdx=lootEnable?parseInt(document.getElementById('loot-idx-sel').value)||0:0;
   if(editId){
-    bosses=bosses.map(b=>b.id===editId?{...b,name,zone,hours,bossType,fixedTimes,awkEnable,awkN,awkName,awkHours}:b);
+    bosses=bosses.map(b=>b.id===editId?{...b,name,zone,hours,bossType,fixedTimes,awkEnable,awkN,awkName,awkHours,lootEnable,lootGuilds,lootIdx}:b);
     const k=getK(editId);
     if(bossType==='kill'&&newLastKill)k.lastKill=newLastKill;
     if(awkEnable)k.cnt=Math.min(newCnt,awkN-1);
   }else{
     const newId=Date.now();
-    bosses.push({id:newId,name,zone,hours,bossType,fixedTimes,awkEnable,awkN,awkName,awkHours});
+    bosses.push({id:newId,name,zone,hours,bossType,fixedTimes,awkEnable,awkN,awkName,awkHours,lootEnable,lootGuilds,lootIdx});
     if(bossType==='kill'&&newLastKill){const k=getK(newId);k.lastKill=newLastKill;}
   }
   save();closeModal();render();
+}
+function openLootOverride(id){
+  const boss=bosses.find(b=>b.id===id);
+  if(!boss?.lootEnable||!boss.lootGuilds?.length)return;
+  const guilds=boss.lootGuilds;
+  document.getElementById('conf-title').textContent=`임시 룻 변경 — ${boss.name}`;
+  document.getElementById('conf-desc').innerHTML=
+    `이번 처치만 다른 결사의 룻으로 처리합니다.<br>다음 처치부터는 원래 순서로 복귀합니다.<br><br>`+
+    `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">`+
+    guilds.map((g,i)=>`<button class="ccbtn" style="flex:0 0 auto;padding:8px 14px" onclick="killBoss(${id},${i});closeConf()">${g}</button>`).join('')+
+    `</div>`;
+  document.getElementById('conf-ok').style.display='none';
+  document.getElementById('conf-ovl').classList.add('on');
+}
+
+function closeConf(){
+  document.getElementById('conf-ovl').classList.remove('on');
+  document.getElementById('conf-ok').style.display='';
 }
 function editBoss(id){openModal(bosses.find(b=>b.id===id));}
 function delBoss(id){
@@ -1214,69 +1325,74 @@ function delEvent(id){
   if(curTab==='sched')buildSchedView();
   showToast('이벤트 삭제 완료');
 }
-function todayEvents(){
-  const now=new Date(),dow=now.getDay();
-  const todayStart=new Date(now);todayStart.setHours(0,0,0,0);
-  const todayEnd=new Date(now);todayEnd.setHours(23,59,59,999);
+function getEventsForDate(targetDate){
+  const dow=targetDate.getDay();
+  const dayStart=new Date(targetDate);dayStart.setHours(0,0,0,0);
+  const dayEnd=new Date(targetDate);dayEnd.setHours(23,59,59,999);
   return events.filter(ev=>{
-    if(ev.evType==='period'){const ps=new Date(ev.pstart),pe=new Date(ev.pend);return ps<=todayEnd&&pe>=todayStart;}
-    if(ev.evType==='once'){const od=new Date(ev.onceDt);return od>=todayStart&&od<=todayEnd;}
+    if(ev.evType==='period'){const ps=new Date(ev.pstart),pe=new Date(ev.pend);return ps<=dayEnd&&pe>=dayStart;}
+    if(ev.evType==='once'){const od=new Date(ev.onceDt);return od>=dayStart&&od<=dayEnd;}
     if(ev.evType==='fixed'){return ev.fixedTimes?.some(ft=>ft.day===dow);}
-    if(ev.evType==='monthly'){return ev.monthDays?.includes(now.getDate());}
+    if(ev.evType==='monthly'){return ev.monthDays?.includes(targetDate.getDate());}
     return ev.days.includes(7)||ev.days.includes(dow);
   });
 }
+function todayEvents(){return getEventsForDate(new Date());}
 
 // ═══════════════════════════════
 //  일정표 뷰 빌드
 // ═══════════════════════════════
-function getTodayBossItems(){
-  const now=new Date(),nowMs=now.getTime();
-  const today=new Date();today.setHours(0,0,0,0);
-  const todayMs=today.getTime();
+function getBossItemsForDate(targetDate){
+  const nowMs=Date.now();
+  const dayStart=new Date(targetDate);dayStart.setHours(0,0,0,0);
+  const dayMs=dayStart.getTime();
+  const dow=targetDate.getDay();
+  const isToday=dayMs===new Date(new Date().setHours(0,0,0,0)).getTime();
   const items=[];
   bosses.forEach(boss=>{
     const k=getK(boss.id);
-    if(k.awkActive){items.push({bossId:boss.id,name:boss.awkName,sub:boss.zone+' · 각성 출현',timeMs:0,isPast:true,state:'awaken'});return;}
+    if(k.awkActive&&isToday){
+      const lootGuild=boss.lootEnable&&boss.lootGuilds?.length?boss.lootGuilds[boss.lootIdx%boss.lootGuilds.length]:null;
+      items.push({bossId:boss.id,name:boss.awkName,sub:boss.zone+' · 각성 출현',timeMs:0,isPast:true,state:'awaken',lootGuild});return;
+    }
     if(boss.bossType==='fixed'){
-      const spawns=getTodayFixedSpawns(boss);
-      const next=getNextFixedMs(boss);
+      const spawns=[];
+      boss.fixedTimes?.forEach(ft=>{if(ft.day!==dow)return;const d=new Date(targetDate);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);spawns.push(d.getTime());});
+      spawns.sort((a,b)=>a-b);
+      const lootGuild=boss.lootEnable&&boss.lootGuilds?.length?boss.lootGuilds[boss.lootIdx%boss.lootGuilds.length]:null;
       spawns.forEach(sm=>{
         const isPast=sm<=nowMs;
         const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
-        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':'wait',isFixed:true,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
-      });
-      return;
+        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':'wait',isFixed:true,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt,lootGuild});
+      });return;
     }
     if(k.lastKill){
       const sm=k.lastKill+boss.hours*3600000;
-      if(sm>=todayMs&&sm<todayMs+86400000){
+      if(sm>=dayMs&&sm<dayMs+86400000){
         const isPast=sm<=nowMs;
         const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
-        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':'wait',awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
+        const lootGuild=boss.lootEnable&&boss.lootGuilds?.length?boss.lootGuilds[boss.lootIdx%boss.lootGuilds.length]:null;
+        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':'wait',awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt,lootGuild});
       }
     }
   });
   items.sort((a,b)=>a.timeMs-b.timeMs);
   return items;
 }
-function buildSchedView(){buildSchedContent();}
-function buildSchedContent(){
-  const now=new Date(),nowMs=now.getTime(),dow=now.getDay();
-  const dateStr=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
-  const bossItems=getTodayBossItems();
+function getTodayBossItems(){return getBossItemsForDate(new Date());}
+
+let _schedDay=0; // 0=오늘, 1=내일
+function buildSchedView(){buildSchedContent(_schedDay);}
+function setSchedDay(d){_schedDay=d;buildSchedView();}
+function buildSchedContent(dayOffset=0){
+  const targetDate=new Date();if(dayOffset>0)targetDate.setDate(targetDate.getDate()+dayOffset);
+  const nowMs=Date.now(),dow=targetDate.getDay();
+  const isToday=dayOffset===0;
+  const dateStr=`${targetDate.getFullYear()}.${String(targetDate.getMonth()+1).padStart(2,'0')}.${String(targetDate.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
+  const bossItems=getBossItemsForDate(targetDate);
   const evItems=[];
-  todayEvents().forEach(ev=>{
+  getEventsForDate(targetDate).forEach(ev=>{
     let startMs,endMs,timeLabel;
-    if(ev.evType==='period'){
-      startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();
-      const ps=new Date(ev.pstart),pe=new Date(ev.pend);
-      const fmtDT=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-      timeLabel=`${fmtDT(ps)} ~ ${fmtDT(pe)}`;
-    }else if(ev.evType==='once'){
-      startMs=new Date(ev.onceDt).getTime();endMs=startMs+3600000;
-      const od=new Date(ev.onceDt);
-      timeLabel=`${String(od.getMonth()+1).padStart(2,'0')}/${String(od.getDate()).padStart(2,'0')} ${String(od.getHours()).padStart(2,'0')}:${String(od.getMinutes()).padStart(2,'0')}`;
     }else{
       const [sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);
       startMs=new Date().setHours(sh,sm2,0,0);endMs=new Date().setHours(eh,em,0,0);
@@ -1286,7 +1402,8 @@ function buildSchedContent(){
   });
   evItems.sort((a,b)=>a.startMs-b.startMs);
   const wrap=document.getElementById('sched-wrap');
-  let html=`<div class="sched-top"><div><div class="sched-title">오늘의 결사 일정</div><div class="sched-date">${dateStr}</div></div><button class="sched-shot-btn" onclick="openShotPanel()">📷 스크린샷용</button></div>`;
+  const schedLabel=isToday?'오늘의 결사 일정':'내일의 결사 일정';
+  let html=`<div class="sched-top"><div><div class="sched-title">${schedLabel}</div><div class="sched-date">${dateStr}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="sched-day-toggle"><button class="sched-day-btn ${isToday?'on':''}" onclick="setSchedDay(0)">오늘</button><button class="sched-day-btn ${!isToday?'on':''}" onclick="setSchedDay(1)">내일</button></div><button class="sched-shot-btn" onclick="openShotPanel()">📷 스크린샷용</button></div></div>`;
   html+=`<div class="sched-block"><div class="sched-blk-hdr boss">⚔ 보스 리젠 (오늘)</div>`;
   if(!bossItems.length){html+=`<div class="sched-empty">오늘 리젠 예정 보스가 없습니다.</div>`;}
   else{
@@ -1302,7 +1419,7 @@ function buildSchedContent(){
       }
       html+=`<div class="sched-row" style="${it.awkEnable&&(it.cnt+1)>=it.awkN&&it.state!=='awaken'?'background:rgba(155,127,232,.04);border-left:2px solid var(--purple);':''}">
         <div class="sched-dot" style="background:${dot}"></div>
-        <div class="sched-row-left"><div class="sched-row-name">${it.name}</div><div class="sched-row-sub">${it.sub}</div>${awkHtml}</div>
+        <div class="sched-row-left"><div class="sched-row-name">${it.name}${it.lootGuild?` <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:var(--gold-bg);color:var(--gold2);border:1px solid rgba(201,168,76,.4);font-weight:600">🏆${it.lootGuild}</span>`:''}</div><div class="sched-row-sub">${it.sub}</div>${awkHtml}</div>
         <div class="sched-row-right"><div class="sched-row-time${timeCls}">${it.isPast&&it.state!=='awaken'?'리젠됨':timeStr}</div><div class="sched-row-badge">${it.state==='awaken'?'각성 출현 중':it.isPast?'처치 가능':'리젠 예정'}</div></div>
       </div>`;
     });
@@ -1323,8 +1440,8 @@ function buildSchedContent(){
     });
   }
   html+=`</div>`;
-  const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+1);tmrStart.setHours(0,0,0,0);
-  const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+1);tmrEnd.setHours(8,0,0,0);
+  const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+dayOffset+1);tmrStart.setHours(0,0,0,0);
+  const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+dayOffset+1);tmrEnd.setHours(8,0,0,0);
   const tmrStartMs=tmrStart.getTime(),tmrEndMs=tmrEnd.getTime(),tmrDow=tmrStart.getDay();
   const dawnItems=[];
   bosses.forEach(boss=>{
@@ -1393,14 +1510,18 @@ function buildSchedContent(){
 function openShotPanel(){
   let panel=document.getElementById('shot-panel');
   if(!panel){panel=document.createElement('div');panel.id='shot-panel';panel.className='shot-panel';document.body.appendChild(panel);}
+  panel._dayOffset=_schedDay;
   renderShotSetup(panel);panel.classList.add('show');
 }
 let _shotState={raidTime:'',bossChecks:null,evChecks:null,dawnChecks:null,bossOrder:null};
 function renderShotSetup(panel){
-  const now=new Date(),nowMs=now.getTime(),dow=now.getDay();
-  const dateStr=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
-  const bossItems=getTodayBossItems();
-  const evItems=_buildEvItems(nowMs);
+  const dayOffset=panel._dayOffset||0;
+  const targetDate=new Date();if(dayOffset>0)targetDate.setDate(targetDate.getDate()+dayOffset);
+  const now=new Date(),nowMs=now.getTime(),dow=targetDate.getDay();
+  const dateStr=`${targetDate.getFullYear()}.${String(targetDate.getMonth()+1).padStart(2,'0')}.${String(targetDate.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
+  const dayLabel=dayOffset===0?'오늘':'내일';
+  const bossItems=getBossItemsForDate(targetDate);
+  const evItems=_buildEvItemsForDate(nowMs,targetDate);
   if(_shotState.bossChecks===null)_shotState.bossChecks=new Set(bossItems.map((_,i)=>i));
   if(_shotState.evChecks===null)_shotState.evChecks=new Set(evItems.map((_,i)=>i));
   // 보스 일정 순서 배열 (원본 bossItems 인덱스 기준) — 개수가 바뀌면 재초기화
@@ -1455,6 +1576,20 @@ function _saveShotChecks(){
 }
 function _resetShotState(){_shotState={raidTime:'',bossChecks:null,evChecks:null,dawnChecks:null,bossOrder:null};}
 // 새벽 일정 아이템 계산 공통 함수 (설정 패널 + 결과 패널 공용)
+function _buildEvItemsForDate(nowMs,targetDate){
+  const items=[];
+  getEventsForDate(targetDate).forEach(ev=>{
+    let startMs,endMs,timeLabel;
+    const td=targetDate;
+    if(ev.evType==='period'){startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();const fmtDT=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;timeLabel=`${fmtDT(new Date(ev.pstart))} ~ ${fmtDT(new Date(ev.pend))}`;}
+    else if(ev.evType==='once'){const od=new Date(ev.onceDt);startMs=od.getTime();endMs=startMs+3600000;timeLabel=`${String(od.getMonth()+1).padStart(2,'0')}/${String(od.getDate()).padStart(2,'0')} ${String(od.getHours()).padStart(2,'0')}:${String(od.getMinutes()).padStart(2,'0')}`;}
+    else if(ev.evType==='monthly'){const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);const sd=new Date(td);sd.setHours(sh,sm2,0,0);const ed=new Date(td);ed.setHours(eh,em,0,0);startMs=sd.getTime();endMs=ed.getTime();timeLabel=`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;}
+    else{const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);const sd=new Date(td);sd.setHours(sh,sm2,0,0);const ed=new Date(td);ed.setHours(eh,em,0,0);startMs=sd.getTime();endMs=ed.getTime();timeLabel=`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;}
+    items.push({...ev,startMs,endMs,timeLabel,isPast:endMs<=nowMs,isNow:startMs<=nowMs&&nowMs<endMs});
+  });
+  items.sort((a,b)=>a.startMs-b.startMs);return items;
+}
+function _buildEvItems(nowMs){return _buildEvItemsForDate(nowMs,new Date());}
 function _buildDawnItems(){
   const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+1);tmrStart.setHours(0,0,0,0);
   const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+1);tmrEnd.setHours(8,0,0,0);
@@ -1527,7 +1662,7 @@ function renderShotResult(panel){
     return`<div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${isAwkAlert?'#f8f4ff':W};${isAwkAlert?'border-left:3px solid #7c5fcf;':''}">
       <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${it.state==='awaken'?'#7c5fcf':it.isPast?'#2e9e5b':'#b8860b'}"></div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:700;color:${T1}">${it.name}</div>
+        <div style="font-size:13px;font-weight:700;color:${T1}">${it.name}${it.lootGuild?` <span style="font-size:10px;padding:1px 6px;border-radius:3px;background:#fff3cd;color:#7a4f00;border:1px solid rgba(122,79,0,.25);font-weight:700">🏆${it.lootGuild}</span>`:""}</div>
         <div style="font-size:11px;color:${T3};margin-top:1px">${it.sub}${it.timeMs>0?` · <span style="background:${it.isPast?'#d4edda':'#fff3cd'};color:${it.isPast?'#155724':'#7a4f00'};font-weight:700;padding:2px 7px;border-radius:5px;font-size:12px;border:1px solid ${it.isPast?'rgba(21,87,36,.25)':'rgba(122,79,0,.25)'}">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</span>`:''}</div>
         ${awkLine}
       </div>
