@@ -406,7 +406,6 @@ input[type="date"]{color-scheme:dark}
   <div class="mdl-title" id="mdl-title">보스 추가</div>
   <div class="section-label">기본 정보</div>
   <div class="fgrp"><label class="flbl">보스 이름</label><input class="finput" id="f-name" placeholder="예: 세르갈린"></div>
-  <div class="frow"><div class="fgrp"><label class="flbl">구역 / 종류</label><input class="finput" id="f-zone" placeholder="예: 혼돈보스"></div></div>
   <div class="fgrp" style="margin-top:4px">
     <label class="flbl">리젠 방식</label>
     <div class="boss-type-row">
@@ -495,12 +494,6 @@ input[type="date"]{color-scheme:dark}
   <div class="mdl-title" id="ev-title">이벤트 추가</div>
   <div class="section-label">이벤트 정보</div>
   <div class="fgrp"><label class="flbl">이벤트 이름</label><input class="finput" id="ev-name" placeholder="예: 사냥터 오픈, 길드전, 공성전"></div>
-  <div class="fgrp"><label class="flbl">분류</label>
-    <select class="finput" id="ev-cat">
-      <option value="hunt">사냥</option><option value="guild">길드</option>
-      <option value="siege">공성</option><option value="event">이벤트</option><option value="etc">기타</option>
-    </select>
-  </div>
   <div class="fgrp">
     <label class="flbl">이벤트 유형</label>
     <div class="ev-type-row">
@@ -826,7 +819,7 @@ function buildCard(boss){
     <div class="bcard-body">
       <div class="bcard-main">
         <div class="bleft">
-          <div class="bname-row"><span class="bname">${boss.name}</span><span class="badge b-type">${boss.zone}</span>
+          <div class="bname-row"><span class="bname">${boss.name}</span>
             ${boss.awkEnable?`<span class="badge b-awk">각성 연계</span>`:''}
             ${boss.bossType==='fixed'?`<span class="badge b-fixed">고정 시간</span>`:''}
             ${state==='ready'||state==='awaken'?`<span class="badge b-go">${state==='awaken'?'각성!':'리젠!'}</span>`:''}
@@ -859,9 +852,9 @@ function buildDayView(isToday){
     const k=getK(boss.id);
     if(k.lastKill&&!k.awkActive){
       const spawnMs=k.lastKill+boss.hours*3600000;
-      if(sameDay(spawnMs,refDate))items.push({name:boss.name,zone:boss.zone,spawnMs,type:'normal',past:spawnMs<=now,id:boss.id,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
+      if(sameDay(spawnMs,refDate))items.push({name:boss.name,spawnMs,type:'normal',past:spawnMs<=now,id:boss.id,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});
     }
-    if(boss.awkEnable&&k.awkActive&&isToday)items.push({name:boss.awkName,zone:boss.zone,spawnMs:now-1,type:'awaken',past:true,id:boss.id});
+    if(boss.awkEnable&&k.awkActive&&isToday)items.push({name:boss.awkName,spawnMs:now-1,type:'awaken',past:true,id:boss.id});
   });
   items.sort((a,b)=>a.spawnMs-b.spawnMs);
   const hdrEl=document.getElementById('day-hdr-txt');
@@ -879,7 +872,7 @@ function buildDayView(isToday){
     }else if(it.type==='awaken'){awkHtml=`<div class="di-awk-info" style="color:var(--purple2)">각성 보스</div>`;}
     const isAwkAlert=it.type==='normal'&&it.awkEnable&&(it.cnt+1)>=it.awkN;
     return`<div class="day-item${it.past?' ready-item':''}${isAwkAlert?' awk-alert-item':''}">
-      <div class="di-left"><div class="di-name">${it.name}</div><div class="di-meta">${it.zone}</div>${awkHtml}</div>
+      <div class="di-left"><div class="di-name">${it.name}</div>${awkHtml}</div>
       <div class="di-right"><div class="di-time${it.past?' past':''}">${it.past?'리젠됨':fmtHHMM(it.spawnMs)}</div><div class="di-label">${it.past?'처치 가능':'리젠 예정'}</div></div>
     </div>`;
   }).join('');
@@ -1034,7 +1027,6 @@ function openModal(boss=null){
   editId=boss?boss.id:null;
   document.getElementById('mdl-title').textContent=boss?'보스 편집':'보스 추가';
   document.getElementById('f-name').value=boss?.name||'';
-  document.getElementById('f-zone').value=boss?.zone||'혼돈보스';
   document.getElementById('f-hours').value=boss?.hours??48;
   const btype=boss?.bossType||'kill';
   setBossType(btype);
@@ -1115,7 +1107,7 @@ function togAwk(){
 }
 function saveBoss(){
   const name=document.getElementById('f-name').value.trim();
-  const zone=document.getElementById('f-zone').value.trim();
+  const zone='';
   const hours=parseFloat(document.getElementById('f-hours').value)||48;
   if(!name){alert('보스 이름을 입력해 주세요.');return;}
   const bossType=document.getElementById('btype-fixed').classList.contains('on')?'fixed':'kill';
@@ -1239,7 +1231,6 @@ function openEventModal(ev=null){
   editEvId=ev?ev.id:null;
   document.getElementById('ev-title').textContent=ev?'이벤트 편집':'이벤트 추가';
   document.getElementById('ev-name').value=ev?.name||'';
-  document.getElementById('ev-cat').value=ev?.cat||'hunt';
   document.getElementById('ev-memo').value=ev?.memo||'';
   const evType=ev?.evType||'repeat';
   setEvType(evType);
@@ -1281,7 +1272,7 @@ function bgCloseEv(e){if(e.target===document.getElementById('evl'))closeEventMod
 function saveEvent(){
   const name=document.getElementById('ev-name').value.trim();
   if(!name){alert('이벤트 이름을 입력해 주세요.');return;}
-  const cat=document.getElementById('ev-cat').value;
+  const cat='etc';
   const memo=document.getElementById('ev-memo').value.trim();
   const activeType=['repeat','fixed','period','once','monthly'].find(t=>document.getElementById('ev-type-'+t).classList.contains('on'))||'repeat';
   let evData={id:editEvId||Date.now(),name,cat,memo,evType:activeType};
@@ -1349,7 +1340,7 @@ function getBossItemsForDate(targetDate){
     const k=getK(boss.id);
     if(k.awkActive&&isToday){
       const lootGuild=boss.lootEnable&&boss.lootGuilds?.length?boss.lootGuilds[boss.lootIdx%boss.lootGuilds.length]:null;
-      items.push({bossId:boss.id,name:boss.awkName,sub:boss.zone+' · 각성 출현',timeMs:0,isPast:true,state:'awaken',lootGuild});return;
+      items.push({bossId:boss.id,name:boss.awkName,sub:'각성 출현',timeMs:0,isPast:true,state:'awaken',lootGuild});return;
     }
     if(boss.bossType==='fixed'){
       const spawns=[];
@@ -1358,17 +1349,17 @@ function getBossItemsForDate(targetDate){
       const lootGuild=boss.lootEnable&&boss.lootGuilds?.length?boss.lootGuilds[boss.lootIdx%boss.lootGuilds.length]:null;
       spawns.forEach(sm=>{
         const isPast=sm<=nowMs;
-        const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
-        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':'wait',isFixed:true,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt,lootGuild});
+        const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';
+        items.push({bossId:boss.id,name:boss.name,sub:awk,timeMs:sm,isPast,state:isPast?'ready':'wait',isFixed:true,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt,lootGuild});
       });return;
     }
     if(k.lastKill){
       const sm=k.lastKill+boss.hours*3600000;
       if(sm>=dayMs&&sm<dayMs+86400000){
         const isPast=sm<=nowMs;
-        const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';
+        const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';
         const lootGuild=boss.lootEnable&&boss.lootGuilds?.length?boss.lootGuilds[boss.lootIdx%boss.lootGuilds.length]:null;
-        items.push({bossId:boss.id,name:boss.name,sub:boss.zone+awk,timeMs:sm,isPast,state:isPast?'ready':'wait',awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt,lootGuild});
+        items.push({bossId:boss.id,name:boss.name,sub:awk,timeMs:sm,isPast,state:isPast?'ready':'wait',awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt,lootGuild});
       }
     }
   });
@@ -1477,7 +1468,7 @@ function buildSchedContent(dayOffset=0){
       const lootBadge=lootInfo?`<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:${lootInfo.isOverride?'rgba(91,156,240,.12)':'var(--gold-bg)'};color:${lootInfo.isOverride?'var(--blue)':'var(--gold2)'};border:1px solid ${lootInfo.isOverride?'rgba(91,156,240,.4)':'rgba(201,168,76,.4)'};font-weight:600">🏆${lootInfo.guild}${lootInfo.isOverride?' (메모)':''}</span>`:'';
       html+=`<div class="sched-row" style="${it.awkEnable&&(it.cnt+1)>=it.awkN&&it.state!=='awaken'?'background:rgba(155,127,232,.04);border-left:2px solid var(--purple);':''}">
         <div class="sched-dot" style="background:${dot}"></div>
-        <div class="sched-row-left"><div class="sched-row-name">${it.name} ${lootBadge}</div><div class="sched-row-sub">${it.sub}</div>${awkHtml}</div>
+        <div class="sched-row-left"><div class="sched-row-name">${it.name} ${lootBadge}</div>${it.sub?`<div class="sched-row-sub">${it.sub}</div>`:''} ${awkHtml}</div>
         <div class="sched-row-right" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
           <div style="display:flex;align-items:center;gap:6px">
             <button style="font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);cursor:pointer" onclick="openLootMemo(${it.bossId})">✏️ 룻 메모</button>
@@ -1498,7 +1489,7 @@ function buildSchedContent(dayOffset=0){
       const badge=ev.isPast?'종료':ev.isNow?'진행 중':'예정';
       const periodMark=ev.evType==='period'?` <span class="ev-period-chip">기간</span>`:'';
       html+=`<div class="sched-row"><div class="sched-dot" style="background:${dot}"></div>
-        <div class="sched-row-left"><div class="sched-row-name">${ev.name}${periodMark}</div><div class="sched-row-sub">${CAT_LABEL[ev.cat]}${ev.memo?' · '+ev.memo:''}</div></div>
+        <div class="sched-row-left"><div class="sched-row-name">${ev.name}${periodMark}</div>${ev.memo?`<div class="sched-row-sub">${ev.memo}</div>`:''}</div>
         <div class="sched-row-right"><div class="sched-row-time${timeCls}" style="font-size:${ev.evType==='period'?'11':'14'}px">${ev.timeLabel}</div><div class="sched-row-badge">${badge}</div></div>
       </div>`;
     });
@@ -1511,18 +1502,18 @@ function buildSchedContent(dayOffset=0){
   bosses.forEach(boss=>{
     const k=getK(boss.id);
     if(boss.bossType==='fixed'){
-      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:ms});}});
+      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:awk,timeMs:ms});}});
     }else if(k.lastKill&&!k.awkActive){
       const sm=k.lastKill+boss.hours*3600000;
-      if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:sm});}
+      if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:awk,timeMs:sm});}
     }
   });
   events.forEach(ev=>{
-    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<tmrEndMs&&pe>tmrStartMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});}
-    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});});}
-    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
-    else if(ev.evType==='monthly'&&ev.monthDays?.includes(tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
-    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
+    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<tmrEndMs&&pe>tmrStartMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ps,cat:ev.cat});}
+    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});});}
+    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
+    else if(ev.evType==='monthly'&&ev.monthDays?.includes(tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
+    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
   });
   dawnItems.sort((a,b)=>a.timeMs-b.timeMs);
   if(dawnItems.length){
@@ -1561,7 +1552,7 @@ function buildSchedContent(dayOffset=0){
         const dayStr=ev.days.includes(7)?'매일':ev.days.map(d=>DAY_KR[d]).join('·');
         schedInfo=`<div class="ev-days-row"><span class="ev-day-chip">${dayStr}</span></div><div class="ev-time-row"><span class="ev-time">${ev.start} ~ ${ev.end}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
       }
-      html+=`<div class="ev-card"><div class="ev-card-top"><span class="ev-name">${ev.name}</span><span class="ev-cat-badge ${CAT_CLS[ev.cat]}">${CAT_LABEL[ev.cat]}</span></div>${schedInfo}<div class="ev-actions"><button class="cbtn" onclick="openEventModal(events.find(e=>e.id===${ev.id}))">편집</button><button class="cbtn danger" onclick="delEvent(${ev.id})">삭제</button></div></div>`;
+      html+=`<div class="ev-card"><div class="ev-card-top"><span class="ev-name">${ev.name}</span></div>${schedInfo}<div class="ev-actions"><button class="cbtn" onclick="openEventModal(events.find(e=>e.id===${ev.id}))">편집</button><button class="cbtn danger" onclick="delEvent(${ev.id})">삭제</button></div></div>`;
     });
   }
   html+=`</div></div>`;
@@ -1663,18 +1654,18 @@ function _buildDawnItems(){
   bosses.forEach(boss=>{
     const k=getK(boss.id);
     if(boss.bossType==='fixed'){
-      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:ms,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}});
+      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:awk,timeMs:ms,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}});
     }else if(k.lastKill&&!k.awkActive){
       const sm=k.lastKill+boss.hours*3600000;
-      if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?` · ${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:boss.zone+awk,timeMs:sm,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}
+      if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:awk,timeMs:sm,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}
     }
   });
   events.forEach(ev=>{
-    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<tmrEndMs&&pe>tmrStartMs)items.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ps,cat:ev.cat});}
-    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});});}
-    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
-    else if(ev.evType==='monthly'&&ev.monthDays?.includes(tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
-    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:CAT_LABEL[ev.cat]+(ev.memo?' · '+ev.memo:''),timeMs:ms,cat:ev.cat});}
+    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<tmrEndMs&&pe>tmrStartMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ps,cat:ev.cat});}
+    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});});}
+    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
+    else if(ev.evType==='monthly'&&ev.monthDays?.includes(tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
+    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
   });
   items.sort((a,b)=>a.timeMs-b.timeMs);
   return{items,tmrStart};
@@ -1713,16 +1704,16 @@ function renderShotResult(panel){
       :'';
     const isAwkAlert=it.awkEnable&&it.state!=='awaken'&&(it.cnt+1)>=it.awkN;
     const li=getEffectiveLoot(bosses.find(b=>b.id===it.bossId)||{});
-    const lootBadge=li?`<span style="font-size:10px;padding:1px 7px;border-radius:3px;background:#fff3cd;color:#7a4f00;border:1px solid rgba(122,79,0,.25);font-weight:700;white-space:nowrap">🏆${li.guild}</span>`:'';
+    const lootBadge=li?`<span style="font-size:12px;padding:2px 8px;border-radius:4px;background:#fff3cd;color:#7a4f00;border:1px solid rgba(122,79,0,.25);font-weight:700;white-space:nowrap">🏆${li.guild}</span>`:'';
     const regenTime=it.timeMs>0
       ?`<div style="font-size:13px;font-weight:800;background:${it.isPast?'#d4edda':'#fff3cd'};color:${it.isPast?'#155724':'#7a4f00'};padding:3px 9px;border-radius:5px;border:1px solid ${it.isPast?'rgba(21,87,36,.25)':'rgba(122,79,0,.25)'}">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</div>`
       :'';
     const statusBadge=showBadge?`<div style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${it.isPast||it.state==='awaken'?'#e8f7ee':'#ede8fb'};color:${it.isPast||it.state==='awaken'?'#2e9e5b':'#7c5fcf'};margin-top:3px">${it.isPast||it.state==='awaken'?'처치 가능':'시작 전'}</div>`:'';
-    return`<div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${isAwkAlert?'#f8f4ff':W};${isAwkAlert?'border-left:3px solid #7c5fcf;':''}">
+    return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid ${BD};gap:10px;background:${isAwkAlert?'#f8f4ff':W};${isAwkAlert?'border-left:3px solid #7c5fcf;':''}">
       <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${it.state==='awaken'?'#7c5fcf':it.isPast?'#2e9e5b':'#b8860b'}"></div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:700;color:${T1};display:flex;align-items:center;gap:5px;flex-wrap:wrap">${it.name} ${lootBadge}</div>
-        <div style="font-size:11px;color:${T3};margin-top:2px">${it.sub}</div>
+        <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:center;gap:6px;flex-wrap:wrap">${it.name} ${lootBadge}</div>
+        ${it.sub?`<div style="font-size:11px;color:${T3};margin-top:2px">${it.sub}</div>`:''}
         ${awkLine}
       </div>
       <div style="text-align:right;flex-shrink:0">${regenTime}${statusBadge}</div>
@@ -1731,11 +1722,11 @@ function renderShotResult(panel){
 
   // [수정E] 이벤트 시간을 뱃지 스타일로 — 상태별 색상 구분
   const evRow=(ev)=>`
-    <div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${W}">
-      <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${DOT_COLOR[ev.cat]||'#888899'}"></div>
+    <div style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid ${BD};gap:10px;background:${W}">
+      <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#8888a8"></div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:700;color:${T1}">${ev.name}</div>
-        <div style="font-size:11px;color:${T3};margin-top:1px">${CAT_LABEL[ev.cat]}${ev.memo?' · '+ev.memo:''}</div>
+        <div style="font-size:15px;font-weight:800;color:${T1}">${ev.name}</div>
+        ${ev.memo?`<div style="font-size:11px;color:${T3};margin-top:2px">${ev.memo}</div>`:''}
       </div>
       <div style="text-align:right;flex-shrink:0">
         <div style="font-size:12px;font-weight:700;background:${ev.isPast?'#e9ecef':ev.isNow?'#fff3cd':'#e8f0fe'};color:${ev.isPast?'#495057':ev.isNow?'#7a4f00':'#1a4a8a'};padding:3px 9px;border-radius:5px;display:inline-block;border:1px solid ${ev.isPast?'rgba(0,0,0,.1)':ev.isNow?'rgba(122,79,0,.2)':'rgba(26,74,138,.2)'}">${ev.timeLabel}</div>
