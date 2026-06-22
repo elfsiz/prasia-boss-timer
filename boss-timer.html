@@ -764,7 +764,7 @@ function execMaint(){
   showToast(isReg?'📅 정기점검 적용 완료':'⚡ 임시점검 적용 — 전체 리젠됨','maint');
   render();
 }
-function closeConf(){document.getElementById('conf-ovl').classList.remove('on');}
+function closeConf(){document.getElementById('conf-ovl').classList.remove('on');document.getElementById('conf-ok').style.display='';}
 function bgCloseConf(e){if(e.target===document.getElementById('conf-ovl'))closeConf();}
 function togMaint(){
   const b=document.getElementById('maint-body'),a=document.getElementById('maint-arrow');
@@ -1162,10 +1162,6 @@ function openLootOverride(id){
   document.getElementById('conf-ovl').classList.add('on');
 }
 
-function closeConf(){
-  document.getElementById('conf-ovl').classList.remove('on');
-  document.getElementById('conf-ok').style.display='';
-}
 function editBoss(id){openModal(bosses.find(b=>b.id===id));}
 function delBoss(id){
   const b=bosses.find(x=>x.id===id);
@@ -1613,19 +1609,6 @@ function _buildDawnItems(){
   });
   items.sort((a,b)=>a.timeMs-b.timeMs);
   return{items,tmrStart};
-}
-
-function _buildEvItems(nowMs){
-  const items=[];
-  todayEvents().forEach(ev=>{
-    let startMs,endMs,timeLabel;
-    if(ev.evType==='period'){startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();const fmtDT=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;timeLabel=`${fmtDT(new Date(ev.pstart))} ~ ${fmtDT(new Date(ev.pend))}`;}
-    else if(ev.evType==='once'){const od=new Date(ev.onceDt);startMs=od.getTime();endMs=startMs+3600000;timeLabel=`${String(od.getMonth()+1).padStart(2,'0')}/${String(od.getDate()).padStart(2,'0')} ${String(od.getHours()).padStart(2,'0')}:${String(od.getMinutes()).padStart(2,'0')}`;}
-    else if(ev.evType==='monthly'){const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);startMs=new Date().setHours(sh,sm2,0,0);endMs=new Date().setHours(eh,em,0,0);timeLabel=`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;}
-    else{const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);startMs=new Date().setHours(sh,sm2,0,0);endMs=new Date().setHours(eh,em,0,0);timeLabel=`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;}
-    items.push({...ev,startMs,endMs,timeLabel,isPast:endMs<=nowMs,isNow:startMs<=nowMs&&nowMs<endMs});
-  });
-  items.sort((a,b)=>a.startMs-b.startMs);return items;
 }
 
 // ── [수정 D,E,F] renderShotResult: 스크린샷 시간 표시 시인성 개선 ──
