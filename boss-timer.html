@@ -1712,14 +1712,20 @@ function renderShotResult(panel){
         :`<div style="font-size:10px;color:#888;margin-top:3px">각성까지 ${it.awkN-(it.cnt+1)}회 남음 (${it.cnt+1}/${it.awkN})</div>`)
       :'';
     const isAwkAlert=it.awkEnable&&it.state!=='awaken'&&(it.cnt+1)>=it.awkN;
+    const li=getEffectiveLoot(bosses.find(b=>b.id===it.bossId)||{});
+    const lootBadge=li?`<span style="font-size:10px;padding:1px 7px;border-radius:3px;background:#fff3cd;color:#7a4f00;border:1px solid rgba(122,79,0,.25);font-weight:700;white-space:nowrap">🏆${li.guild}</span>`:'';
+    const regenTime=it.timeMs>0
+      ?`<div style="font-size:13px;font-weight:800;background:${it.isPast?'#d4edda':'#fff3cd'};color:${it.isPast?'#155724':'#7a4f00'};padding:3px 9px;border-radius:5px;border:1px solid ${it.isPast?'rgba(21,87,36,.25)':'rgba(122,79,0,.25)'}">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</div>`
+      :'';
+    const statusBadge=showBadge?`<div style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${it.isPast||it.state==='awaken'?'#e8f7ee':'#ede8fb'};color:${it.isPast||it.state==='awaken'?'#2e9e5b':'#7c5fcf'};margin-top:3px">${it.isPast||it.state==='awaken'?'처치 가능':'시작 전'}</div>`:'';
     return`<div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid ${BD};gap:10px;background:${isAwkAlert?'#f8f4ff':W};${isAwkAlert?'border-left:3px solid #7c5fcf;':''}">
       <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${it.state==='awaken'?'#7c5fcf':it.isPast?'#2e9e5b':'#b8860b'}"></div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:700;color:${T1}">${it.name}${(()=>{const li=getEffectiveLoot(bosses.find(b=>b.id===it.bossId)||{});return li?` <span style="font-size:10px;padding:1px 6px;border-radius:3px;background:#fff3cd;color:#7a4f00;border:1px solid rgba(122,79,0,.25);font-weight:700">🏆${li.guild}</span>`:''})()}</div>
-        <div style="font-size:11px;color:${T3};margin-top:1px">${it.sub}${it.timeMs>0?` · <span style="background:${it.isPast?'#d4edda':'#fff3cd'};color:${it.isPast?'#155724':'#7a4f00'};font-weight:700;padding:2px 7px;border-radius:5px;font-size:12px;border:1px solid ${it.isPast?'rgba(21,87,36,.25)':'rgba(122,79,0,.25)'}">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</span>`:''}</div>
+        <div style="font-size:13px;font-weight:700;color:${T1};display:flex;align-items:center;gap:5px;flex-wrap:wrap">${it.name} ${lootBadge}</div>
+        <div style="font-size:11px;color:${T3};margin-top:2px">${it.sub}</div>
         ${awkLine}
       </div>
-      ${showBadge?`<div style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;background:${it.isPast||it.state==='awaken'?'#e8f7ee':'#ede8fb'};color:${it.isPast||it.state==='awaken'?'#2e9e5b':'#7c5fcf'}">${it.isPast||it.state==='awaken'?'처치 가능':'시작 전'}</div>`:''}
+      <div style="text-align:right;flex-shrink:0">${regenTime}${statusBadge}</div>
     </div>`;
   };
 
@@ -1751,7 +1757,7 @@ function renderShotResult(panel){
       <div style="font-size:16px;font-weight:800;color:${T1}">⚔ 결사 오늘 일정</div>
       <div style="font-size:12px;font-weight:600;color:${T2}">${dateStr}</div>
     </div>
-    ${raidTimeVal?`<div style="display:flex;align-items:center;gap:16px;padding:8px 0;margin-bottom:14px;border-bottom:1.5px solid #b09ae8;flex-wrap:wrap"><div style="display:flex;align-items:baseline;gap:8px"><div style="font-size:12px;color:#7c5fcf;font-weight:700;white-space:nowrap">결사 일정 시작 시간</div><div style="font-size:31px;font-weight:900;color:#5c3d9e;letter-spacing:3px;font-family:monospace;line-height:1">${raidTimeVal}</div></div>${raidMemoVal?`<div style="font-size:13px;color:#4a3080;font-weight:600;padding:4px 10px;background:rgba(155,127,232,.1);border-radius:6px;border:1px solid rgba(155,127,232,.25);flex:1;min-width:0">${raidMemoVal}</div>`:''}</div>`:''}`;
+    ${raidTimeVal?`<div style="display:flex;align-items:center;gap:12px;padding:8px 0;margin-bottom:14px;border-bottom:1.5px solid #b09ae8"><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><div style="font-size:11px;color:#7c5fcf;font-weight:700;line-height:1.4;text-align:right">결사 일정<br>시작 시간</div><div style="font-size:31px;font-weight:900;color:#5c3d9e;letter-spacing:3px;font-family:monospace;line-height:1">${raidTimeVal}</div></div>${raidMemoVal?`<div style="font-size:13px;color:#4a3080;font-weight:600;padding:4px 10px;background:rgba(155,127,232,.1);border-radius:6px;border:1px solid rgba(155,127,232,.25);flex:1;min-width:0">${raidMemoVal}</div>`:''}</div>`:''}`;
 
   if(raidMs){
     const allBossRows=[];
