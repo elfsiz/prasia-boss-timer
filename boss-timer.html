@@ -1589,8 +1589,8 @@ function renderShotSetup(panel){
     :'<div class="shot-empty">오늘 이벤트 없음</div>';
   panel.innerHTML=`<div class="shot-setup">
     <div class="shot-setup-title">📋 일정표 생성</div><div class="shot-setup-date">${dateStr}</div>
-    <div class="shot-section-lbl">결사 일정 시작 시간 <span style="font-size:10px;font-weight:400;color:var(--t3)">(선택 — 입력 시 그룹 분리)</span></div>
-    <div class="shot-time-row"><div class="hm-row"><select class="shot-hm-sel" id="shot-time-h" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select><span class="hm-colon" style="color:var(--purple2)">:</span><select class="shot-hm-sel" id="shot-time-m" onchange="_shotState.raidTime=getSelHM('shot-time-h','shot-time-m')"></select></div>${_shotState.raidTime?`<button class="raid-clear-btn" onclick="_shotState.raidTime='';fillHM('shot-time-h','shot-time-m','00:00')">초기화</button>`:''}<input class="finput" id="shot-memo-inp" placeholder="📝 일정 메모 (선택)" value="${_shotState.raidMemo||''}" style="flex:1;font-size:13px;padding:8px 10px" oninput="_shotState.raidMemo=this.value.trim()"></div>
+    <div class="shot-section-lbl">📝 일정 메모 <span style="font-size:10px;font-weight:400;color:var(--t3)">(선택)</span></div>
+    <input class="finput" id="shot-memo-inp" placeholder="오늘 일정 관련 메모를 입력하세요" value="${_shotState.raidMemo||''}" style="font-size:13px;padding:10px 12px;width:100%" oninput="_shotState.raidMemo=this.value">
     <div class="shot-section-lbl">⚔ 보스 일정 순서 <span style="font-size:10px;font-weight:400;color:var(--t3)">(▲▼로 동선에 맞게 순서 조정)</span></div><div class="shot-check-list" id="shot-boss-list">${bossCheckRows}</div>
     <div class="shot-section-lbl">📅 이벤트 선택</div><div class="shot-check-list" id="shot-ev-list">${evCheckRows}</div>
     ${dawnItems.length?`<div class="shot-section-lbl">🌙 새벽 일정 선택 <span style="font-size:10px;font-weight:400;color:var(--t3)">(${String(tmrStart.getMonth()+1).padStart(2,'0')}/${String(tmrStart.getDate()).padStart(2,'0')} 00:00~08:00)</span></div>
@@ -1599,7 +1599,7 @@ function renderShotSetup(panel){
     <button class="shot-close" style="width:100%;margin-top:8px" onclick="_resetShotState();document.getElementById('shot-panel').classList.remove('show')">닫기</button>
   </div>`;
   const [_sh,_sm]=(stripSec(_shotState.raidTime)||'00:00').split(':');
-  fillHour('shot-time-h',_sh||'00');fillMin('shot-time-m',_sm||'00');
+  // 메모 입력창은 innerHTML 교체 후 자동 복원됨
 }
 function _captureBossChecks(){
   const boxes=document.querySelectorAll('.shot-boss-chk');
@@ -1618,7 +1618,6 @@ function _saveShotChecks(){
   _shotState.bossChecks=new Set([...document.querySelectorAll('.shot-boss-chk:checked')].map(el=>parseInt(el.dataset.idx)));
   _shotState.evChecks=new Set([...document.querySelectorAll('.shot-ev-chk:checked')].map(el=>parseInt(el.dataset.idx)));
   _shotState.dawnChecks=new Set([...document.querySelectorAll('.shot-dawn-chk:checked')].map(el=>parseInt(el.dataset.idx)));
-  _shotState.raidTime=getSelHM('shot-time-h','shot-time-m');
   _shotState.raidMemo=(document.getElementById('shot-memo-inp')?.value||'').trim();
 }
 function _resetShotState(){_shotState={raidTime:'',raidMemo:'',bossChecks:null,evChecks:null,dawnChecks:null,bossOrder:null};}
@@ -1782,13 +1781,19 @@ function renderShotResult(panel){
     ...selEv.map(ev=>({...ev,_type:'event',_timeMin:Math.floor(ev.startMs/60000)}))
   ].sort((a,b)=>a._timeMin-b._timeMin);
 
-  const raidMin=raidMs?Math.floor(raidMs/60000):null;
-
-  let body=`<div id="shot-body" style="background:${BG};border-radius:14px;padding:16px;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:420px;margin:0 auto">
-    <div style="margin-bottom:${raidMemoVal?'8px':'12px'};padding-bottom:10px;border-bottom:2px solid rgba(8,145,178,.2)">
-      <div style="font-size:14px;font-weight:800;color:${T1}">${dateStr} 결사 일정</div>
+  // 이벤트 mergedRow - 메모를 오른쪽 시간 배지 아래에 표시
+  const mergedRowEv=(it)=>`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${W}">
+    <div style="width:3px;height:${it.memo?'44px':'34px'};background:${EVENT_BAR};flex-shrink:0"></div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:15px;font-weight:800;color:${T1}">${it.name}</div>
     </div>
-    ${raidMemoVal?`<div style="font-size:13px;color:#0c4a6e;font-weight:600;padding:5px 12px;background:rgba(2,132,199,.08);border-radius:6px;border:1px solid rgba(2,132,199,.2);margin-bottom:10px">${raidMemoVal}</div>`:''}`;
+    <div style="text-align:right;flex-shrink:0">
+      <div style="font-size:12px;font-weight:800;background:${EV_BG};color:${EV_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${EV_BORDER};white-space:nowrap">${it.timeLabel}</div>
+      ${it.memo?`<div style="font-size:12px;font-weight:600;color:#0284c7;margin-top:3px;white-space:nowrap">${it.memo}</div>`:''}
+    </div>
+  </div>`;
+
+  const mergedRowFinal=(it)=>it._type==='boss'?mergedRow(it):mergedRowEv(it);
 
   // 시간(hour) 단위로 그룹화
   const hourGroups={};
@@ -1799,23 +1804,17 @@ function renderShotResult(panel){
   });
   const sortedHours=Object.entries(hourGroups).sort((a,b)=>+a[0]-+b[0]);
 
-  if(raidMin!==null){
-    // 시작 시간 표시 (크게)
-    body+=`<div style="font-size:22px;font-weight:900;color:#0284c7;letter-spacing:2px;font-family:monospace;margin:0 0 8px;display:flex;align-items:center;gap:8px"><span style="font-size:12px;font-weight:700;color:#7fb3c8;letter-spacing:0;font-family:sans-serif">집결</span>${raidTimeVal}</div>`;
-    // 모든 항목 한 박스에 통합 + 내부 시간 구분선
-    let boxContent='';
-    sortedHours.forEach(([h,items])=>{
-      boxContent+=internalHourDiv(h==-1?'현재':h);
-      boxContent+=items.map(mergedRow).join('');
-    });
-    body+=groupBox(boxContent);
-  }else{
-    // 시작 시간 없음 - 시간별 별도 박스
-    sortedHours.forEach(([h,items])=>{
-      body+=`<div style="font-size:16px;font-weight:900;color:#0284c7;letter-spacing:1px;font-family:monospace;margin:10px 0 5px;padding-left:2px">${String(h==-1?'현재':h).padStart(2,'0')}:00</div>`;
-      body+=groupBox(items.map(mergedRow).join(''));
-    });
-  }
+  let body=`<div id="shot-body" style="background:${BG};border-radius:14px;padding:16px;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:420px;margin:0 auto">
+    <div style="margin-bottom:${raidMemoVal?'8px':'12px'};padding-bottom:10px;border-bottom:2px solid rgba(8,145,178,.2)">
+      <div style="font-size:14px;font-weight:800;color:${T1}">${dateStr} 결사 일정</div>
+    </div>
+    ${raidMemoVal?`<div style="font-size:13px;color:#0c4a6e;font-weight:600;padding:5px 12px;background:rgba(2,132,199,.08);border-radius:6px;border:1px solid rgba(2,132,199,.2);margin-bottom:10px">${raidMemoVal}</div>`:''}`;
+
+  // 시간별 별도 박스
+  sortedHours.forEach(([h,items])=>{
+    body+=`<div style="font-size:16px;font-weight:900;color:#0284c7;letter-spacing:1px;font-family:monospace;margin:10px 0 5px;padding-left:2px">${String(h==-1?'현재':h).padStart(2,'0')}:00</div>`;
+    body+=groupBox(items.map(mergedRowFinal).join(''));
+  });
 
   // 새벽 일정
   const {items:allDawn,tmrStart:_tmrStart}=_buildDawnItems();
