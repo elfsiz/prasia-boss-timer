@@ -1783,14 +1783,11 @@ function renderShotResult(panel){
 
   // 이벤트 mergedRow - 메모를 오른쪽 시간 배지 아래에 표시
   const mergedRowEv=(it)=>`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${W}">
-    <div style="width:3px;height:${it.memo?'44px':'34px'};background:${EVENT_BAR};flex-shrink:0"></div>
+    <div style="width:3px;height:34px;background:${EVENT_BAR};flex-shrink:0"></div>
     <div style="flex:1;min-width:0">
-      <div style="font-size:15px;font-weight:800;color:${T1}">${it.name}</div>
+      <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">${it.name}${it.memo?`<span style="font-size:12px;font-weight:600;color:#0284c7">${it.memo}</span>`:''}</div>
     </div>
-    <div style="text-align:right;flex-shrink:0">
-      <div style="font-size:12px;font-weight:800;background:${EV_BG};color:${EV_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${EV_BORDER};white-space:nowrap">${it.timeLabel}</div>
-      ${it.memo?`<div style="font-size:12px;font-weight:600;color:#0284c7;margin-top:3px;white-space:nowrap">${it.memo}</div>`:''}
-    </div>
+    <div style="font-size:12px;font-weight:800;background:${EV_BG};color:${EV_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${EV_BORDER};flex-shrink:0;white-space:nowrap">${it.timeLabel}</div>
   </div>`;
 
   const mergedRowFinal=(it)=>it._type==='boss'?mergedRow(it):mergedRowEv(it);
