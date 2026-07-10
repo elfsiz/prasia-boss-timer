@@ -317,6 +317,7 @@ input[type="date"]{color-scheme:dark}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
 </head>
 <body>
@@ -599,6 +600,28 @@ function save(){
   localStorage.setItem('pr_e',JSON.stringify(events));
 }
 
+function downloadShotImage(){
+  const el=document.getElementById('shot-body');
+  if(!el){showToast('일정표를 먼저 생성해 주세요.');return;}
+  const btn=document.getElementById('shot-dl-btn');
+  if(btn){btn.textContent='저장 중...';btn.disabled=true;}
+  html2canvas(el,{
+    scale:2,
+    backgroundColor:null,
+    useCORS:true,
+    logging:false,
+  }).then(canvas=>{
+    const a=document.createElement('a');
+    const d=new Date();
+    a.download=`결사일정_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.png`;
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+    if(btn){btn.textContent='📥 이미지 저장';btn.disabled=false;}
+  }).catch(()=>{
+    showToast('이미지 저장 실패. 다시 시도해 주세요.');
+    if(btn){btn.textContent='📥 이미지 저장';btn.disabled=false;}
+  });
+}
 function setupFirebase(){
   db.ref('.info/connected').on('value',snap=>{
     const el=document.getElementById('conn-badge');
@@ -1805,7 +1828,7 @@ function renderShotResult(panel){
     <div style="margin-bottom:${raidMemoVal?'8px':'12px'};padding-bottom:10px;border-bottom:2px solid rgba(8,145,178,.2)">
       <div style="font-size:14px;font-weight:800;color:${T1}">${dateStr} 결사 일정</div>
     </div>
-    ${raidMemoVal?`<div style="font-size:13px;color:#0c4a6e;font-weight:600;padding:5px 12px;background:rgba(2,132,199,.08);border-radius:6px;border:1px solid rgba(2,132,199,.2);margin-bottom:10px">${raidMemoVal}</div>`:''}`;
+    ${raidMemoVal?`<div style="background:linear-gradient(90deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#c77dff,#ff6b6b);padding:2.5px;border-radius:10px;margin-bottom:12px"><div style="background:#fff;border-radius:8px;padding:8px 14px"><div style="font-size:14px;font-weight:700;color:#0c2d48;line-height:1.5">${raidMemoVal}</div></div></div>`:''}`;
 
   // 시간별 별도 박스
   sortedHours.forEach(([h,items])=>{
@@ -1842,6 +1865,7 @@ function renderShotResult(panel){
     <div style="font-size:12px;color:#aaaaaa;margin-top:12px;text-align:center">위 화면을 스크린샷하여 결사원들과 공유하세요</div>
     <div style="display:flex;gap:8px;margin-top:10px;width:100%;max-width:420px;flex-wrap:wrap">
       <button class="shot-close" style="flex:1" onclick="renderShotSetup(document.getElementById('shot-panel'))">← 다시 설정</button>
+      <button id="shot-dl-btn" class="shot-close" style="flex:1;background:var(--gold);color:#1a1200;border-color:var(--gold);font-weight:700" onclick="downloadShotImage()">📥 이미지 저장</button>
       <button class="shot-close" style="flex:1" onclick="_resetShotState();document.getElementById('shot-panel').classList.remove('show')">닫기</button>
     </div>`;
 }
