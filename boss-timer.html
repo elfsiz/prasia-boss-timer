@@ -1596,6 +1596,12 @@ function _buildCombinedItems(targetDate,nowMs){
     ...evItems.map((ev,i)=>({...ev,_kind:'event',_src:i,_label:ev.name,_time:ev.timeLabel,_dot:'#0284c7',_memo:ev.memo})),
     ...dawnItems.map((it,i)=>({...it,_kind:'dawn',_src:i,_label:it.name,_time:`🌙 ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}`,_dot:'#6644aa'})),
   ];
+  // 초기 나열 순서: 시간순 정렬 (사용자가 이후 ▲▼로 변경 가능)
+  all.sort((a,b)=>{
+    const ta=a._kind==='event'?(a.startMs||0):(a.timeMs||0);
+    const tb=b._kind==='event'?(b.startMs||0):(b.timeMs||0);
+    return ta-tb;
+  });
   return{all,bossItems,evItems,dawnItems,tmrStart};
 }
 
