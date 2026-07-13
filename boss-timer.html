@@ -1800,9 +1800,16 @@ function renderShotResult(panel){
   };
 
   const mergedAll=[
-    ...selBoss.map(it=>({...it,_type:'boss',_timeMin:it.timeMs?Math.floor(it.timeMs/60000):0})),
-    ...selEv.map(ev=>({...ev,_type:'event',_timeMin:Math.floor(ev.startMs/60000)}))
-  ].sort((a,b)=>a._timeMin-b._timeMin);
+    ...selBoss.map((it,userIdx)=>({...it,_type:'boss',_timeMin:it.timeMs?Math.floor(it.timeMs/60000):0,_userIdx:userIdx})),
+    ...selEv.map((ev,i)=>({...ev,_type:'event',_timeMin:Math.floor(ev.startMs/60000),_userIdx:i}))
+  ].sort((a,b)=>{
+    const hourA=a._type==='boss'?(a.timeMs?new Date(a.timeMs).getHours():-1):new Date(a.startMs).getHours();
+    const hourB=b._type==='boss'?(b.timeMs?new Date(b.timeMs).getHours():-1):new Date(b.startMs).getHours();
+    if(hourA!==hourB)return hourA-hourB;
+    // 같은 시간대: 보스끼리는 사용자 지정 순서 우선
+    if(a._type==='boss'&&b._type==='boss')return a._userIdx-b._userIdx;
+    return a._timeMin-b._timeMin;
+  });
 
   // 이벤트 mergedRow - 메모를 오른쪽 시간 배지 아래에 표시
   const mergedRowEv=(it)=>`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${W}">
