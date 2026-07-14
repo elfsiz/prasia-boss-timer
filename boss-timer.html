@@ -248,12 +248,12 @@ input[type="date"]{color-scheme:dark}
 .raid-panel{background:rgba(155,127,232,.08);border:1px solid rgba(155,127,232,.3);border-radius:var(--r);padding:14px;margin-bottom:12px}
 .raid-clear-btn{font-size:11px;padding:5px 10px;border-radius:var(--rs);border:1px solid var(--border2);background:none;color:var(--t3);cursor:pointer}
 .sched-blk-hdr.raid{background:rgba(155,127,232,.1);color:var(--purple2)}
-.shot-setup{background:var(--bg2);border-radius:var(--r);padding:20px;width:100%;max-width:420px}
+.shot-setup{background:var(--bg2);border-radius:var(--r);padding:20px;width:100%;max-width:420px;display:flex;flex-direction:column;max-height:calc(100vh - 48px);overflow:hidden}
 .shot-setup-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px}
 .shot-setup-date{font-size:12px;color:var(--t3);margin-bottom:4px}
 .shot-section-lbl{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.7px;margin:14px 0 8px}
 .shot-time-row{display:flex;align-items:center;gap:10px}
-.shot-check-list{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto}
+.shot-check-list{display:flex;flex-direction:column;gap:4px;flex:1;overflow-y:auto;min-height:0}
 .shot-check-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs);background:var(--bg3);cursor:pointer}
 .shot-check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex-shrink:0}
 .shot-check-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -1635,8 +1635,10 @@ function renderShotSetup(panel){
     <input class="finput" id="shot-memo-inp" placeholder="오늘 일정 관련 메모를 입력하세요" value="${_shotState.raidMemo||''}" style="font-size:13px;padding:10px 12px;width:100%" oninput="_shotState.raidMemo=this.value">
     <div class="shot-section-lbl">📋 일정 순서 <span style="font-size:10px;font-weight:400;color:var(--t3)">(▲▼로 순서 조정 · 체크 해제 시 제외)</span></div>
     <div class="shot-check-list" id="shot-cmb-list">${rows}</div>
-    <button class="shot-generate-btn" onclick="_saveShotChecks();renderShotResult(document.getElementById('shot-panel'))">일정표 생성 →</button>
-    <button class="shot-close" style="width:100%;margin-top:8px" onclick="_resetShotState();document.getElementById('shot-panel').classList.remove('show')">닫기</button>
+    <div style="padding-top:12px;border-top:1px solid var(--border);margin-top:8px;display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+      <button class="shot-generate-btn" style="margin-top:0" onclick="_saveShotChecks();renderShotResult(document.getElementById('shot-panel'))">일정표 생성 →</button>
+      <button class="shot-close" style="width:100%" onclick="_resetShotState();document.getElementById('shot-panel').classList.remove('show')">닫기</button>
+    </div>
   </div>`;
 }
 
