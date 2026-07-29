@@ -275,7 +275,7 @@ input[type="date"]{color-scheme:dark}
 .boss-type-btn{flex:1;padding:9px 8px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);transition:all .15s}
 .boss-type-btn.on{background:var(--gold-bg);border-color:rgba(201,168,76,.5);color:var(--gold2)}
 .fixed-times-wrap{display:flex;flex-direction:column;gap:8px}
-.fixed-time-row{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 10px}
+.fixed-time-row{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 10px;flex-wrap:wrap}
 .fixed-day-sel{background:var(--bg);border:1px solid var(--border2);border-radius:var(--rs);padding:6px 8px;font-size:13px;color:var(--text);outline:none;cursor:pointer;min-width:60px}
 .fixed-time-sep{color:var(--t3);font-size:12px}
 .fixed-hm-sel{background:var(--bg);border:1px solid var(--border2);border-radius:var(--rs);padding:6px 8px;font-size:13px;color:var(--text);outline:none;cursor:pointer;min-width:52px;text-align:center}
@@ -980,7 +980,7 @@ function setBossType(type){
   const spawnSec=document.getElementById('spawn-section');
   if(spawnSec)spawnSec.style.display=type==='kill'?'block':'none';
 }
-function addFixedTimeRow(day=1,hh='20',mm='00'){
+function addFixedTimeRow(day=1,hh='20',mm='00',memo=''){
   const wrap=document.getElementById('fixed-times-wrap');
   const idx=Date.now()+Math.random();
   const dayOpts=DAY_KR2.map((d,i)=>`<option value="${i}"${i===day?'selected':''}>${d}</option>`).join('');
@@ -989,13 +989,19 @@ function addFixedTimeRow(day=1,hh='20',mm='00'){
   for(let i=0;i<60;i++){const v=String(i).padStart(2,'0');mOpts+=`<option value="${v}"${v===mm?'selected':''}>${v}</option>`;}
   const row=document.createElement('div');
   row.className='fixed-time-row';row.dataset.idx=idx;
-  row.innerHTML=`<select class="fixed-day-sel">${dayOpts}</select><span class="fixed-time-sep">요일</span><select class="fixed-hm-sel hh">${hOpts}</select><span class="hm-colon">:</span><select class="fixed-hm-sel mm">${mOpts}</select><button type="button" class="fixed-del-btn" onclick="this.parentElement.remove()">✕</button>`;
+  row.innerHTML=`<select class="fixed-day-sel">${dayOpts}</select><span class="fixed-time-sep">요일</span><select class="fixed-hm-sel hh">${hOpts}</select><span class="hm-colon">:</span><select class="fixed-hm-sel mm">${mOpts}</select><input class="fixed-memo-inp" placeholder="메모 (선택)" value="${memo}" style="flex:1;min-width:80px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--rs);padding:5px 8px;font-size:12px;color:var(--text);outline:none"><button type="button" class="fixed-del-btn" onclick="this.parentElement.remove()">✕</button>`;
   wrap.appendChild(row);
 }
 function getFixedTimes(){
   const rows=document.querySelectorAll('#fixed-times-wrap .fixed-time-row');
   const times=[];
-  rows.forEach(row=>{const day=parseInt(row.querySelector('.fixed-day-sel').value);const hh=row.querySelector('.hh').value;const mm=row.querySelector('.mm').value;times.push({day,hh,mm});});
+  rows.forEach(row=>{
+    const day=parseInt(row.querySelector('.fixed-day-sel').value);
+    const hh=row.querySelector('.hh').value;
+    const mm=row.querySelector('.mm').value;
+    const memo=(row.querySelector('.fixed-memo-inp')?.value||'').trim();
+    times.push({day,hh,mm,memo});
+  });
   return times;
 }
 function getNextFixedMs(boss){
@@ -1048,7 +1054,7 @@ function openModal(boss=null){
   const btype=boss?.bossType||'kill';
   setBossType(btype);
   document.getElementById('fixed-times-wrap').innerHTML='';
-  if(btype==='fixed'&&boss?.fixedTimes?.length){boss.fixedTimes.forEach(ft=>addFixedTimeRow(ft.day,ft.hh,ft.mm));}
+  if(btype==='fixed'&&boss?.fixedTimes?.length){boss.fixedTimes.forEach(ft=>addFixedTimeRow(ft.day,ft.hh,ft.mm,ft.memo||''));}
   else if(btype==='fixed'){addFixedTimeRow();}
   const spawnSec=document.getElementById('spawn-section');
   const spawnHr=document.getElementById('spawn-hr');
@@ -1358,13 +1364,13 @@ function getBossItemsForDate(targetDate){
     }
     if(boss.bossType==='fixed'){
       const spawns=[];
-      boss.fixedTimes?.forEach(ft=>{if(ft.day!==dow)return;const d=new Date(targetDate);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);spawns.push(d.getTime());});
-      spawns.sort((a,b)=>a-b);
+      boss.fixedTimes?.forEach(ft=>{if(ft.day!==dow)return;const d=new Date(targetDate);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);spawns.push({ms:d.getTime(),memo:ft.memo||''});});
+      spawns.sort((a,b)=>a.ms-b.ms);
       const lootGuild=boss.lootEnable&&boss.lootGuilds?.length?boss.lootGuilds[boss.lootIdx%boss.lootGuilds.length]:null;
-      spawns.forEach(sm=>{
+      spawns.forEach(({ms:sm,memo})=>{
         const isPast=sm<=nowMs;
         const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';
-        items.push({bossId:boss.id,name:boss.name,sub:awk,timeMs:sm,isPast,state:isPast?'ready':'wait',isFixed:true,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt,lootGuild});
+        items.push({bossId:boss.id,name:boss.name,sub:awk,fixedMemo:memo,timeMs:sm,isPast,state:isPast?'ready':'wait',isFixed:true,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt,lootGuild});
       });return;
     }
     if(k.lastKill){
@@ -1482,7 +1488,7 @@ function buildSchedContent(dayOffset=0){
       const lootBadge=lootInfo?`<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:${lootInfo.isOverride?'rgba(91,156,240,.12)':'var(--gold-bg)'};color:${lootInfo.isOverride?'var(--blue)':'var(--gold2)'};border:1px solid ${lootInfo.isOverride?'rgba(91,156,240,.4)':'rgba(201,168,76,.4)'};font-weight:600">🏆${lootInfo.guild}${lootInfo.isOverride?' (메모)':''}</span>`:'';
       html+=`<div class="sched-row" style="${it.awkEnable&&(it.cnt+1)>=it.awkN&&it.state!=='awaken'?'background:rgba(155,127,232,.04);border-left:2px solid var(--purple);':''}">
         <div class="sched-dot" style="background:${dot}"></div>
-        <div class="sched-row-left"><div class="sched-row-name">${it.name} ${lootBadge}</div>${it.sub?`<div class="sched-row-sub">${it.sub}</div>`:''} ${awkHtml}</div>
+        <div class="sched-row-left"><div class="sched-row-name">${it.name} ${lootBadge}${it.fixedMemo?`<span style="font-size:11px;color:var(--blue);font-weight:600;margin-left:4px">${it.fixedMemo}</span>`:''}</div>${it.sub?`<div class="sched-row-sub">${it.sub}</div>`:''} ${awkHtml}</div>
         <div class="sched-row-right" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
           <div style="display:flex;align-items:center;gap:6px">
             <button style="font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);cursor:pointer" onclick="openLootMemo(${it.bossId})">✏️ 룻 메모</button>
@@ -1733,7 +1739,7 @@ function renderShotResult(panel){
       return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${W}">
         <div style="width:3px;height:34px;background:${BOSS_BAR};flex-shrink:0"></div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:center;gap:5px;flex-wrap:wrap">${it.name} ${lootBadge}</div>
+          <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:center;gap:5px;flex-wrap:wrap">${it.name} ${lootBadge}${it.fixedMemo?`<span style="font-size:11px;font-weight:600;color:#0284c7">${it.fixedMemo}</span>`:''}</div>
           ${awkLine}
         </div>
         <div style="flex-shrink:0">${regenBadge}</div>
