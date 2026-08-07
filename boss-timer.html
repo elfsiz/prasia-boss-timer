@@ -1542,7 +1542,7 @@ function buildSchedContent(dayOffset=0){
     dawnItems.forEach(it=>{
       const dot=it.type==='boss'?'#c9a84c':(DOT_COLOR[it.cat]||'#8888a8');
       html+=`<div class="sched-row"><div class="sched-dot" style="background:${dot}"></div>
-        <div class="sched-row-left"><div class="sched-row-name">${it.name}</div><div class="sched-row-sub">${it.sub}</div></div>
+        <div class="sched-row-left"><div class="sched-row-name">${it.name}${it.sub?`<span style="font-size:11px;color:var(--blue);font-weight:600;margin-left:6px">${it.sub}</span>`:''}</div></div>
         <div class="sched-row-right"><div class="sched-row-time">${fmtHHMM(it.timeMs)}</div><div class="sched-row-badge">${it.type==='boss'?'리젠 예정':'예정'}</div></div>
       </div>`;
     });
@@ -1756,13 +1756,13 @@ function renderShotResult(panel){
       // dawn
       const isBoss=it.type==='boss';
       const bar=isBoss?BOSS_BAR:EVENT_BAR;
-      const timeBg=isBoss?BOSS_BG:EV_BG;
-      const timeColor=isBoss?BOSS_COLOR:EV_COLOR;
-      const timeBorder=isBoss?BOSS_BORDER:EV_BORDER;
       const timeStr=`${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}`;
+      const memo=isBoss?(it.fixedMemo||''):(it.sub||'');
       return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:#f8f4ff">
         <div style="width:3px;height:34px;background:${DAWN_BAR};flex-shrink:0"></div>
-        <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:800;color:${T1}">${it.name} <span style="font-size:11px;font-weight:600;color:#6644aa">🌙 새벽</span></div></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">${it.name}${memo?`<span style="font-size:12px;font-weight:600;color:#6644aa">${memo}</span>`:''} <span style="font-size:11px;font-weight:600;color:#6644aa">🌙 새벽</span></div>
+        </div>
         <div style="font-size:12px;font-weight:800;background:#e8e0fb;color:#4a2c8a;padding:3px 10px;border-radius:6px;border:1px solid rgba(74,44,138,.25);white-space:nowrap">${timeStr}</div>
       </div>`;
     }
