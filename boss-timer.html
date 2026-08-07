@@ -1522,7 +1522,7 @@ function buildSchedContent(dayOffset=0){
   bosses.forEach(boss=>{
     const k=getK(boss.id);
     if(boss.bossType==='fixed'){
-      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:awk,timeMs:ms});}});
+      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:awk,fixedMemo:ft.memo||'',timeMs:ms});}});
     }else if(k.lastKill&&!k.awkActive){
       const sm=k.lastKill+boss.hours*3600000;
       if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:awk,timeMs:sm});}
@@ -1542,7 +1542,7 @@ function buildSchedContent(dayOffset=0){
     dawnItems.forEach(it=>{
       const dot=it.type==='boss'?'#c9a84c':(DOT_COLOR[it.cat]||'#8888a8');
       html+=`<div class="sched-row"><div class="sched-dot" style="background:${dot}"></div>
-        <div class="sched-row-left"><div class="sched-row-name">${it.name}${it.sub?`<span style="font-size:11px;color:var(--blue);font-weight:600;margin-left:6px">${it.sub}</span>`:''}</div></div>
+        <div class="sched-row-left"><div class="sched-row-name">${it.name}${(it.sub||it.fixedMemo)?`<span style="font-size:11px;color:var(--blue);font-weight:600;margin-left:6px">${it.fixedMemo||it.sub}</span>`:''}</div></div>
         <div class="sched-row-right"><div class="sched-row-time">${fmtHHMM(it.timeMs)}</div><div class="sched-row-badge">${it.type==='boss'?'리젠 예정':'예정'}</div></div>
       </div>`;
     });
@@ -1687,7 +1687,7 @@ function _buildDawnItems(){
   bosses.forEach(boss=>{
     const k=getK(boss.id);
     if(boss.bossType==='fixed'){
-      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:awk,timeMs:ms,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}});
+      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:awk,fixedMemo:ft.memo||'',timeMs:ms,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}});
     }else if(k.lastKill&&!k.awkActive){
       const sm=k.lastKill+boss.hours*3600000;
       if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:awk,timeMs:sm,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}
