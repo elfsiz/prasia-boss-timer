@@ -1589,9 +1589,14 @@ function openShotPanel(){
   renderShotSetup(panel);panel.classList.add('show');
 }
 // ── 스크린샷 상태: 통합 순서 방식 ──
-let _shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,showRegenTime:true};
+let _shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSet:new Set()};
 
-function _resetShotState(){_shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,showRegenTime:true};}
+function _resetShotState(){_shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSet:new Set()};}
+function _toggleRegenHide(si){
+  if(_shotState.hiddenRegenSet.has(si))_shotState.hiddenRegenSet.delete(si);
+  else _shotState.hiddenRegenSet.add(si);
+  renderShotResult(document.getElementById('shot-panel'));
+}
 
 function _buildCombinedItems(targetDate,nowMs){
   const bossItems=getBossItemsForDate(targetDate);
@@ -1642,11 +1647,6 @@ function renderShotSetup(panel){
     <div class="shot-section-lbl">📋 일정 순서 <span style="font-size:10px;font-weight:400;color:var(--t3)">(▲▼로 순서 조정 · 체크 해제 시 제외)</span></div>
     <div class="shot-check-list" id="shot-cmb-list">${rows}</div>
     <div style="padding-top:12px;border-top:1px solid var(--border);margin-top:8px;display:flex;flex-direction:column;gap:8px;flex-shrink:0">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text);padding:4px 0">
-        <input type="checkbox" id="shot-regen-toggle" ${_shotState.showRegenTime?'checked':''} onchange="_shotState.showRegenTime=this.checked" style="width:16px;height:16px;cursor:pointer;accent-color:#0d9488">
-        <span>리젠 시간 표시</span>
-        <span style="font-size:11px;color:var(--t3)">(해제 시 일괄 시간 배포용)</span>
-      </label>
       <button class="shot-generate-btn" style="margin-top:0" onclick="_saveShotChecks();renderShotResult(document.getElementById('shot-panel'))">일정표 생성 →</button>
       <button class="shot-close" style="width:100%" onclick="_resetShotState();document.getElementById('shot-panel').classList.remove('show')">닫기</button>
     </div>
@@ -1729,7 +1729,7 @@ function renderShotResult(panel){
   const order=_shotState.combinedOrder&&_shotState.combinedOrder.length===all.length
     ?_shotState.combinedOrder:all.map((_,i)=>i);
   const checks=_shotState.combinedChecks||new Set(all.map((_,i)=>i));
-  const selItems=order.filter(si=>checks.has(si)).map(si=>all[si]);
+  const selItems=order.filter(si=>checks.has(si)).map(si=>({...all[si],_si:si}));
 
   // 행 렌더러
   const itemRow=(it)=>{
@@ -1738,11 +1738,12 @@ function renderShotResult(panel){
       const lootBadge=li?`<span style="font-size:11px;padding:2px 7px;border-radius:4px;background:${BOSS_BG};color:${BOSS_COLOR};border:1px solid ${BOSS_BORDER};font-weight:700;white-space:nowrap">🏆${li.guild}</span>`:'';
       const awkLine=(it.awkEnable&&it.state!=='awaken'&&(it.cnt+1)>=it.awkN)
         ?`<div style="font-size:10px;font-weight:700;color:#0d9488;margin-top:3px;padding:2px 7px;background:#ccfbf1;border:1px solid rgba(13,148,136,.4);border-radius:4px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`:'';
-      const regenBadge=_shotState.showRegenTime
-        ?(it.timeMs>0
-          ?`<div style="font-size:12px;font-weight:800;background:${it.isPast?BOSS_BG:'#fff3cd'};color:${it.isPast?BOSS_COLOR:'#7a4f00'};padding:3px 10px;border-radius:6px;border:1px solid ${it.isPast?BOSS_BORDER:'rgba(122,79,0,.25)'};white-space:nowrap">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</div>`
-          :`<div style="font-size:12px;font-weight:800;background:${BOSS_BG};color:${BOSS_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${BOSS_BORDER};white-space:nowrap">처치 가능</div>`)
-        :'';
+      const hidden=_shotState.hiddenRegenSet.has(it._si);
+      const regenBadge=hidden
+        ?`<div onclick="_toggleRegenHide(${it._si})" style="font-size:11px;font-weight:600;color:#aaa;padding:3px 8px;border-radius:6px;border:1px dashed #ccc;cursor:pointer;white-space:nowrap;user-select:none">시간 숨김</div>`
+        :(it.timeMs>0
+          ?`<div onclick="_toggleRegenHide(${it._si})" style="font-size:12px;font-weight:800;background:${it.isPast?BOSS_BG:'#fff3cd'};color:${it.isPast?BOSS_COLOR:'#7a4f00'};padding:3px 10px;border-radius:6px;border:1px solid ${it.isPast?BOSS_BORDER:'rgba(122,79,0,.25)'};white-space:nowrap;cursor:pointer;user-select:none">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</div>`
+          :`<div onclick="_toggleRegenHide(${it._si})" style="font-size:12px;font-weight:800;background:${BOSS_BG};color:${BOSS_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${BOSS_BORDER};white-space:nowrap;cursor:pointer;user-select:none">처치 가능</div>`);
       return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${W}">
         <div style="width:3px;height:34px;background:${BOSS_BAR};flex-shrink:0"></div>
         <div style="flex:1;min-width:0">
