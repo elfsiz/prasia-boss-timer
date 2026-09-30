@@ -1740,7 +1740,7 @@ function renderShotResult(panel){
         ?`<div style="font-size:10px;font-weight:700;color:#0d9488;margin-top:3px;padding:2px 7px;background:#ccfbf1;border:1px solid rgba(13,148,136,.4);border-radius:4px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`:'';
       const hidden=_shotState.hiddenRegenSet.has(it._si);
       const regenBadge=hidden
-        ?`<div onclick="_toggleRegenHide(${it._si})" style="font-size:11px;font-weight:600;color:#aaa;padding:3px 8px;border-radius:6px;border:1px dashed #ccc;cursor:pointer;white-space:nowrap;user-select:none">시간 숨김</div>`
+        ?`<div onclick="_toggleRegenHide(${it._si})" style="width:24px;height:24px;cursor:pointer;opacity:0;flex-shrink:0" title="탭하여 시간 표시"></div>`
         :(it.timeMs>0
           ?`<div onclick="_toggleRegenHide(${it._si})" style="font-size:12px;font-weight:800;background:${it.isPast?BOSS_BG:'#fff3cd'};color:${it.isPast?BOSS_COLOR:'#7a4f00'};padding:3px 10px;border-radius:6px;border:1px solid ${it.isPast?BOSS_BORDER:'rgba(122,79,0,.25)'};white-space:nowrap;cursor:pointer;user-select:none">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</div>`
           :`<div onclick="_toggleRegenHide(${it._si})" style="font-size:12px;font-weight:800;background:${BOSS_BG};color:${BOSS_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${BOSS_BORDER};white-space:nowrap;cursor:pointer;user-select:none">처치 가능</div>`);
@@ -1795,9 +1795,11 @@ function renderShotResult(panel){
   </div>`;
   body+=`<div style="margin-top:8px;font-size:10px;color:${T3};text-align:center">프라시아 전기 · 결사 일정 관리</div></div>`;
 
+  const hiddenCount=_shotState.hiddenRegenSet.size;
   panel.innerHTML=`
     <div class="shot-content" style="background:transparent;padding:0">${body}</div>
     <div style="font-size:12px;color:#aaaaaa;margin-top:12px;text-align:center">위 화면을 스크린샷하여 결사원들과 공유하세요</div>
+    ${hiddenCount>0?`<div style="font-size:12px;color:#0d9488;margin-top:6px;text-align:center;cursor:pointer" onclick="_shotState.hiddenRegenSet.clear();renderShotResult(document.getElementById('shot-panel'))">리젠 시간 숨김 ${hiddenCount}개 · 탭하여 모두 복원</div>`:''}
     <div style="display:flex;gap:8px;margin-top:10px;width:100%;max-width:420px;flex-wrap:wrap">
       <button class="shot-close" style="flex:1" onclick="renderShotSetup(document.getElementById('shot-panel'))">← 다시 설정</button>
       <button id="shot-dl-btn" class="shot-close" style="flex:1;background:var(--gold);color:#1a1200;border-color:var(--gold);font-weight:700" onclick="downloadShotImage()">📥 이미지 저장</button>
