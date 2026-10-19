@@ -1589,19 +1589,50 @@ function openShotPanel(){
   renderShotSetup(panel);panel.classList.add('show');
 }
 // ── 스크린샷 상태: 통합 순서 방식 ──
-let _shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSet:new Set()};
+let _shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSet:new Set(),customRegenTimes:{}};
 
-function _resetShotState(){_shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSet:new Set()};}
-function _toggleRegenHide(si){
-  if(_shotState.hiddenRegenSet.has(si))_shotState.hiddenRegenSet.delete(si);
-  else _shotState.hiddenRegenSet.add(si);
+function _resetShotState(){_shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSet:new Set(),customRegenTimes:{}};}
+
+function _openRegenEditor(si,defaultTime){
+  // 기존 팝업 제거
+  document.getElementById('regen-editor-pop')?.remove();
+  const panel=document.getElementById('shot-panel');
+  const isHidden=_shotState.hiddenRegenSet.has(si);
+  const curTime=_shotState.customRegenTimes[si]||defaultTime||'';
+  const pop=document.createElement('div');
+  pop.id='regen-editor-pop';
+  pop.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center';
+  pop.innerHTML=`<div style="background:#1c1c30;border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:20px;min-width:260px;max-width:320px;width:90%">
+    <div style="font-size:14px;font-weight:700;color:#e8e8f0;margin-bottom:14px">리젠 시간 설정</div>
+    <div style="font-size:12px;color:#8888a8;margin-bottom:6px">표시할 시간 입력 (HH:MM)</div>
+    <input id="regen-time-inp" type="time" value="${curTime}" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:#222240;color:#e8e8f0;font-size:16px;margin-bottom:14px;box-sizing:border-box">
+    <div style="display:flex;gap:8px">
+      <button onclick="_applyRegenHide(${si})" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:#2a2a48;color:#aaa;font-size:13px;cursor:pointer">시간 숨김</button>
+      <button onclick="_applyRegenTime(${si})" style="flex:1;padding:10px;border-radius:8px;border:none;background:#0d9488;color:#fff;font-size:13px;font-weight:700;cursor:pointer">확인</button>
+      <button onclick="document.getElementById('regen-editor-pop').remove()" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:#2a2a48;color:#aaa;font-size:13px;cursor:pointer">취소</button>
+    </div>
+  </div>`;
+  pop.addEventListener('click',e=>{if(e.target===pop)pop.remove();});
+  document.body.appendChild(pop);
+}
+function _applyRegenTime(si){
+  const val=document.getElementById('regen-time-inp')?.value||'';
+  document.getElementById('regen-editor-pop')?.remove();
+  if(val){_shotState.customRegenTimes[si]=val;_shotState.hiddenRegenSet.delete(si);}
+  else{delete _shotState.customRegenTimes[si];}
+  renderShotResult(document.getElementById('shot-panel'));
+}
+function _applyRegenHide(si){
+  document.getElementById('regen-editor-pop')?.remove();
+  _shotState.hiddenRegenSet.add(si);
+  delete _shotState.customRegenTimes[si];
   renderShotResult(document.getElementById('shot-panel'));
 }
 
-function _buildCombinedItems(targetDate,nowMs){
+function _buildCombinedItems(targetDate,nowMs,dayOffset){
   const bossItems=getBossItemsForDate(targetDate);
   const evItems=_buildEvItemsForDate(nowMs,targetDate);
-  const {items:dawnItems,tmrStart}=_buildDawnItems();
+  const {items:dawnItems,tmrStart}=_buildDawnItems(dayOffset||0);
   const all=[
     ...bossItems.map((it,i)=>({...it,_kind:'boss',_src:i,_label:it.name,_time:it.timeMs>0?`리젠 ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}`:it.isPast?'리젠됨':'',_dot:'#0d9488'})),
     ...evItems.map((ev,i)=>({...ev,_kind:'event',_src:i,_label:ev.name,_time:ev.timeLabel,_dot:'#0284c7',_memo:ev.memo})),
@@ -1621,7 +1652,7 @@ function renderShotSetup(panel){
   const targetDate=new Date();if(dayOffset>0)targetDate.setDate(targetDate.getDate()+dayOffset);
   const now=new Date(),nowMs=now.getTime(),dow=targetDate.getDay();
   const dateStr=`${targetDate.getFullYear()}.${String(targetDate.getMonth()+1).padStart(2,'0')}.${String(targetDate.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
-  const {all}=_buildCombinedItems(targetDate,nowMs);
+  const {all}=_buildCombinedItems(targetDate,nowMs,dayOffset);
 
   // 통합 순서 초기화 (항목 수 변경 시 재초기화)
   if(!_shotState.combinedOrder||_shotState.combinedOrder.length!==all.length){
@@ -1684,9 +1715,10 @@ function _buildEvItemsForDate(nowMs,targetDate){
   items.sort((a,b)=>a.startMs-b.startMs);return items;
 }
 function _buildEvItems(nowMs){return _buildEvItemsForDate(nowMs,new Date());}
-function _buildDawnItems(){
-  const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+1);tmrStart.setHours(0,0,0,0);
-  const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+1);tmrEnd.setHours(8,0,0,0);
+function _buildDawnItems(dayOffset){
+  const off=(dayOffset||0)+1;
+  const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+off);tmrStart.setHours(0,0,0,0);
+  const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+off);tmrEnd.setHours(8,0,0,0);
   const tmrStartMs=tmrStart.getTime(),tmrEndMs=tmrEnd.getTime(),tmrDow=tmrStart.getDay();
   const items=[];
   bosses.forEach(boss=>{
@@ -1725,7 +1757,7 @@ function renderShotResult(panel){
   const groupBox=(rows)=>`<div style="border-radius:12px;overflow:hidden;border:1px solid ${BD}">${rows}</div>`;
 
   // 통합 아이템 빌드
-  const {all}=_buildCombinedItems(targetDate,nowMs);
+  const {all}=_buildCombinedItems(targetDate,nowMs,dayOffset);
   const order=_shotState.combinedOrder&&_shotState.combinedOrder.length===all.length
     ?_shotState.combinedOrder:all.map((_,i)=>i);
   const checks=_shotState.combinedChecks||new Set(all.map((_,i)=>i));
@@ -1739,11 +1771,15 @@ function renderShotResult(panel){
       const awkLine=(it.awkEnable&&it.state!=='awaken'&&(it.cnt+1)>=it.awkN)
         ?`<div style="font-size:10px;font-weight:700;color:#0d9488;margin-top:3px;padding:2px 7px;background:#ccfbf1;border:1px solid rgba(13,148,136,.4);border-radius:4px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`:'';
       const hidden=_shotState.hiddenRegenSet.has(it._si);
+      const customT=_shotState.customRegenTimes[it._si];
+      const autoTime=it.timeMs>0?`${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}`:'';
+      const dispTime=customT||autoTime;
+      const isCustom=!!customT;
       const regenBadge=hidden
-        ?`<div onclick="_toggleRegenHide(${it._si})" style="width:24px;height:24px;cursor:pointer;opacity:0;flex-shrink:0" title="탭하여 시간 표시"></div>`
-        :(it.timeMs>0
-          ?`<div onclick="_toggleRegenHide(${it._si})" style="font-size:12px;font-weight:800;background:${it.isPast?BOSS_BG:'#fff3cd'};color:${it.isPast?BOSS_COLOR:'#7a4f00'};padding:3px 10px;border-radius:6px;border:1px solid ${it.isPast?BOSS_BORDER:'rgba(122,79,0,.25)'};white-space:nowrap;cursor:pointer;user-select:none">리젠 ${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}</div>`
-          :`<div onclick="_toggleRegenHide(${it._si})" style="font-size:12px;font-weight:800;background:${BOSS_BG};color:${BOSS_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${BOSS_BORDER};white-space:nowrap;cursor:pointer;user-select:none">처치 가능</div>`);
+        ?`<div onclick="_openRegenEditor(${it._si},'${autoTime}')" style="width:24px;height:24px;cursor:pointer;opacity:0;flex-shrink:0" title="탭하여 시간 설정"></div>`
+        :(dispTime
+          ?`<div onclick="_openRegenEditor(${it._si},'${autoTime}')" style="font-size:12px;font-weight:800;background:${isCustom?'#e0f2fe':it.isPast?BOSS_BG:'#fff3cd'};color:${isCustom?'#0c4a6e':it.isPast?BOSS_COLOR:'#7a4f00'};padding:3px 10px;border-radius:6px;border:1px solid ${isCustom?'rgba(2,132,199,.3)':it.isPast?BOSS_BORDER:'rgba(122,79,0,.25)'};white-space:nowrap;cursor:pointer;user-select:none">${isCustom?'':'리젠 '}${dispTime}</div>`
+          :`<div onclick="_openRegenEditor(${it._si},'')" style="font-size:12px;font-weight:800;background:${BOSS_BG};color:${BOSS_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${BOSS_BORDER};white-space:nowrap;cursor:pointer;user-select:none">처치 가능</div>`);
       return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${W}">
         <div style="width:3px;height:34px;background:${BOSS_BAR};flex-shrink:0"></div>
         <div style="flex:1;min-width:0">
@@ -1788,18 +1824,13 @@ function renderShotResult(panel){
     body+=`<div style="text-align:center;padding:20px;color:${T3};font-size:13px">선택된 일정이 없습니다</div>`;
   }
 
-  body+=`<div style="margin-top:10px;display:flex;gap:14px;justify-content:center">
-    <span style="font-size:10px;color:${T3};display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:#0d9488;border-radius:50%;display:inline-block"></span>보스</span>
-    <span style="font-size:10px;color:${T3};display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:#0284c7;border-radius:50%;display:inline-block"></span>이벤트</span>
-    <span style="font-size:10px;color:${T3};display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:#6644aa;border-radius:50%;display:inline-block"></span>새벽</span>
-  </div>`;
-  body+=`<div style="margin-top:8px;font-size:10px;color:${T3};text-align:center">프라시아 전기 · 결사 일정 관리</div></div>`;
+  body+=`</div>`;
 
   const hiddenCount=_shotState.hiddenRegenSet.size;
   panel.innerHTML=`
     <div class="shot-content" style="background:transparent;padding:0">${body}</div>
     <div style="font-size:12px;color:#aaaaaa;margin-top:12px;text-align:center">위 화면을 스크린샷하여 결사원들과 공유하세요</div>
-    ${hiddenCount>0?`<div style="font-size:12px;color:#0d9488;margin-top:6px;text-align:center;cursor:pointer" onclick="_shotState.hiddenRegenSet.clear();renderShotResult(document.getElementById('shot-panel'))">리젠 시간 숨김 ${hiddenCount}개 · 탭하여 모두 복원</div>`:''}
+    ${hiddenCount>0?`<div style="font-size:12px;color:#0d9488;margin-top:6px;text-align:center;cursor:pointer" onclick="_shotState.hiddenRegenSet.clear();_shotState.customRegenTimes={};renderShotResult(document.getElementById('shot-panel'))">리젠 시간 숨김 ${hiddenCount}개 · 탭하여 모두 복원</div>`:''}
     <div style="display:flex;gap:8px;margin-top:10px;width:100%;max-width:420px;flex-wrap:wrap">
       <button class="shot-close" style="flex:1" onclick="renderShotSetup(document.getElementById('shot-panel'))">← 다시 설정</button>
       <button id="shot-dl-btn" class="shot-close" style="flex:1;background:var(--gold);color:#1a1200;border-color:var(--gold);font-weight:700" onclick="downloadShotImage()">📥 이미지 저장</button>
