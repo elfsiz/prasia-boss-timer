@@ -1594,18 +1594,22 @@ let _shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSe
 function _resetShotState(){_shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSet:new Set(),customRegenTimes:{}};}
 
 function _openRegenEditor(si,defaultTime){
-  // 기존 팝업 제거
   document.getElementById('regen-editor-pop')?.remove();
-  const panel=document.getElementById('shot-panel');
-  const isHidden=_shotState.hiddenRegenSet.has(si);
   const curTime=_shotState.customRegenTimes[si]||defaultTime||'';
+  const [defH,defM]=curTime?curTime.split(':').map(Number):[0,0];
+  const hOpts=Array.from({length:24},(_,i)=>`<option value="${i}" ${i===defH?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('');
+  const mOpts=Array.from({length:60},(_,i)=>`<option value="${i}" ${i===defM?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('');
+  const selStyle='flex:1;padding:10px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:#222240;color:#e8e8f0;font-size:20px;font-weight:700;text-align:center;cursor:pointer;-webkit-appearance:none;appearance:none';
   const pop=document.createElement('div');
   pop.id='regen-editor-pop';
   pop.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center';
   pop.innerHTML=`<div style="background:#1c1c30;border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:20px;min-width:260px;max-width:320px;width:90%">
     <div style="font-size:14px;font-weight:700;color:#e8e8f0;margin-bottom:14px">리젠 시간 설정</div>
-    <div style="font-size:12px;color:#8888a8;margin-bottom:6px">표시할 시간 입력 (HH:MM)</div>
-    <input id="regen-time-inp" type="time" step="60" value="${curTime}" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:#222240;color:#e8e8f0;font-size:16px;margin-bottom:14px;box-sizing:border-box">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <select id="regen-h-sel" style="${selStyle}">${hOpts}</select>
+      <span style="font-size:22px;font-weight:800;color:#e8e8f0">:</span>
+      <select id="regen-m-sel" style="${selStyle}">${mOpts}</select>
+    </div>
     <div style="display:flex;gap:8px">
       <button onclick="_applyRegenHide(${si})" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:#2a2a48;color:#aaa;font-size:13px;cursor:pointer">시간 숨김</button>
       <button onclick="_applyRegenTime(${si})" style="flex:1;padding:10px;border-radius:8px;border:none;background:#0d9488;color:#fff;font-size:13px;font-weight:700;cursor:pointer">확인</button>
@@ -1616,10 +1620,12 @@ function _openRegenEditor(si,defaultTime){
   document.body.appendChild(pop);
 }
 function _applyRegenTime(si){
-  const val=document.getElementById('regen-time-inp')?.value||'';
+  const h=document.getElementById('regen-h-sel')?.value??'';
+  const m=document.getElementById('regen-m-sel')?.value??'';
   document.getElementById('regen-editor-pop')?.remove();
-  if(val){_shotState.customRegenTimes[si]=val;_shotState.hiddenRegenSet.delete(si);}
-  else{delete _shotState.customRegenTimes[si];}
+  const val=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  _shotState.customRegenTimes[si]=val;
+  _shotState.hiddenRegenSet.delete(si);
   renderShotResult(document.getElementById('shot-panel'));
 }
 function _applyRegenHide(si){
