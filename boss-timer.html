@@ -509,10 +509,10 @@ input[type="date"]{color-scheme:dark}
     <div class="fgrp">
       <label class="flbl">반복 요일 (복수 선택 가능)</label>
       <div class="day-picker" id="ev-days">
-        <button type="button" class="dp-btn" data-d="0">일</button><button type="button" class="dp-btn" data-d="1">월</button>
-        <button type="button" class="dp-btn" data-d="2">화</button><button type="button" class="dp-btn" data-d="3">수</button>
-        <button type="button" class="dp-btn" data-d="4">목</button><button type="button" class="dp-btn" data-d="5">금</button>
-        <button type="button" class="dp-btn" data-d="6">토</button><button type="button" class="dp-btn" data-d="7">매일</button>
+        <button type="button" class="dp-btn" data-d="0" onclick="this.classList.toggle('on')">일</button><button type="button" class="dp-btn" data-d="1" onclick="this.classList.toggle('on')">월</button>
+        <button type="button" class="dp-btn" data-d="2" onclick="this.classList.toggle('on')">화</button><button type="button" class="dp-btn" data-d="3" onclick="this.classList.toggle('on')">수</button>
+        <button type="button" class="dp-btn" data-d="4" onclick="this.classList.toggle('on')">목</button><button type="button" class="dp-btn" data-d="5" onclick="this.classList.toggle('on')">금</button>
+        <button type="button" class="dp-btn" data-d="6" onclick="this.classList.toggle('on')">토</button><button type="button" class="dp-btn" data-d="7" onclick="this.classList.toggle('on')">매일</button>
       </div>
     </div>
     <div class="fgrp"><label class="flbl">시작 시각</label><div class="hm-row"><select class="hm-sel" id="ev-start-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="ev-start-m"></select></div></div>
