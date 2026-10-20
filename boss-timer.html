@@ -713,7 +713,7 @@ function killBoss(id,overrideGuildIdx=null){
     bosses=bosses.map(b=>b.id===id?{...b,lootIdx:nextIdx}:b);
     if(boss.awkEnable&&k.cnt>=boss.awkN){
       k.awkActive=true;k.awkSpawn=Date.now();k.awkKill=null;
-      showToast(`⚡ ${boss.awkName} 각성 출현! (룻: ${gName})`,'awk');
+      showToast(`⚡ ${boss.awkName} 출현! (룻: ${gName})`,'awk');
     }else{
       const left=boss.awkEnable?(boss.awkN-k.cnt):null;
       const lootMsg=gName?` · 룻: ${gName}`:'';
@@ -722,7 +722,7 @@ function killBoss(id,overrideGuildIdx=null){
   }else{
     if(boss.awkEnable&&k.cnt>=boss.awkN){
       k.awkActive=true;k.awkSpawn=Date.now();k.awkKill=null;
-      showToast(`⚡ ${boss.awkName} 각성 출현!`,'awk');
+      showToast(`⚡ ${boss.awkName} 출현!`,'awk');
     }else{
       const left=boss.awkEnable?(boss.awkN-k.cnt):null;
       showToast(left!==null?`${boss.name} 처치 (${k.cnt}/${boss.awkN}) · 각성까지 ${left}회`:`${boss.name} 처치 완료`);
@@ -884,7 +884,7 @@ function buildDayView(isToday){
     let awkHtml='';
     if(it.type==='normal'&&it.awkEnable){
       const afterKill=it.cnt+1;
-      if(afterKill>=it.awkN){awkHtml=`<div class="di-awk-alert">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`;}
+      if(afterKill>=it.awkN){awkHtml=`<div class="di-awk-alert">⚡ 처치 시 ${it.awkName} 출현!</div>`;}
       else{awkHtml=`<div class="di-awk-info">각성까지 ${it.awkN-afterKill}회 남음 (${afterKill}/${it.awkN})</div>`;}
     }else if(it.type==='awaken'){awkHtml=`<div class="di-awk-info" style="color:var(--purple2)">각성 보스</div>`;}
     const isAwkAlert=it.type==='normal'&&it.awkEnable&&(it.cnt+1)>=it.awkN;
@@ -1360,7 +1360,7 @@ function getBossItemsForDate(targetDate){
     const k=getK(boss.id);
     if(k.awkActive&&isToday){
       const lootGuild=boss.lootEnable&&boss.lootGuilds?.length?boss.lootGuilds[boss.lootIdx%boss.lootGuilds.length]:null;
-      items.push({bossId:boss.id,name:boss.awkName,sub:'각성 출현',timeMs:0,isPast:true,state:'awaken',lootGuild});return;
+      items.push({bossId:boss.id,name:boss.awkName,sub:'출현 중',timeMs:0,isPast:true,state:'awaken',lootGuild});return;
     }
     if(boss.bossType==='fixed'){
       const spawns=[];
@@ -1481,7 +1481,7 @@ function buildSchedContent(dayOffset=0){
       let awkHtml='';
       if(it.awkEnable&&it.state!=='awaken'){
         const afterKill=it.cnt+1;
-        if(afterKill>=it.awkN) awkHtml=`<div style="font-size:11px;font-weight:600;color:var(--purple2);margin-top:4px;padding:2px 8px;background:var(--purple-bg);border:1px solid rgba(155,127,232,.3);border-radius:4px;display:inline-block;animation:bl 1.4s infinite">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`;
+        if(afterKill>=it.awkN) awkHtml=`<div style="font-size:11px;font-weight:600;color:var(--purple2);margin-top:4px;padding:2px 8px;background:var(--purple-bg);border:1px solid rgba(155,127,232,.3);border-radius:4px;display:inline-block;animation:bl 1.4s infinite">⚡ 처치 시 ${it.awkName} 출현!</div>`;
         else awkHtml=`<div style="font-size:11px;color:var(--t2);margin-top:3px">각성까지 ${it.awkN-afterKill}회 남음 (${afterKill}/${it.awkN})</div>`;
       }
       const lootInfo=getEffectiveLoot(bosses.find(b=>b.id===it.bossId)||{});
@@ -1775,7 +1775,7 @@ function renderShotResult(panel){
       const li=getEffectiveLoot(bosses.find(b=>b.id===it.bossId)||{});
       const lootBadge=li?`<span style="font-size:11px;padding:2px 7px;border-radius:4px;background:${BOSS_BG};color:${BOSS_COLOR};border:1px solid ${BOSS_BORDER};font-weight:700;white-space:nowrap">🏆${li.guild}</span>`:'';
       const awkLine=(it.awkEnable&&it.state!=='awaken'&&(it.cnt+1)>=it.awkN)
-        ?`<div style="font-size:10px;font-weight:700;color:#0d9488;margin-top:3px;padding:2px 7px;background:#ccfbf1;border:1px solid rgba(13,148,136,.4);border-radius:4px;display:inline-block">⚡ 처치 시 ${it.awkName} 각성 출현!</div>`:'';
+        ?`<div style="font-size:10px;font-weight:700;color:#0d9488;margin-top:3px;padding:2px 7px;background:#ccfbf1;border:1px solid rgba(13,148,136,.4);border-radius:4px;display:inline-block">⚡ 처치 시 ${it.awkName} 출현!</div>`:'';
       const hidden=_shotState.hiddenRegenSet.has(it._si);
       const customT=_shotState.customRegenTimes[it._si];
       const autoTime=it.timeMs>0?`${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}`:'';
@@ -1784,7 +1784,7 @@ function renderShotResult(panel){
       const regenBadge=hidden
         ?`<div onclick="_openRegenEditor(${it._si},'${autoTime}')" style="width:24px;height:24px;cursor:pointer;opacity:0;flex-shrink:0" title="탭하여 시간 설정"></div>`
         :(dispTime
-          ?`<div onclick="_openRegenEditor(${it._si},'${autoTime}')" style="font-size:12px;font-weight:800;background:${isCustom?'#e0f2fe':it.isPast?BOSS_BG:'#fff3cd'};color:${isCustom?'#0c4a6e':it.isPast?BOSS_COLOR:'#7a4f00'};padding:3px 10px;border-radius:6px;border:1px solid ${isCustom?'rgba(2,132,199,.3)':it.isPast?BOSS_BORDER:'rgba(122,79,0,.25)'};white-space:nowrap;cursor:pointer;user-select:none">${isCustom?'':'리젠 '}${dispTime}</div>`
+          ?`<div onclick="_openRegenEditor(${it._si},'${autoTime}')" style="font-size:12px;font-weight:800;background:${isCustom?'#e0f2fe':it.isPast?BOSS_BG:'#fff3cd'};color:${isCustom?'#0c4a6e':it.isPast?BOSS_COLOR:'#7a4f00'};padding:3px 10px;border-radius:6px;border:1px solid ${isCustom?'rgba(2,132,199,.3)':it.isPast?BOSS_BORDER:'rgba(122,79,0,.25)'};white-space:nowrap;cursor:pointer;user-select:none">${dispTime}</div>`
           :`<div onclick="_openRegenEditor(${it._si},'')" style="font-size:12px;font-weight:800;background:${BOSS_BG};color:${BOSS_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${BOSS_BORDER};white-space:nowrap;cursor:pointer;user-select:none">처치 가능</div>`);
       return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${W}">
         <div style="width:3px;height:34px;background:${BOSS_BAR};flex-shrink:0"></div>
@@ -1800,7 +1800,7 @@ function renderShotResult(panel){
         <div style="flex:1;min-width:0">
           <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">${it.name}${it._memo?`<span style="font-size:12px;font-weight:600;color:#0284c7">${it._memo}</span>`:''}</div>
         </div>
-        <div style="font-size:12px;font-weight:800;background:${EV_BG};color:${EV_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${EV_BORDER};flex-shrink:0;white-space:nowrap">${it.timeLabel}</div>
+        <div style="font-size:12px;font-weight:800;background:${EV_BG};color:${EV_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${EV_BORDER};flex-shrink:0;white-space:nowrap">${it.timeLabel.replace(/\d{1,2}\/\d{1,2}\s*/g,'')}</div>
       </div>`;
     }else{
       // dawn
