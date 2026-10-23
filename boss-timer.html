@@ -1516,36 +1516,39 @@ function buildSchedContent(dayOffset=0){
   }
   html+=`</div>`;
   const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+dayOffset+1);tmrStart.setHours(0,0,0,0);
-  const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+dayOffset+1);tmrEnd.setHours(8,0,0,0);
+  const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+dayOffset+1);tmrEnd.setHours(9,0,0,0);
   const tmrStartMs=tmrStart.getTime(),tmrEndMs=tmrEnd.getTime(),tmrDow=tmrStart.getDay();
   const dawnItems=[];
+  const _dph=ms=>new Date(ms).getHours()<6?'dawn':'morning';
   bosses.forEach(boss=>{
     const k=getK(boss.id);
     if(boss.bossType==='fixed'){
-      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:awk,fixedMemo:ft.memo||'',timeMs:ms});}});
+      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:awk,fixedMemo:ft.memo||'',timeMs:ms,_phase:_dph(ms)});}});
     }else if(k.lastKill&&!k.awkActive){
       const sm=k.lastKill+boss.hours*3600000;
-      if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:awk,timeMs:sm});}
+      if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';dawnItems.push({type:'boss',name:boss.name,sub:awk,timeMs:sm,_phase:_dph(sm)});}
     }
   });
   events.forEach(ev=>{
-    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<tmrEndMs&&pe>tmrStartMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ps,cat:ev.cat});}
-    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});});}
-    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
-    else if(ev.evType==='monthly'&&ev.monthDays?.includes(tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
-    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
+    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<tmrEndMs&&pe>tmrStartMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ps,cat:ev.cat,_phase:_dph(ps)});}
+    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat,_phase:_dph(ms)});});}
+    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat,_phase:_dph(ms)});}
+    else if(ev.evType==='monthly'&&ev.monthDays?.includes(tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat,_phase:_dph(ms)});}
+    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)dawnItems.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat,_phase:_dph(ms)});}
   });
   dawnItems.sort((a,b)=>a.timeMs-b.timeMs);
-  if(dawnItems.length){
-    const tmrDateStr=`${String(tmrStart.getMonth()+1).padStart(2,'0')}/${String(tmrStart.getDate()).padStart(2,'0')}`;
-    html+=`<div class="sched-block"><div class="sched-blk-hdr dawn">🌙 내일 새벽 일정 <span class="dawn-badge">${tmrDateStr} 00:00~08:00</span></div>`;
-    dawnItems.forEach(it=>{
-      const dot=it.type==='boss'?'#c9a84c':(DOT_COLOR[it.cat]||'#8888a8');
-      html+=`<div class="sched-row"><div class="sched-dot" style="background:${dot}"></div>
-        <div class="sched-row-left"><div class="sched-row-name">${it.name}${(it.sub||it.fixedMemo)?`<span style="font-size:11px;color:var(--blue);font-weight:600;margin-left:6px">${it.fixedMemo||it.sub}</span>`:''}</div></div>
-        <div class="sched-row-right"><div class="sched-row-time">${fmtHHMM(it.timeMs)}</div><div class="sched-row-badge">${it.type==='boss'?'리젠 예정':'예정'}</div></div>
-      </div>`;
-    });
+  const dawnOnly=dawnItems.filter(it=>it._phase==='dawn');
+  const morningOnly=dawnItems.filter(it=>it._phase==='morning');
+  const tmrDateStr=`${String(tmrStart.getMonth()+1).padStart(2,'0')}/${String(tmrStart.getDate()).padStart(2,'0')}`;
+  const _dawnRow=it=>{const dot=it.type==='boss'?'#c9a84c':(DOT_COLOR[it.cat]||'#8888a8');return`<div class="sched-row"><div class="sched-dot" style="background:${dot}"></div><div class="sched-row-left"><div class="sched-row-name">${it.name}${(it.sub||it.fixedMemo)?`<span style="font-size:11px;color:var(--blue);font-weight:600;margin-left:6px">${it.fixedMemo||it.sub}</span>`:''}</div></div><div class="sched-row-right"><div class="sched-row-time">${fmtHHMM(it.timeMs)}</div><div class="sched-row-badge">${it.type==='boss'?'리젠 예정':'예정'}</div></div></div>`;};
+  if(dawnOnly.length){
+    html+=`<div class="sched-block"><div class="sched-blk-hdr dawn">🌙 내일 새벽 일정 <span class="dawn-badge">${tmrDateStr} 00:00~06:00</span></div>`;
+    dawnOnly.forEach(it=>{html+=_dawnRow(it);});
+    html+=`</div>`;
+  }
+  if(morningOnly.length){
+    html+=`<div class="sched-block"><div class="sched-blk-hdr" style="background:linear-gradient(90deg,rgba(234,88,12,.12),transparent);border-left:3px solid #ea580c;color:#ea580c">☀️ 내일 아침 일정 <span class="dawn-badge" style="background:rgba(234,88,12,.1);color:#c2410c;border-color:rgba(234,88,12,.3)">${tmrDateStr} 06:00~09:00</span></div>`;
+    morningOnly.forEach(it=>{html+=_dawnRow(it);});
     html+=`</div>`;
   }
   html+=`<div style="margin-top:16px"><div class="sec-hdr"><span class="sec-title">등록된 이벤트 목록</span></div><div class="ev-list" id="ev-manage">`;
@@ -1642,7 +1645,7 @@ function _buildCombinedItems(targetDate,nowMs,dayOffset){
   const all=[
     ...bossItems.map((it,i)=>({...it,_kind:'boss',_src:i,_label:it.name,_time:it.timeMs>0?`리젠 ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}`:it.isPast?'리젠됨':'',_dot:'#0d9488'})),
     ...evItems.map((ev,i)=>({...ev,_kind:'event',_src:i,_label:ev.name,_time:ev.timeLabel,_dot:'#0284c7',_memo:ev.memo})),
-    ...dawnItems.map((it,i)=>({...it,_kind:'dawn',_src:i,_label:it.name,_time:`🌙 ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}`,_dot:'#6644aa'})),
+    ...dawnItems.map((it,i)=>({...it,_kind:'dawn',_src:i,_label:it.name,_time:`${it._phase==='morning'?'☀️':'🌙'} ${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}`,_dot:it._phase==='morning'?'#ea580c':'#6644aa'})),
   ];
   // 초기 나열 순서: 시간순 정렬 (사용자가 이후 ▲▼로 변경 가능)
   all.sort((a,b)=>{
@@ -1724,24 +1727,25 @@ function _buildEvItems(nowMs){return _buildEvItemsForDate(nowMs,new Date());}
 function _buildDawnItems(dayOffset){
   const off=(dayOffset||0)+1;
   const tmrStart=new Date();tmrStart.setDate(tmrStart.getDate()+off);tmrStart.setHours(0,0,0,0);
-  const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+off);tmrEnd.setHours(8,0,0,0);
+  const tmrEnd=new Date();tmrEnd.setDate(tmrEnd.getDate()+off);tmrEnd.setHours(9,0,0,0);
   const tmrStartMs=tmrStart.getTime(),tmrEndMs=tmrEnd.getTime(),tmrDow=tmrStart.getDay();
+  const _ph=ms=>new Date(ms).getHours()<6?'dawn':'morning';
   const items=[];
   bosses.forEach(boss=>{
     const k=getK(boss.id);
     if(boss.bossType==='fixed'){
-      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:awk,fixedMemo:ft.memo||'',timeMs:ms,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}});
+      boss.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:awk,fixedMemo:ft.memo||'',timeMs:ms,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt,_phase:_ph(ms)});}});
     }else if(k.lastKill&&!k.awkActive){
       const sm=k.lastKill+boss.hours*3600000;
-      if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:awk,timeMs:sm,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt});}
+      if(sm>=tmrStartMs&&sm<tmrEndMs){const awk=boss.awkEnable?`${k.cnt+1}/${boss.awkN}회`:'';items.push({type:'boss',name:boss.name,sub:awk,timeMs:sm,awkEnable:boss.awkEnable,awkN:boss.awkN,awkName:boss.awkName,cnt:k.cnt,_phase:_ph(sm)});}
     }
   });
   events.forEach(ev=>{
-    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<tmrEndMs&&pe>tmrStartMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ps,cat:ev.cat});}
-    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});});}
-    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
-    else if(ev.evType==='monthly'&&ev.monthDays?.includes(tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
-    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat});}
+    if(ev.evType==='period'){const ps=new Date(ev.pstart).getTime(),pe=new Date(ev.pend).getTime();if(ps<tmrEndMs&&pe>tmrStartMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ps,cat:ev.cat,_phase:_ph(ps)});}
+    else if(ev.evType==='fixed'){ev.fixedTimes?.forEach(ft=>{if(ft.day!==tmrDow)return;const d=new Date(tmrStart);d.setHours(parseInt(ft.hh),parseInt(ft.mm),0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat,_phase:_ph(ms)});});}
+    else if(ev.evType==='once'){const ms=new Date(ev.onceDt).getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat,_phase:_ph(ms)});}
+    else if(ev.evType==='monthly'&&ev.monthDays?.includes(tmrStart.getDate())){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat,_phase:_ph(ms)});}
+    else if(ev.evType==='repeat'&&(ev.days.includes(7)||ev.days.includes(tmrDow))){const[sh,sm2]=ev.start.split(':').map(Number);const d=new Date(tmrStart);d.setHours(sh,sm2,0,0);const ms=d.getTime();if(ms>=tmrStartMs&&ms<tmrEndMs)items.push({type:'event',name:ev.name,sub:ev.memo||'',timeMs:ms,cat:ev.cat,_phase:_ph(ms)});}
   });
   items.sort((a,b)=>a.timeMs-b.timeMs);
   return{items,tmrStart};
@@ -1803,19 +1807,44 @@ function renderShotResult(panel){
         <div style="font-size:12px;font-weight:800;background:${EV_BG};color:${EV_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${EV_BORDER};flex-shrink:0;white-space:nowrap">${it.timeLabel.replace(/\d{1,2}\/\d{1,2}\s*/g,'')}</div>
       </div>`;
     }else{
-      // dawn
+      // dawn / morning
       const isBoss=it.type==='boss';
-      const bar=isBoss?BOSS_BAR:EVENT_BAR;
-      const timeStr=`${String(new Date(it.timeMs).getHours()).padStart(2,'0')}:${String(new Date(it.timeMs).getMinutes()).padStart(2,'0')}`;
+      const isMorning=it._phase==='morning';
+      const d2=new Date(it.timeMs);
+      const timeStr=`${String(d2.getHours()).padStart(2,'0')}:${String(d2.getMinutes()).padStart(2,'0')}`;
+      const dateDay=d2.getDate();
       const memo=isBoss?(it.fixedMemo||''):(it.sub||'');
-      return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:#f8f4ff">
-        <div style="width:3px;height:34px;background:${DAWN_BAR};flex-shrink:0"></div>
+      const phaseBg=isMorning?'#fff7ed':'#f8f4ff';
+      const phaseBarClr=isMorning?'#ea580c':DAWN_BAR;
+      const phaseLabel=isMorning?'☀️ 아침':'🌙 새벽';
+      const phaseLabelClr=isMorning?'#c2410c':'#6644aa';
+      const phaseBadgeBg=isMorning?'#fed7aa':'#e8e0fb';
+      const phaseBadgeClr=isMorning?'#7c2d12':'#4a2c8a';
+      const phaseBadgeBdr=isMorning?'rgba(124,45,18,.25)':'rgba(74,44,138,.25)';
+      return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${phaseBg}">
+        <div style="width:3px;height:34px;background:${phaseBarClr};flex-shrink:0"></div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">${it.name}${memo?`<span style="font-size:12px;font-weight:600;color:#6644aa">${memo}</span>`:''} <span style="font-size:11px;font-weight:600;color:#6644aa">🌙 새벽</span></div>
+          <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">${it.name}${memo?`<span style="font-size:12px;font-weight:600;color:${phaseLabelClr}">${memo}</span>`:''} <span style="font-size:11px;font-weight:600;color:${phaseLabelClr}">${phaseLabel}</span></div>
         </div>
-        <div style="font-size:12px;font-weight:800;background:#e8e0fb;color:#4a2c8a;padding:3px 10px;border-radius:6px;border:1px solid rgba(74,44,138,.25);white-space:nowrap">${timeStr}</div>
+        <div style="font-size:12px;font-weight:800;background:${phaseBadgeBg};color:${phaseBadgeClr};padding:3px 10px;border-radius:6px;border:1px solid ${phaseBadgeBdr};white-space:nowrap">${dateDay}일 ${timeStr}</div>
       </div>`;
     }
+  };
+
+  // 구분선 삽입을 위해 selItems를 순회하며 dawn 전환 지점에 divider 추가
+  const buildRows=()=>{
+    let rows='';
+    let dawnDividerInserted=false;
+    selItems.forEach(it=>{
+      if(it._kind==='dawn'&&!dawnDividerInserted){
+        const fd=new Date(it.timeMs);
+        const fdStr=`${fd.getMonth()+1}월 ${fd.getDate()}일`;
+        rows+=`<div style="padding:0 12px"><div style="display:flex;align-items:center;gap:8px;margin:2px 0"><span style="font-size:11px;font-weight:800;color:#9999bb;white-space:nowrap">${fdStr} 새벽·아침</span><div style="flex:1;height:1px;background:rgba(124,58,237,.2)"></div></div></div>`;
+        dawnDividerInserted=true;
+      }
+      rows+=itemRow(it);
+    });
+    return rows;
   };
 
   let body=`<div id="shot-body" style="background:${BG};border-radius:14px;padding:16px;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:420px;margin:0 auto">
@@ -1825,7 +1854,7 @@ function renderShotResult(panel){
     ${raidMemoVal?`<div style="background:#0d9488;border-radius:10px;padding:10px 14px;margin-bottom:12px"><div style="font-size:21px;font-weight:700;color:#fff;line-height:1.4">${raidMemoVal}</div></div>`:''}`;
 
   if(selItems.length){
-    body+=groupBox(selItems.map(itemRow).join(''));
+    body+=groupBox(buildRows());
   }else{
     body+=`<div style="text-align:center;padding:20px;color:${T3};font-size:13px">선택된 일정이 없습니다</div>`;
   }
