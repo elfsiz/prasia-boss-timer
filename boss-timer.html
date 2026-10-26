@@ -1454,8 +1454,8 @@ function buildSchedContent(dayOffset=0){
     if(ev.evType==='period'){
       startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();
       const ps=new Date(ev.pstart),pe=new Date(ev.pend);
-      const fmtDT=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-      timeLabel=`${fmtDT(ps)} ~ ${fmtDT(pe)}`;
+      const fmtT=d=>`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      timeLabel=`${fmtT(ps)} ~ ${fmtT(pe)}`;
     }else if(ev.evType==='once'){
       startMs=new Date(ev.onceDt).getTime();endMs=startMs+3600000;
       const od=new Date(ev.onceDt);
@@ -1510,7 +1510,7 @@ function buildSchedContent(dayOffset=0){
       const periodMark=ev.evType==='period'?` <span class="ev-period-chip">기간</span>`:'';
       html+=`<div class="sched-row"><div class="sched-dot" style="background:${dot}"></div>
         <div class="sched-row-left"><div class="sched-row-name">${ev.name}${periodMark}</div>${ev.memo?`<div class="sched-row-sub">${ev.memo}</div>`:''}</div>
-        <div class="sched-row-right"><div class="sched-row-time${timeCls}" style="font-size:${ev.evType==='period'?'11':'14'}px">${ev.timeLabel}</div><div class="sched-row-badge">${badge}</div></div>
+        <div class="sched-row-right"><div class="sched-row-time${timeCls}">${ev.timeLabel}</div><div class="sched-row-badge">${badge}</div></div>
       </div>`;
     });
   }
@@ -1715,7 +1715,7 @@ function _buildEvItemsForDate(nowMs,targetDate){
   getEventsForDate(targetDate).forEach(ev=>{
     let startMs,endMs,timeLabel;
     const td=targetDate;
-    if(ev.evType==='period'){startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();const fmtDT=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;timeLabel=`${fmtDT(new Date(ev.pstart))} ~ ${fmtDT(new Date(ev.pend))}`;}
+    if(ev.evType==='period'){startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();const fmtT=d=>`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;timeLabel=`${fmtT(new Date(ev.pstart))} ~ ${fmtT(new Date(ev.pend))}`;}
     else if(ev.evType==='once'){const od=new Date(ev.onceDt);startMs=od.getTime();endMs=startMs+3600000;timeLabel=`${String(od.getMonth()+1).padStart(2,'0')}/${String(od.getDate()).padStart(2,'0')} ${String(od.getHours()).padStart(2,'0')}:${String(od.getMinutes()).padStart(2,'0')}`;}
     else if(ev.evType==='monthly'){const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);const sd=new Date(td);sd.setHours(sh,sm2,0,0);const ed=new Date(td);ed.setHours(eh,em,0,0);startMs=sd.getTime();endMs=ed.getTime();timeLabel=ev.start===ev.end?stripSec(ev.start):`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;}
     else{const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);const sd=new Date(td);sd.setHours(sh,sm2,0,0);const ed=new Date(td);ed.setHours(eh,em,0,0);startMs=sd.getTime();endMs=ed.getTime();timeLabel=ev.start===ev.end?stripSec(ev.start):`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`;}
