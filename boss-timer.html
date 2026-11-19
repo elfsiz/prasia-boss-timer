@@ -1788,8 +1788,8 @@ function renderShotResult(panel){
       const regenBadge=hidden
         ?`<div onclick="_openRegenEditor(${it._si},'${autoTime}')" style="width:24px;height:24px;cursor:pointer;opacity:0;flex-shrink:0" title="탭하여 시간 설정"></div>`
         :(dispTime
-          ?`<div onclick="_openRegenEditor(${it._si},'${autoTime}')" style="font-size:12px;font-weight:800;background:${isCustom?'#e0f2fe':it.isPast?BOSS_BG:'#fff3cd'};color:${isCustom?'#0c4a6e':it.isPast?BOSS_COLOR:'#7a4f00'};padding:3px 10px;border-radius:6px;border:1px solid ${isCustom?'rgba(2,132,199,.3)':it.isPast?BOSS_BORDER:'rgba(122,79,0,.25)'};white-space:nowrap;cursor:pointer;user-select:none">${dispTime}</div>`
-          :`<div onclick="_openRegenEditor(${it._si},'')" style="font-size:12px;font-weight:800;background:${BOSS_BG};color:${BOSS_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${BOSS_BORDER};white-space:nowrap;cursor:pointer;user-select:none">처치 가능</div>`);
+          ?`<div onclick="_openRegenEditor(${it._si},'${autoTime}')" style="font-size:14px;font-weight:800;color:#0c2d48;white-space:nowrap;cursor:pointer;user-select:none;font-variant-numeric:tabular-nums;flex-shrink:0">${dispTime}</div>`
+          :`<div onclick="_openRegenEditor(${it._si},'')" style="font-size:14px;font-weight:800;color:#0c2d48;white-space:nowrap;cursor:pointer;user-select:none;flex-shrink:0">처치 가능</div>`);
       return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${W}">
         <div style="width:3px;height:34px;background:${BOSS_BAR};flex-shrink:0"></div>
         <div style="flex:1;min-width:0">
@@ -1804,7 +1804,7 @@ function renderShotResult(panel){
         <div style="flex:1;min-width:0">
           <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">${it.name}${it._memo?`<span style="font-size:12px;font-weight:600;color:#0284c7">${it._memo}</span>`:''}</div>
         </div>
-        <div style="font-size:12px;font-weight:800;background:${EV_BG};color:${EV_COLOR};padding:3px 10px;border-radius:6px;border:1px solid ${EV_BORDER};flex-shrink:0;white-space:nowrap">${it.timeLabel.replace(/\d{1,2}\/\d{1,2}\s*/g,'')}</div>
+        <div style="font-size:14px;font-weight:800;color:#0c2d48;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums">${it.timeLabel.replace(/\d{1,2}\/\d{1,2}\s*/g,'')}</div>
       </div>`;
     }else{
       // dawn / morning
@@ -1826,7 +1826,7 @@ function renderShotResult(panel){
         <div style="flex:1;min-width:0">
           <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">${it.name}${memo?`<span style="font-size:12px;font-weight:600;color:${phaseLabelClr}">${memo}</span>`:''} <span style="font-size:11px;font-weight:600;color:${phaseLabelClr}">${phaseLabel}</span></div>
         </div>
-        <div style="font-size:12px;font-weight:800;background:${phaseBadgeBg};color:${phaseBadgeClr};padding:3px 10px;border-radius:6px;border:1px solid ${phaseBadgeBdr};white-space:nowrap">${dateDay}일 ${timeStr}</div>
+        <div style="font-size:14px;font-weight:800;color:#0c2d48;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums">${dateDay}일 ${timeStr}</div>
       </div>`;
     }
   };
