@@ -130,6 +130,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(238,242,247,0.97);backdr
 .pip-lbl{font-size:10px;color:var(--t3);margin-left:4px}
 .bright{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
 .cdwn{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text);line-height:1;letter-spacing:-.5px}
+.cd-tot{font-size:12px;font-weight:500;color:var(--t2);letter-spacing:0}
 .cdwn.urgent{color:var(--amber)}
 .cdwn.sm{font-size:13px;font-weight:500;color:var(--t2)}
 .cdwn.ready{font-size:13px;font-weight:600;color:var(--green);animation:bl 1.2s infinite}
@@ -807,7 +808,9 @@ function fmtSec(sec){
   if(sec===null)return null;
   if(sec<=0)return'READY';
   const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);
-  return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  const tot=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  if(h>=24)return`${Math.floor(h/24)}일 ${h%24}시간 <span class="cd-tot">(${tot})</span>`;
+  return tot;
 }
 function fmtHHMM(ms){const d=new Date(ms);return`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
 function fmtFull(ms){const d=new Date(ms);return`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${fmtHHMM(ms)}`;}
@@ -961,7 +964,7 @@ function tick(){
   bosses.forEach(boss=>{
     const rr=regRemain(boss);
     const cd=document.getElementById('cd-'+boss.id);
-    if(cd&&rr!==null){if(rr<=0){rerender=true;return;}cd.textContent=fmtSec(rr);cd.className='cdwn'+(rr<1800?' urgent':'');}
+    if(cd&&rr!==null){if(rr<=0){rerender=true;return;}cd.innerHTML=fmtSec(rr);cd.className='cdwn'+(rr<1800?' urgent':'');}
   });
   if(rerender)render();
   updateStats();
