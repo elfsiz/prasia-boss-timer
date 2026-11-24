@@ -115,7 +115,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(238,242,247,0.97);backdr
 .bcard.s-awaken .bcard-body::before{background:var(--purple)}
 .bcard-main{display:flex;justify-content:space-between;gap:10px}
 .bleft{flex:1;min-width:0}
-.bname-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px}
+.bname-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .bname{font-size:15px;font-weight:700;color:var(--text)}
 .badge{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500;border:1px solid;white-space:nowrap}
 .b-type{background:var(--bg3);color:var(--t2);border-color:var(--border2)}
@@ -135,12 +135,15 @@ header{position:sticky;top:0;z-index:50;background:rgba(238,242,247,0.97);backdr
 .cdwn.sm{font-size:13px;font-weight:500;color:var(--t2)}
 .cdwn.ready{font-size:13px;font-weight:600;color:var(--green);animation:bl 1.2s infinite}
 .spawn-hint{font-size:11px;color:var(--t2);text-align:right;font-weight:500}
-.card-actions{display:flex;gap:6px;margin-top:11px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap}
-.cbtn{padding:8px 14px;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);white-space:nowrap}
+.card-row2{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:7px;flex-wrap:wrap}
+.card-row2 .bmeta{flex:1 1 130px;min-width:0;line-height:1.5}
+.bmeta .spawn-hint{display:inline;font-size:11px;font-weight:500;color:var(--t2)}
+.card-actions{display:flex;gap:5px;flex-shrink:0;margin-left:auto}
+.cbtn{padding:6px 14px;min-height:30px;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);white-space:nowrap}
 .cbtn:active{opacity:.7}
 .cbtn.kill{background:var(--gold-bg);border-color:rgba(201,168,76,.4);color:var(--gold2)}
 .cbtn.awk-kill{background:var(--purple-bg);border-color:rgba(155,127,232,.4);color:var(--purple2)}
-.cbtn.right{margin-left:auto}
+.cbtn.right{color:var(--text)}
 .cbtn.danger:active{color:var(--red)}
 .awk-strip{border-top:1px dashed rgba(155,127,232,.3);padding:12px 14px;background:rgba(155,127,232,.05)}
 .awk-hdr{font-size:10px;color:var(--purple);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px}
@@ -188,6 +191,7 @@ input[type="date"]{color-scheme:dark}
 .mdl-footer{display:flex;gap:8px;margin-top:20px}
 .mbtn{flex:1;padding:12px;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--t2)}
 .mbtn:active{opacity:.7}
+.mbtn.danger{flex:0 0 auto;padding:12px 16px;background:var(--red-bg);border-color:rgba(201,48,48,.4);color:var(--red)}
 .mbtn.primary{background:var(--gold);border-color:var(--gold);color:#1a1200}
 .confirm-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:24px 20px;width:calc(100% - 32px);max-width:360px;margin:auto;margin-top:auto;margin-bottom:auto}
 .confirm-title{font-size:16px;font-weight:700;margin-bottom:8px}
@@ -498,6 +502,7 @@ input[type="date"]{color-scheme:dark}
     </div>
   </div>
   <div class="mdl-footer">
+    <button class="mbtn danger" id="m-del" style="display:none" onclick="delBossFromModal()">삭제</button>
     <button class="mbtn" onclick="closeModal()">취소</button>
     <button class="mbtn primary" onclick="saveBoss()">저장</button>
   </div>
@@ -572,6 +577,43 @@ input[type="date"]{color-scheme:dark}
     <button class="ccbtn" onclick="closeConf()">취소</button>
     <button class="ccbtn" id="conf-ok" onclick="execMaint()"></button>
   </div>
+</div>
+</div>
+<div class="ovl confirm-ovl" id="kill-ovl" onclick="if(event.target===this)closeKillConf()">
+<div class="confirm-wrap">
+  <div class="confirm-title" id="kill-title"></div>
+  <div class="confirm-desc" id="kill-desc"></div>
+  <div class="confirm-footer">
+    <button class="ccbtn" onclick="closeKillConf()">취소</button>
+    <button class="ccbtn ok-amber" id="kill-ok" onclick="execKillConf()">처치 기록</button>
+  </div>
+</div>
+</div>
+<div class="ovl confirm-ovl" id="time-ovl" onclick="if(event.target===this)closeTimeEdit()">
+<div class="confirm-wrap">
+  <div class="confirm-title" id="te-title"></div>
+  <div class="confirm-desc" id="te-desc" style="margin-bottom:12px"></div>
+  <div class="fgrp">
+    <label class="flbl">① 남은 시간으로 입력</label>
+    <div class="remain-row" style="gap:4px;flex-wrap:nowrap">
+      <input class="remain-inp" id="te-rd" type="number" min="0" max="99" placeholder="0" style="width:46px;padding:9px 4px"><span class="remain-unit">일</span>
+      <input class="remain-inp" id="te-rh" type="number" min="0" max="999" placeholder="0" style="width:46px;padding:9px 4px"><span class="remain-unit">시간</span>
+      <input class="remain-inp" id="te-rm" type="number" min="0" max="59" placeholder="0" style="width:46px;padding:9px 4px"><span class="remain-unit">분 후</span>
+      <button class="remain-calc-btn" style="padding:8px 10px;margin-left:auto;white-space:nowrap" onclick="applyTeRemain()">적용</button>
+    </div>
+  </div>
+  <div class="fgrp">
+    <label class="flbl">② 리젠 예정 시각으로 입력</label>
+    <div class="dt-row">
+      <input class="finput" id="te-date" type="date">
+      <div class="hm-row"><select class="hm-sel" id="te-h"></select><span class="hm-colon">:</span><select class="hm-sel" id="te-m"></select></div>
+    </div>
+  </div>
+  <div class="confirm-footer">
+    <button class="ccbtn" onclick="closeTimeEdit()">취소</button>
+    <button class="ccbtn ok-amber" onclick="saveTimeEdit()">저장</button>
+  </div>
+  <div style="text-align:center;margin-top:14px"><a style="font-size:12px;color:var(--t2);text-decoration:underline;cursor:pointer" onclick="openFullEditFromTime()">상세 편집 (이름, 주기, 각성, 삭제)</a></div>
 </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -810,11 +852,11 @@ function fmtSec(sec){
   const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);
   const tot=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
   if(h>=24)return`${Math.floor(h/24)}일 ${h%24}시간 <span class="cd-tot">(${tot})</span>`;
-  return tot;
+  return h>0?`${h}시간 ${m}분`:`${m}분`;
 }
 function fmtHHMM(ms){const d=new Date(ms);return`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
 function fmtFull(ms){const d=new Date(ms);return`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${fmtHHMM(ms)}`;}
-function fmtSpawnHint(ms,addH){if(!ms)return'';return`${fmtFull(ms+addH*3600000)} 리젠 예정`;}
+function fmtSpawnHint(ms,addH){if(!ms)return'';return`${fmtFull(ms+addH*3600000)} 예정`;}
 function fmtHours(h){return h>=24&&h%24===0?`${h/24}일`:`${h}시간`;}
 
 // ═══════════════════════════════
@@ -832,18 +874,18 @@ function buildPips(boss){
 // ── [수정 B,C] buildCard: 각성 보스 재리젠 타이머 표시 제거 ──
 function buildCard(boss){
   const k=getK(boss.id),state=getState(boss),rr=regRemain(boss),ar=awkRemain(boss);
-  let cdHtml='';
+  let cdHtml='',hintHtml='';
   if(k.awkActive)cdHtml=`<div class="cdwn sm">각성 출현 중</div>`;
   else if(rr===null&&ar===null)cdHtml=`<div class="cdwn sm">기록 없음</div>`;
   else if(rr===0)cdHtml=`<div class="cdwn ready">리젠됨</div>`;
-  else if(rr>0)cdHtml=`<div class="cdwn${rr<1800?' urgent':''}" id="cd-${boss.id}">${fmtSec(rr)}</div><div class="spawn-hint" id="hint-${boss.id}">${fmtSpawnHint(k.lastKill,boss.hours)}</div>`;
+  else if(rr>0)cdHtml=`<div class="cdwn${rr<1800?' urgent':''}" id="cd-${boss.id}">${fmtSec(rr)}</div>`,hintHtml=k.lastKill?` · <span class="spawn-hint" id="hint-${boss.id}">${fmtSpawnHint(k.lastKill,boss.hours)}</span>`:'';
   // [수정B] ar===0, ar>0 케이스 제거 — 각성 보스는 처치 횟수 조건으로만 등장
 
   let strip='';
   if(boss.awkEnable&&k.awkActive){
     strip=`<div class="awk-strip"><div class="awk-hdr">⚡ 각성 출현 <span>— ${boss.awkName}</span></div>
       <div class="awk-row"><div class="awk-name">${boss.awkName}</div><div><div class="awk-cd ready">리젠됨</div><div class="awk-sub">처치 후 카운터 초기화</div></div></div>
-      <div class="awk-actions"><button class="cbtn awk-kill" onclick="killAwaken(${boss.id})">각성 보스 처치 완료</button></div></div>`;
+      <div class="awk-actions"><button class="cbtn awk-kill" onclick="askKillAwaken(${boss.id})">각성 보스 처치 완료</button></div></div>`;
   }
   // [수정C] 각성 재출현/재리젠 대기 블록 제거 — 조건 기반 등장이므로 타이머 불필요
   const killLabel=!k.awkActive?(boss.awkEnable?`처치 (${k.cnt+1}번째)`:'처치'):null;
@@ -858,17 +900,18 @@ function buildCard(boss){
             ${boss.bossType==='fixed'?`<span class="badge b-fixed">고정 시간</span>`:''}
             ${state==='ready'||state==='awaken'?`<span class="badge b-go">${state==='awaken'?'각성!':'리젠!'}</span>`:''}
           </div>
-          <div class="bmeta">리젠 ${fmtHours(boss.hours)}${boss.awkEnable?` · ${boss.awkN}회 처치 시 각성`:''}</div>
           ${lootGuild?`<div style="margin-top:5px;display:flex;align-items:center;gap:5px"><span class="loot-badge">🏆 이번 룻: ${lootGuild}</span>${nextLoot?`<span style="font-size:10px;color:var(--t3)">→ 다음: ${nextLoot}</span>`:''}</div>`:''}
-          ${buildPips(boss)}
         </div>
         <div class="bright">${cdHtml}</div>
       </div>
-      <div class="card-actions">
-        ${killLabel?`<button class="cbtn kill" onclick="killBoss(${boss.id})">${killLabel}</button>`:''}
-        ${boss.lootEnable&&boss.lootGuilds?.length&&!k.awkActive?`<button class="cbtn" style="border-color:rgba(201,168,76,.3);color:var(--gold)" onclick="openLootOverride(${boss.id})">임시 변경</button>`:''}
-        <button class="cbtn right" onclick="editBoss(${boss.id})">편집</button>
-        <button class="cbtn danger" onclick="delBoss(${boss.id})">삭제</button>
+      ${buildPips(boss)}
+      <div class="card-row2">
+        <div class="bmeta">리젠 ${fmtHours(boss.hours)}${boss.awkEnable?` · ${boss.awkN}회 처치 시 각성`:''}${hintHtml}</div>
+        <div class="card-actions">
+          ${killLabel?`<button class="cbtn kill" onclick="askKill(${boss.id})">${killLabel}</button>`:''}
+          ${boss.lootEnable&&boss.lootGuilds?.length&&!k.awkActive?`<button class="cbtn" style="border-color:rgba(201,168,76,.3);color:var(--gold)" onclick="openLootOverride(${boss.id})">임시 변경</button>`:''}
+          <button class="cbtn right" onclick="editBoss(${boss.id})">편집</button>
+        </div>
       </div>
     </div>${strip}</div>`;
 }
@@ -1065,6 +1108,7 @@ function applyRemainTime(){
 function openBossModal(){openModal(null);}
 function openModal(boss=null){
   editId=boss?boss.id:null;
+  document.getElementById('m-del').style.display=boss?'block':'none';
   document.getElementById('mdl-title').textContent=boss?'보스 편집':'보스 추가';
   document.getElementById('f-name').value=boss?.name||'';
   document.getElementById('f-hours').value=boss?.hours??48;
@@ -1194,7 +1238,74 @@ function openLootOverride(id){
   document.getElementById('conf-ovl').classList.add('on');
 }
 
-function editBoss(id){openModal(bosses.find(b=>b.id===id));}
+function editBoss(id){
+  const b=bosses.find(x=>x.id===id);if(!b)return;
+  if((b.bossType||'kill')==='kill')openTimeEdit(id);else openModal(b);
+}
+function delBossFromModal(){
+  const id=editId;if(!id)return;
+  const b=bosses.find(x=>x.id===id);
+  if(!confirm(`"${b?.name}" 보스를 삭제할까요?\n처치 기록도 함께 삭제됩니다.`))return;
+  bosses=bosses.filter(x=>x.id!==id);delete kills[id];save();closeModal();render();
+}
+// ── 처치 확인창 ──
+let _killPending=null;
+function _hhmmNow(){const n=new Date();return`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;}
+function askKill(id){
+  const b=bosses.find(x=>x.id===id);if(!b)return;
+  const k=getK(id);
+  if(k.awkActive){showToast('각성 보스를 먼저 처치해 주세요!');return;}
+  document.getElementById('kill-title').textContent=`${b.name} 처치`;
+  document.getElementById('kill-desc').innerHTML=`지금(<b>${_hhmmNow()}</b>) 처치한 것으로 기록할까요?`+(b.awkEnable?`<br>각성 카운터 ${k.cnt} → <b>${k.cnt+1}</b> / ${b.awkN}`:'')+`<br><span style="font-size:12px;color:var(--t3)">시각이 다르면 기록 후 편집에서 수정할 수 있습니다.</span>`;
+  _killPending={type:'kill',id};
+  document.getElementById('kill-ovl').classList.add('on');
+}
+function askKillAwaken(id){
+  const b=bosses.find(x=>x.id===id);if(!b)return;
+  document.getElementById('kill-title').textContent=`${b.awkName} 처치`;
+  document.getElementById('kill-desc').innerHTML=`지금(<b>${_hhmmNow()}</b>) 각성 보스를 처치한 것으로 기록할까요?<br>처치 카운터가 초기화됩니다.`;
+  _killPending={type:'awk',id};
+  document.getElementById('kill-ovl').classList.add('on');
+}
+function closeKillConf(){document.getElementById('kill-ovl').classList.remove('on');_killPending=null;}
+function execKillConf(){
+  const p=_killPending;closeKillConf();if(!p)return;
+  if(p.type==='awk')killAwaken(p.id);else killBoss(p.id);
+}
+// ── 리젠 시각 수정 (시간 전용) ──
+let _teId=null;
+function openTimeEdit(id){
+  const b=bosses.find(x=>x.id===id);if(!b)return;
+  const k=getK(id);_teId=id;
+  const spawnMs=k.lastKill?k.lastKill+b.hours*3600000:Date.now();
+  document.getElementById('te-title').textContent=`${b.name} - 리젠 시각 수정`;
+  document.getElementById('te-desc').innerHTML=`리젠 주기 ${fmtHours(b.hours)}`+(k.lastKill?` · 기록된 처치 시각 ${fmtFull(k.lastKill)}`:' · 처치 기록 없음');
+  document.getElementById('te-date').value=toDatePart(spawnMs);
+  fillHM('te-h','te-m',toTimePart(spawnMs));
+  ['te-rd','te-rh','te-rm'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('time-ovl').classList.add('on');
+}
+function _teRemainMs(){
+  const d=parseInt(document.getElementById('te-rd').value)||0,h=parseInt(document.getElementById('te-rh').value)||0,m=parseInt(document.getElementById('te-rm').value)||0;
+  return (d||h||m)?Date.now()+(d*86400+h*3600+m*60)*1000:null;
+}
+function applyTeRemain(){
+  const ms=_teRemainMs();
+  if(!ms){showToast('일, 시간, 분 중 하나를 입력해 주세요.');return;}
+  document.getElementById('te-date').value=toDatePart(ms);
+  fillHM('te-h','te-m',toTimePart(ms));
+  ['te-rd','te-rh','te-rm'].forEach(i=>document.getElementById(i).value='');
+}
+function closeTimeEdit(){document.getElementById('time-ovl').classList.remove('on');}
+function saveTimeEdit(){
+  const id=_teId;const b=bosses.find(x=>x.id===id);if(!b)return;
+  const ms=_teRemainMs()||dtToMs(document.getElementById('te-date').value,getSelHM('te-h','te-m'));
+  if(!ms){showToast('날짜를 입력해 주세요.');return;}
+  const k=getK(id);k.lastKill=ms-b.hours*3600000;
+  save();closeTimeEdit();render();
+  showToast(`${b.name} 리젠 시각을 수정했습니다.`);
+}
+function openFullEditFromTime(){const id=_teId;closeTimeEdit();openModal(bosses.find(x=>x.id===id));}
 function delBoss(id){
   const b=bosses.find(x=>x.id===id);
   if(!confirm(`"${b?.name}" 보스를 삭제할까요?\n처치 기록도 함께 삭제됩니다.`))return;
