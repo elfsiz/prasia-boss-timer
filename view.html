@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#ddf0f5">
+<title>결사 일정</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#eef4f7;--text:#0c2d48;--t2:#1e6091;--t3:#5b7f93;--card:#ffffff;--border:rgba(8,145,178,.2);--accent:#0d9488}
+html,body{background:var(--bg);color:var(--text);font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;min-height:100vh}
+.wrap{max-width:460px;margin:0 auto;padding:16px 14px 40px}
+.top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.ttl{font-size:16px;font-weight:800}
+.upd{font-size:11px;color:var(--t3);text-align:right;line-height:1.5}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tab{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--t2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab.past{opacity:.6}
+.note{font-size:12px;color:var(--t3);text-align:center;margin-top:14px;line-height:1.7}
+.msg{text-align:center;padding:48px 16px;color:var(--t3);font-size:14px;line-height:1.8}
+.past-flag{font-size:12px;color:#b45309;background:rgba(180,83,9,.1);border:1px solid rgba(180,83,9,.3);border-radius:8px;padding:6px 10px;margin-bottom:10px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="ttl">결사 일정</div>
+    <div class="upd" id="upd"></div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div id="flag"></div>
+  <div id="body"><div class="msg">불러오는 중...</div></div>
+  <div class="note">일정이 바뀌면 이 페이지가 자동으로 갱신됩니다.<br>새로고침하지 않아도 최신 내용이 표시됩니다.</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyDSoYuNFDUoKkOt3aGS13mGoeETR6ral6E",
+  databaseURL:"https://prasia-boss-timer-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"prasia-boss-timer",
+  appId:"1:55119017487:web:ad4036a8e4b0d2957a957a"
+});
+const db=firebase.database();
+let items={},curKey=null;
+
+function todayKey(){const d=new Date();return`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;}
+function fmtTime(ms){if(!ms)return'';const d=new Date(ms);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
+
+function render(){
+  const keys=Object.keys(items).sort();
+  const tabs=document.getElementById('tabs'),body=document.getElementById('body'),flag=document.getElementById('flag'),upd=document.getElementById('upd');
+  if(!keys.length){tabs.innerHTML='';flag.innerHTML='';upd.textContent='';body.innerHTML='<div class="msg">아직 배포된 일정이 없습니다.</div>';return;}
+  if(!curKey||!items[curKey]){
+    const t=todayKey();
+    curKey=items[t]?t:(keys.filter(k=>k>=t)[0]||keys[keys.length-1]);
+  }
+  tabs.innerHTML=keys.map(k=>`<button class="tab${k===curKey?' on':''}${k<todayKey()?' past':''}" onclick="pick('${k}')">${esc(items[k].label||k)}</button>`).join('');
+  const it=items[curKey];
+  upd.innerHTML=`마지막 수정<br>${fmtTime(it.updatedAt)}`;
+  flag.innerHTML=curKey<todayKey()?'<div class="past-flag">지난 날짜의 일정입니다</div>':'';
+  body.innerHTML=it.html||'<div class="msg">내용이 없습니다.</div>';
+}
+function esc(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function pick(k){curKey=k;render();}
+
+db.ref('published/items').on('value',snap=>{
+  items=snap.val()||{};render();
+},err=>{
+  document.getElementById('body').innerHTML='<div class="msg">일정을 불러오지 못했습니다.<br>잠시 후 다시 열어 주세요.</div>';
+});
+</script>
+</body>
+</html>
