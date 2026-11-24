@@ -8,27 +8,27 @@
 <meta name="apple-mobile-web-app-title" content="결사 보스 타이머">
 <meta name="application-name" content="결사 보스 타이머">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230f0f1a' rx='80'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='%23c9a84c'%3E%E2%9A%94%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%231a1b2e' rx='80'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='%23c9a84c'%3E%E2%9A%94%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="theme-color" content="#0f0f1a">
+<meta name="theme-color" content="#eef2f7">
 <title>프라시아 전기 · 결사 일정 관리</title>
 <style>
 :root{
-  --bg:#0f0f1a;--bg2:#1a1a2e;--bg3:#222240;--card:#1c1c30;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
-  --text:#e8e8f0;--t2:#8888a8;--t3:#4a4a68;
-  --gold:#c9a84c;--gold2:#f0d080;--gold-bg:rgba(201,168,76,0.1);
-  --green:#4caf7d;--green-bg:rgba(76,175,125,0.1);
-  --amber:#e09a40;--amber-bg:rgba(224,154,64,0.1);
-  --purple:#9b7fe8;--purple2:#c4b0f8;--purple-bg:rgba(155,127,232,0.12);
-  --red:#e05a5a;--red-bg:rgba(224,90,90,0.1);
-  --blue:#5b9cf0;--blue-bg:rgba(91,156,240,0.1);
+  --bg:#eef2f7;--bg2:#ffffff;--bg3:#e1e8f2;--card:#ffffff;
+  --border:rgba(20,40,80,0.12);--border2:rgba(20,40,80,0.22);
+  --text:#16213a;--t2:#4a5878;--t3:#66749a;
+  --gold:#b8860b;--gold2:#8a6508;--gold-bg:rgba(184,134,11,0.12);
+  --green:#15803d;--green-bg:rgba(21,128,61,0.1);
+  --amber:#b45309;--amber-bg:rgba(180,83,9,0.1);
+  --purple:#6d4ad6;--purple2:#5b3cc4;--purple-bg:rgba(109,74,214,0.1);
+  --red:#c93030;--red-bg:rgba(201,48,48,0.1);
+  --blue:#1d6fd6;--blue-bg:rgba(29,111,214,0.1);
   --r:12px;--rs:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg);color:var(--text);font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;min-height:100vh}
 .app{max-width:560px;margin:0 auto;padding-bottom:90px}
-header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 16px 10px}
+header{position:sticky;top:0;z-index:50;background:rgba(238,242,247,0.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 16px 10px}
 .hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
 .logo-name{font-size:15px;font-weight:700;color:var(--text)}
 .logo-sub{font-size:11px;color:var(--t3);margin-top:2px}
@@ -39,9 +39,9 @@ header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:0 0 auto;padding:7px 14px;text-align:center;font-size:13px;border:none;border-radius:var(--rs);cursor:pointer;background:none;color:var(--t2);transition:all .15s;white-space:nowrap}
 .tab.on{background:var(--bg3);color:var(--text);font-weight:600}
-.tab.today{color:#7ab8f5}
+.tab.today{color:#1d6fd6}
 .tab.today.on{background:rgba(91,156,240,0.15);color:var(--blue)}
-.tab.tmrw{color:#a8d8a8}
+.tab.tmrw{color:#15803d}
 .tab.tmrw.on{background:rgba(76,175,125,0.12);color:var(--green)}
 .maint-wrap{padding:10px 16px 0}
 .maint-panel{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden}
@@ -75,6 +75,19 @@ header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-
 .sbtn{font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:none;color:var(--t3);cursor:pointer}
 .sbtn.on{background:var(--bg3);color:var(--t2);border-color:var(--border2)}
 .blist{display:flex;flex-direction:column;gap:8px}
+@media(min-width:860px){
+  .app{max-width:960px}
+  .blist{display:grid;grid-template-columns:1fr 1fr;align-items:start}
+  .maint-wrap{padding:12px 16px 0}
+  .stats{padding:12px 16px}
+  .sec{padding:12px 16px 0}
+  .day-section{padding:12px 16px 0}
+  .day-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .sched-wrap{padding:0 16px 0}
+  .ev-list{display:grid!important;grid-template-columns:1fr 1fr;align-items:start}
+  .mdl{max-width:640px;border-radius:var(--r);margin:auto}
+  .ovl{align-items:center}
+}
 .empty{text-align:center;padding:40px 16px;color:var(--t3);font-size:14px;line-height:1.8}
 .day-section{padding:10px 16px 0}
 .day-hdr{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:6px}
@@ -120,7 +133,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-
 .cdwn.urgent{color:var(--amber)}
 .cdwn.sm{font-size:13px;font-weight:500;color:var(--t2)}
 .cdwn.ready{font-size:13px;font-weight:600;color:var(--green);animation:bl 1.2s infinite}
-.spawn-hint{font-size:10px;color:var(--t3);text-align:right}
+.spawn-hint{font-size:11px;color:var(--t2);text-align:right;font-weight:500}
 .card-actions{display:flex;gap:6px;margin-top:11px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap}
 .cbtn{padding:8px 14px;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);white-space:nowrap}
 .cbtn:active{opacity:.7}
@@ -140,7 +153,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(15,15,26,0.96);backdrop-
 .awk-actions{margin-top:8px;display:flex;gap:6px}
 .fab{position:fixed;bottom:24px;right:20px;width:54px;height:54px;background:var(--gold);border:none;border-radius:50%;cursor:pointer;font-size:26px;color:#1a1200;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(201,168,76,.45);z-index:100;transition:transform .15s}
 .fab:active{transform:scale(.92)}
-.ovl{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.ovl{position:fixed;inset:0;background:rgba(20,30,50,.5);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .ovl.on{opacity:1;pointer-events:all}
 .mdl{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r) var(--r) 0 0;padding:20px 16px 40px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;transform:translateY(24px);transition:transform .2s}
 .ovl.on .mdl{transform:translateY(0)}
@@ -704,7 +717,7 @@ function sameDay(ms,refDate){
 function killBoss(id,overrideGuildIdx=null){
   const boss=bosses.find(b=>b.id===id),k=getK(id);
   if(k.awkActive){showToast('각성 보스를 먼저 처치해 주세요!');return;}
-  k.cnt++;k.lastKill=Date.now();
+  k.cnt++;const _now1=Date.now();k.lastKill=_now1-(_now1%60000);
   // 룻 순환 처리
   if(boss.lootEnable&&boss.lootGuilds?.length){
     const gIdx=overrideGuildIdx!=null?overrideGuildIdx:boss.lootIdx;
@@ -732,7 +745,7 @@ function killBoss(id,overrideGuildIdx=null){
 }
 function killAwaken(id){
   const boss=bosses.find(b=>b.id===id),k=getK(id);
-  k.awkActive=false;k.awkKill=Date.now();k.cnt=0;k.lastKill=Date.now();
+  const _now2=Date.now();k.awkActive=false;k.awkKill=_now2-(_now2%60000);k.cnt=0;k.lastKill=_now2-(_now2%60000);
   showToast(`${boss.awkName} 처치 · 카운터 초기화`);
   save();render();
 }
