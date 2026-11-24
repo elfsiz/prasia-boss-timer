@@ -1480,7 +1480,7 @@ function buildSchedContent(dayOffset=0){
     }else{
       const [sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);
       startMs=new Date(targetDate).setHours(sh,sm2,0,0);endMs=new Date(targetDate).setHours(eh,em,0,0);
-      timeLabel=ev.allDay?'종일':(ev.start===ev.end?stripSec(ev.start):`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`);
+      timeLabel=ev.allDay?'00:00 ~ 23:59':(ev.start===ev.end?stripSec(ev.start):`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`);
     }
     evItems.push({...ev,startMs,endMs,timeLabel,isPast:endMs<=nowMs,isNow:startMs<=nowMs&&nowMs<endMs});
   });
@@ -1576,7 +1576,7 @@ function buildSchedContent(dayOffset=0){
       let schedInfo='';
       if(ev.evType==='monthly'){
         const dayStr=(ev.monthDays||[]).sort((a,b)=>a-b).map(d=>d+'일').join('·');
-        schedInfo=`<div class="ev-days-row"><span class="ev-day-chip" style="background:var(--gold-bg);color:var(--gold2);border-color:rgba(201,168,76,.4)">📆 매월</span><span class="ev-day-chip">${dayStr}</span></div><div class="ev-time-row"><span class="ev-time">${ev.allDay?'종일':(ev.start===ev.end?ev.start:ev.start+' ~ '+ev.end)}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
+        schedInfo=`<div class="ev-days-row"><span class="ev-day-chip" style="background:var(--gold-bg);color:var(--gold2);border-color:rgba(201,168,76,.4)">📆 매월</span><span class="ev-day-chip">${dayStr}</span></div><div class="ev-time-row"><span class="ev-time">${ev.allDay?'00:00 ~ 23:59':(ev.start===ev.end?ev.start:ev.start+' ~ '+ev.end)}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
       } else if(ev.evType==='fixed'){
         const grouped={};(ev.fixedTimes||[]).forEach(ft=>{if(!grouped[ft.day])grouped[ft.day]=[];grouped[ft.day].push(`${ft.hh}:${ft.mm}`);});
         const rows=Object.entries(grouped).map(([d,times])=>`<span class="ev-day-chip">${DAY_KR2[d]} ${times.join('·')}</span>`).join('');
@@ -1590,7 +1590,7 @@ function buildSchedContent(dayOffset=0){
         schedInfo=`<div class="ev-days-row"><span class="ev-period-chip">📆 기간</span></div><div class="ev-time-row"><span class="ev-time" style="font-size:12px">${fmtDT(ev.pstart)} ~ ${fmtDT(ev.pend)}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
       }else{
         const dayStr=ev.days.includes(7)?'매일':ev.days.map(d=>DAY_KR[d]).join('·');
-        schedInfo=`<div class="ev-days-row"><span class="ev-day-chip">${dayStr}</span></div><div class="ev-time-row"><span class="ev-time">${ev.allDay?'종일':(ev.start===ev.end?ev.start:ev.start+' ~ '+ev.end)}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
+        schedInfo=`<div class="ev-days-row"><span class="ev-day-chip">${dayStr}</span></div><div class="ev-time-row"><span class="ev-time">${ev.allDay?'00:00 ~ 23:59':(ev.start===ev.end?ev.start:ev.start+' ~ '+ev.end)}</span><span class="ev-memo">${ev.memo||''}</span></div>`;
       }
       html+=`<div class="ev-card"><div class="ev-card-top"><span class="ev-name">${ev.name}</span></div>${schedInfo}<div class="ev-actions"><button class="cbtn" onclick="openEventModal(events.find(e=>e.id===${ev.id}))">편집</button><button class="cbtn danger" onclick="delEvent(${ev.id})">삭제</button></div></div>`;
     });
@@ -1734,8 +1734,8 @@ function _buildEvItemsForDate(nowMs,targetDate){
     const td=targetDate;
     if(ev.evType==='period'){startMs=new Date(ev.pstart).getTime();endMs=new Date(ev.pend).getTime();const fmtT=d=>`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;timeLabel=`${fmtT(new Date(ev.pstart))} ~ ${fmtT(new Date(ev.pend))}`;}
     else if(ev.evType==='once'){const od=new Date(ev.onceDt);startMs=od.getTime();endMs=startMs+3600000;timeLabel=`${String(od.getHours()).padStart(2,'0')}:${String(od.getMinutes()).padStart(2,'0')}`;}
-    else if(ev.evType==='monthly'){const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);const sd=new Date(td);sd.setHours(sh,sm2,0,0);const ed=new Date(td);ed.setHours(eh,em,0,0);startMs=sd.getTime();endMs=ed.getTime();timeLabel=ev.allDay?'종일':(ev.start===ev.end?stripSec(ev.start):`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`);}
-    else{const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);const sd=new Date(td);sd.setHours(sh,sm2,0,0);const ed=new Date(td);ed.setHours(eh,em,0,0);startMs=sd.getTime();endMs=ed.getTime();timeLabel=ev.allDay?'종일':(ev.start===ev.end?stripSec(ev.start):`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`);}
+    else if(ev.evType==='monthly'){const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);const sd=new Date(td);sd.setHours(sh,sm2,0,0);const ed=new Date(td);ed.setHours(eh,em,0,0);startMs=sd.getTime();endMs=ed.getTime();timeLabel=ev.allDay?'00:00 ~ 23:59':(ev.start===ev.end?stripSec(ev.start):`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`);}
+    else{const[sh,sm2]=ev.start.split(':').map(Number),[eh,em]=ev.end.split(':').map(Number);const sd=new Date(td);sd.setHours(sh,sm2,0,0);const ed=new Date(td);ed.setHours(eh,em,0,0);startMs=sd.getTime();endMs=ed.getTime();timeLabel=ev.allDay?'00:00 ~ 23:59':(ev.start===ev.end?stripSec(ev.start):`${stripSec(ev.start)} ~ ${stripSec(ev.end)}`);}
     items.push({...ev,startMs,endMs,timeLabel,isPast:endMs<=nowMs,isNow:startMs<=nowMs&&nowMs<endMs});
   });
   items.sort((a,b)=>a.startMs-b.startMs);return items;
