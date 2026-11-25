@@ -706,7 +706,8 @@ function publishShot(){
   const btn=document.getElementById('shot-pub-btn');
   if(btn){btn.disabled=true;btn.textContent='배포 중...';}
   const reset=()=>{if(btn){btn.disabled=false;btn.textContent='고정 주소로 배포 (링크 일정 갱신)';}};
-  db.ref('published/items/'+key).set({html:el.outerHTML,label,updatedAt:firebase.database.ServerValue.TIMESTAMP}).then(()=>{
+  const pubHtml=el.outerHTML.replace(/\sonclick="[^"]*"/g,'').replace(/cursor:pointer;/g,'');
+  db.ref('published/items/'+key).set({html:pubHtml,label,updatedAt:firebase.database.ServerValue.TIMESTAMP}).then(()=>{
     showToast(`${label} 일정을 배포했습니다.`);reset();
     // 오래된 배포본 정리: 최근 4개만 유지
     db.ref('published/items').once('value').then(sn=>{
@@ -1952,12 +1953,17 @@ function renderShotResult(panel){
   const dateStr=`${targetDate.getFullYear()}.${String(targetDate.getMonth()+1).padStart(2,'0')}.${String(targetDate.getDate()).padStart(2,'0')} (${DAY_KR[dow]})`;
   const raidMemoVal=_shotState.raidMemo||'';
 
-  const W='#ffffff',BG='#ddf0f5',BD='rgba(8,145,178,.12)';
-  const T1='#0c2d48',T2='#1e6091',T3='#7fb3c8';
-  const BOSS_BAR='#0d9488',EVENT_BAR='#0284c7',DAWN_BAR='#6644aa';
-  const BOSS_BG='#ccfbf1',BOSS_COLOR='#134e4a',BOSS_BORDER='rgba(13,148,136,.3)';
-  const EV_BG='#e0f2fe',EV_COLOR='#0c4a6e',EV_BORDER='rgba(2,132,199,.3)';
-  const groupBox=(rows)=>`<div style="border-radius:12px;overflow:hidden;border:1px solid ${BD}">${rows}</div>`;
+  const T1='#0c2d48',T3='#7fb3c8',EVC='#0369a1';
+  const PERS=[
+    {name:'새벽',from:0,to:6,rail:'#d6cff8',deep:'#5b4bc4',card:'#f6f4fe'},
+    {name:'오전',from:6,to:12,rail:'#bde3f6',deep:'#0b7aa8',card:'#f0f9fd'},
+    {name:'오후',from:12,to:18,rail:'#f9e3a2',deep:'#a8730a',card:'#fffaea'},
+    {name:'저녁',from:18,to:24,rail:'#fbcaac',deep:'#c2511b',card:'#fff4ec'}];
+  const NOPER={name:'미정',rail:'#dbe4ea',deep:'#4a6a80',card:'#f3f7f9'};
+  const perOf=min=>min<0?NOPER:(PERS.find(q=>min>=q.from*60&&min<q.to*60)||PERS[3]);
+  const toMin=t=>{const m=/(\d{1,2}):(\d{2})/.exec(t||'');return m?(+m[1])*60+(+m[2]):-1;};
+  const hhmm=ms=>{const d=new Date(ms);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+  const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 
   // 통합 아이템 빌드
   const {all}=_buildCombinedItems(targetDate,nowMs,dayOffset);
@@ -1966,88 +1972,88 @@ function renderShotResult(panel){
   const checks=_shotState.combinedChecks||new Set(all.map((_,i)=>i));
   const selItems=order.filter(si=>checks.has(si)).map(si=>({...all[si],_si:si}));
 
-  // 행 렌더러
-  const itemRow=(it)=>{
+  // 표시용 단위(unit)로 정규화
+  const toUnit=(it,idx)=>{
+    const u={idx,si:it._si,boss:false,isEv:false,name:it.name,memo:'',loot:'',tag:'',range:'',timeStr:'',min:-1,hidden:false,allDay:false,auto:''};
     if(it._kind==='boss'){
+      u.boss=true;
       const li=getEffectiveLoot(bosses.find(b=>b.id===it.bossId)||{});
-      const lootBadge=li?`<span style="font-size:11px;padding:2px 7px;border-radius:4px;background:${BOSS_BG};color:${BOSS_COLOR};border:1px solid ${BOSS_BORDER};font-weight:700;white-space:nowrap">🏆${li.guild}</span>`:'';
-      const awkLine=(it.awkEnable&&it.state!=='awaken'&&(it.cnt+1)>=it.awkN)
-        ?`<div style="font-size:10px;font-weight:700;color:#0d9488;margin-top:3px;padding:2px 7px;background:#ccfbf1;border:1px solid rgba(13,148,136,.4);border-radius:4px;display:inline-block">⚡ 처치 시 ${it.awkName} 출현!</div>`:'';
-      const hidden=_shotState.hiddenRegenSet.has(it._si);
+      if(li)u.loot=`<span style="font-size:11px;padding:1px 6px;border-radius:4px;background:#ccfbf1;color:#134e4a;border:1px solid rgba(13,148,136,.3);font-weight:700;white-space:nowrap">🏆${esc(li.guild)}</span>`;
+      if(it.awkEnable&&it.state!=='awaken'&&(it.cnt+1)>=it.awkN)u.tag=`<span style="font-size:10px;font-weight:700;color:#0d9488;border:1px solid rgba(13,148,136,.5);background:#ccfbf1;border-radius:4px;padding:0 5px;white-space:nowrap">⚡각성 출현</span>`;
+      if(it.fixedMemo)u.memo=it.fixedMemo;
+      u.auto=it.timeMs>0?hhmm(it.timeMs):'';
+      u.hidden=_shotState.hiddenRegenSet.has(it._si);
       const customT=_shotState.customRegenTimes[it._si];
-      const autoTime=it.timeMs>0?`${new Date(it.timeMs).getHours().toString().padStart(2,'0')}:${new Date(it.timeMs).getMinutes().toString().padStart(2,'0')}`:'';
-      const dispTime=customT||autoTime;
-      const isCustom=!!customT;
-      const regenBadge=hidden
-        ?`<div onclick="_openRegenEditor(${it._si},'${autoTime}')" style="width:24px;height:24px;cursor:pointer;opacity:0;flex-shrink:0" title="탭하여 시간 설정"></div>`
-        :(dispTime
-          ?`<div onclick="_openRegenEditor(${it._si},'${autoTime}')" style="font-size:14px;font-weight:800;color:#0c2d48;white-space:nowrap;cursor:pointer;user-select:none;font-variant-numeric:tabular-nums;flex-shrink:0">${dispTime}</div>`
-          :`<div onclick="_openRegenEditor(${it._si},'')" style="font-size:14px;font-weight:800;color:#0c2d48;white-space:nowrap;cursor:pointer;user-select:none;flex-shrink:0">처치 가능</div>`);
-      return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${W}">
-        <div style="width:3px;height:34px;background:${BOSS_BAR};flex-shrink:0"></div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:center;gap:5px;flex-wrap:wrap">${it.name} ${lootBadge}${it.fixedMemo?`<span style="font-size:11px;font-weight:600;color:#0284c7">${it.fixedMemo}</span>`:''}</div>
-          ${awkLine}
-        </div>
-        <div style="flex-shrink:0">${regenBadge}</div>
-      </div>`;
-    }else if(it._kind==='event'){
-      return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${W}">
-        <div style="width:3px;height:34px;background:${EVENT_BAR};flex-shrink:0"></div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">${it.name}${it._memo?`<span style="font-size:12px;font-weight:600;color:#0284c7">${it._memo}</span>`:''}</div>
-        </div>
-        <div style="font-size:14px;font-weight:800;color:#0c2d48;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums">${it.timeLabel.replace(/\d{1,2}\/\d{1,2}\s*/g,'')}</div>
-      </div>`;
+      const disp=customT||u.auto;
+      if(u.hidden){u.timeStr='--:--';u.min=toMin(u.auto);}
+      else if(disp){u.timeStr=disp;u.min=toMin(disp);}
+      else{u.timeStr='처치 가능';u.min=-1;}
     }else{
-      // dawn / morning
-      const isBoss=it.type==='boss';
-      const isMorning=it._phase==='morning';
-      const d2=new Date(it.timeMs);
-      const timeStr=`${String(d2.getHours()).padStart(2,'0')}:${String(d2.getMinutes()).padStart(2,'0')}`;
-      const dateDay=d2.getDate();
-      const memo=isBoss?(it.fixedMemo||''):(it.sub||'');
-      const phaseBg=isMorning?'#fff7ed':'#f8f4ff';
-      const phaseBarClr=isMorning?'#ea580c':DAWN_BAR;
-      const phaseLabel=isMorning?'☀️ 아침':'🌙 새벽';
-      const phaseLabelClr=isMorning?'#c2410c':'#6644aa';
-      const phaseBadgeBg=isMorning?'#fed7aa':'#e8e0fb';
-      const phaseBadgeClr=isMorning?'#7c2d12':'#4a2c8a';
-      const phaseBadgeBdr=isMorning?'rgba(124,45,18,.25)':'rgba(74,44,138,.25)';
-      return`<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:0.5px solid rgba(8,145,178,.08);gap:10px;background:${phaseBg}">
-        <div style="width:3px;height:34px;background:${phaseBarClr};flex-shrink:0"></div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:15px;font-weight:800;color:${T1};display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">${it.name}${memo?`<span style="font-size:12px;font-weight:600;color:${phaseLabelClr}">${memo}</span>`:''} <span style="font-size:11px;font-weight:600;color:${phaseLabelClr}">${phaseLabel}</span></div>
-        </div>
-        <div style="font-size:14px;font-weight:800;color:#0c2d48;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums">${dateDay}일 ${timeStr}</div>
-      </div>`;
+      u.isEv=true;
+      if(it._memo)u.memo=it._memo;
+      const clean=(it.timeLabel||'').replace(/\d{1,2}\/\d{1,2}\s*/g,'').trim();
+      u.allDay=/^00:00\s*~\s*23:59$/.test(clean);
+      const ts=clean.match(/\d{1,2}:\d{2}/g)||[];
+      u.timeStr=ts[0]||'';u.min=toMin(ts[0]);
+      if(ts[1]&&ts[1]!==ts[0]&&!u.allDay)u.range=ts[1];
     }
+    return u;
+  };
+  const unitHtml=(u)=>{
+    const click=u.boss?` onclick="_openRegenEditor(${u.si},'${u.auto}')" style="cursor:pointer;display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:2px 5px;margin:0 12px 0 0;vertical-align:top;max-width:100%"`:` style="display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:2px 5px;margin:0 12px 0 0;vertical-align:top;max-width:100%"`;
+    return `<span${click}><span style="font-size:15px;font-weight:800;color:${u.isEv?EVC:T1};white-space:nowrap">${esc(u.name)}</span>${u.loot}${u.tag}${u.memo?`<span style="font-size:11px;font-weight:600;color:${EVC};white-space:nowrap">${esc(u.memo)}</span>`:''}${u.range?`<span style="font-size:11px;font-weight:600;color:#5b7d92;white-space:nowrap">~ ${u.range}</span>`:''}</span>`;
+  };
+  const cntBadge=n=>n>1?`<div style="font-size:12px;font-weight:800;color:#fff;background:#0891b2;border-radius:4px;padding:0 6px;margin-top:3px;height:19px;line-height:19px;flex-shrink:0">×${n}</div>`:'';
+  // 시간대 카드 (왼쪽 막대 + 시각 행)
+  const periodCard=(per,units)=>{
+    const sorted=units.slice().sort((x,y)=>(x.min-y.min)||((x.hidden?1:0)-(y.hidden?1:0))||(x.idx-y.idx));
+    const groups=new Map();
+    sorted.forEach(u=>{const k=u.hidden?'hid':u.timeStr;if(!groups.has(k))groups.set(k,{t:u.timeStr,hidden:u.hidden,list:[]});groups.get(k).list.push(u);});
+    const gs=[...groups.values()];
+    const rail=`<div style="width:32px;flex-shrink:0;background:${per.rail};color:${per.deep};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 0;font-size:15px;font-weight:900;line-height:1.25">${[...per.name].map(ch=>`<div>${ch}</div>`).join('')}</div>`;
+    const rows=gs.map((g,k)=>{
+      const small=g.t==='처치 가능'||g.t==='--:--';
+      const tcol=g.hidden?'#9fb3c0':per.deep;
+      return `<div style="display:flex;gap:10px;padding:5px 12px 5px 10px;${k<gs.length-1?'border-bottom:1px dashed rgba(12,45,72,.14);':''}align-items:flex-start"><div style="width:56px;flex-shrink:0;font-size:${small?'14px':'19px'};font-weight:800;color:${tcol};line-height:${small?'1.9':'1.3'};white-space:nowrap">${g.t}</div><div style="flex:1;min-width:0;line-height:1.6">${g.list.map(unitHtml).join('')}</div>${cntBadge(g.list.length)}</div>`;
+    }).join('');
+    return `<div style="display:flex;margin:0 10px 6px;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(12,45,72,.15)">${rail}<div style="flex:1;min-width:0;background:${per.card};display:flex;flex-direction:column;justify-content:center">${rows}</div></div>`;
+  };
+  const cardsFor=(units)=>{
+    const buckets=new Map();
+    units.forEach(u=>{const per=perOf(u.min);if(!buckets.has(per))buckets.set(per,[]);buckets.get(per).push(u);});
+    return [...PERS,NOPER].filter(per=>buckets.has(per)).map(per=>periodCard(per,buckets.get(per))).join('');
   };
 
-  // 구분선 삽입을 위해 selItems를 순회하며 dawn 전환 지점에 divider 추가
-  const buildRows=()=>{
-    let rows='';
-    let dawnDividerInserted=false;
-    selItems.forEach(it=>{
-      if(it._kind==='dawn'&&!dawnDividerInserted){
-        const fd=new Date(it.timeMs);
-        const fdStr=`${fd.getMonth()+1}월 ${fd.getDate()}일`;
-        rows+=`<div style="padding:0 12px"><div style="display:flex;align-items:center;gap:8px;margin:2px 0"><span style="font-size:11px;font-weight:800;color:#9999bb;white-space:nowrap">${fdStr} 새벽·아침</span><div style="flex:1;height:1px;background:rgba(124,58,237,.2)"></div></div></div>`;
-        dawnDividerInserted=true;
-      }
-      rows+=itemRow(it);
-    });
-    return rows;
-  };
+  const todayUnits=[],dawnUnits=[];
+  selItems.forEach((it,idx)=>{
+    if(it._kind==='dawn'){
+      const isBoss=it.type==='boss';
+      const u={idx,si:it._si,boss:false,isEv:!isBoss,name:it.name,memo:(isBoss?it.fixedMemo:it.sub)||'',loot:'',tag:'',range:'',timeStr:hhmm(it.timeMs),min:toMin(hhmm(it.timeMs)),hidden:false,allDay:false,auto:''};
+      dawnUnits.push(u);
+    }else todayUnits.push(toUnit(it,idx));
+  });
+  const allDayUnits=todayUnits.filter(u=>u.allDay);
+  const timedUnits=todayUnits.filter(u=>!u.allDay);
 
-  let body=`<div id="shot-body" style="background:${BG};border-radius:14px;padding:16px;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:420px;margin:0 auto">
-    <div style="margin-bottom:${raidMemoVal?'8px':'12px'};padding-bottom:10px;border-bottom:2px solid rgba(8,145,178,.2)">
-      <div style="font-size:14px;font-weight:800;color:${T1}">${dateStr} 결사 일정</div>
+  let rowsHtml='';
+  if(allDayUnits.length){
+    rowsHtml+=`<div style="display:flex;gap:12px;padding:4px 24px 10px 24px;align-items:flex-start"><div style="width:44px;flex-shrink:0;font-size:15px;font-weight:800;color:#4a6a80;line-height:1.6">종일</div><div style="flex:1;min-width:0;line-height:1.6">${allDayUnits.map(unitHtml).join('')}<span style="font-size:11px;color:#5b7d92">00:00 ~ 23:59</span></div></div>`;
+  }
+  rowsHtml+=cardsFor(timedUnits);
+  if(dawnUnits.length){
+    const fd=new Date(selItems.find(x=>x._kind==='dawn').timeMs);
+    rowsHtml+=`<div style="padding:4px 14px 6px"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;font-weight:800;color:#7a6fa8;white-space:nowrap">${fd.getMonth()+1}월 ${fd.getDate()}일 새벽·아침</span><div style="flex:1;height:1px;background:rgba(124,58,237,.25)"></div></div></div>`;
+    rowsHtml+=cardsFor(dawnUnits);
+  }
+
+  let body=`<div id="shot-body" style="background:#eef8fb;border:1px solid rgba(8,145,178,.25);border-radius:14px;padding:12px 0 4px;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:420px;margin:0 auto;overflow:hidden">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 14px 8px;border-bottom:2px solid #0891b2;margin-bottom:10px">
+      <span style="font-size:14px;font-weight:800;color:#0891b2;letter-spacing:1px">결사 일정</span><span style="font-size:14px;font-weight:800;color:${T1}">${dateStr}</span>
     </div>
-    ${raidMemoVal?`<div style="background:#0d9488;border-radius:10px;padding:10px 14px;margin-bottom:12px"><div style="font-size:21px;font-weight:700;color:#fff;line-height:1.4">${raidMemoVal}</div></div>`:''}`;
+    ${raidMemoVal?`<div style="background:#0d9488;border-radius:10px;padding:10px 14px;margin:0 10px 10px"><div style="font-size:21px;font-weight:700;color:#fff;line-height:1.4">${esc(raidMemoVal)}</div></div>`:''}`;
 
   if(selItems.length){
-    body+=groupBox(buildRows());
+    body+=rowsHtml;
   }else{
     body+=`<div style="text-align:center;padding:20px;color:${T3};font-size:13px">선택된 일정이 없습니다</div>`;
   }
