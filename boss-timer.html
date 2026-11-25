@@ -1792,7 +1792,7 @@ function _resetShotState(){_shotState={raidMemo:'',combinedOrder:null,combinedCh
 
 function _openRegenEditor(si,defaultTime){
   document.getElementById('regen-editor-pop')?.remove();
-  const curTime=_shotState.customRegenTimes[si]||defaultTime||'';
+  const curTime=_shotState.customRegenTimes[String(si).split(',')[0]]||defaultTime||'';
   const [defH,defM]=curTime?curTime.split(':').map(Number):[0,0];
   const hOpts=Array.from({length:24},(_,i)=>`<option value="${i}" ${i===defH?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('');
   const mOpts=Array.from({length:60},(_,i)=>`<option value="${i}" ${i===defM?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('');
@@ -1808,8 +1808,8 @@ function _openRegenEditor(si,defaultTime){
       <select id="regen-m-sel" style="${selStyle}">${mOpts}</select>
     </div>
     <div style="display:flex;gap:8px">
-      <button onclick="_applyRegenHide(${si})" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:#2a2a48;color:#aaa;font-size:13px;cursor:pointer">시간 숨김</button>
-      <button onclick="_applyRegenTime(${si})" style="flex:1;padding:10px;border-radius:8px;border:none;background:#0d9488;color:#fff;font-size:13px;font-weight:700;cursor:pointer">확인</button>
+      <button onclick="_applyRegenHide('${si}')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:#2a2a48;color:#aaa;font-size:13px;cursor:pointer">시간 숨김</button>
+      <button onclick="_applyRegenTime('${si}')" style="flex:1;padding:10px;border-radius:8px;border:none;background:#0d9488;color:#fff;font-size:13px;font-weight:700;cursor:pointer">확인</button>
       <button onclick="document.getElementById('regen-editor-pop').remove()" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:#2a2a48;color:#aaa;font-size:13px;cursor:pointer">취소</button>
     </div>
   </div>`;
@@ -1821,14 +1821,12 @@ function _applyRegenTime(si){
   const m=document.getElementById('regen-m-sel')?.value??'';
   document.getElementById('regen-editor-pop')?.remove();
   const val=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-  _shotState.customRegenTimes[si]=val;
-  _shotState.hiddenRegenSet.delete(si);
+  String(si).split(',').forEach(x=>{const n=Number(x);_shotState.customRegenTimes[n]=val;_shotState.hiddenRegenSet.delete(n);});
   renderShotResult(document.getElementById('shot-panel'));
 }
 function _applyRegenHide(si){
   document.getElementById('regen-editor-pop')?.remove();
-  _shotState.hiddenRegenSet.add(si);
-  delete _shotState.customRegenTimes[si];
+  String(si).split(',').forEach(x=>{const n=Number(x);_shotState.hiddenRegenSet.add(n);delete _shotState.customRegenTimes[n];});
   renderShotResult(document.getElementById('shot-panel'));
 }
 
@@ -2014,7 +2012,9 @@ function renderShotResult(panel){
     const rows=gs.map((g,k)=>{
       const small=g.t==='처치 가능'||g.t==='--:--';
       const tcol=g.hidden?'#9fb3c0':per.deep;
-      return `<div style="display:flex;gap:10px;padding:5px 12px 5px 10px;${k<gs.length-1?'border-bottom:1px dashed rgba(12,45,72,.14);':''}align-items:flex-start"><div style="width:56px;flex-shrink:0;font-size:${small?'14px':'19px'};font-weight:800;color:${tcol};line-height:${small?'1.9':'1.3'};white-space:nowrap">${g.t}</div><div style="flex:1;min-width:0;line-height:1.6">${g.list.map(unitHtml).join('')}</div>${cntBadge(g.list.length)}</div>`;
+      const bs=g.list.filter(x=>x.boss);
+      const tclick=bs.length?` onclick="_openRegenEditor('${bs.map(x=>x.si).join(',')}','${bs[0].auto}')"`:'';
+      return `<div style="display:flex;gap:10px;padding:5px 12px 5px 10px;${k<gs.length-1?'border-bottom:1px dashed rgba(12,45,72,.14);':''}align-items:flex-start"><div${tclick} style="${bs.length?'cursor:pointer;':''}width:56px;flex-shrink:0;font-size:${small?'14px':'19px'};font-weight:800;color:${tcol};line-height:${small?'1.9':'1.3'};white-space:nowrap">${g.t}</div><div style="flex:1;min-width:0;line-height:1.6">${g.list.map(unitHtml).join('')}</div>${cntBadge(g.list.length)}</div>`;
     }).join('');
     return `<div style="display:flex;margin:0 10px 6px;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(12,45,72,.15)">${rail}<div style="flex:1;min-width:0;background:${per.card};display:flex;flex-direction:column;justify-content:center">${rows}</div></div>`;
   };
