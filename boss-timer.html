@@ -1875,7 +1875,7 @@ function renderShotSetup(panel){
   panel.innerHTML=`<div class="shot-setup">
     <div class="shot-setup-title">📋 일정표 생성</div><div class="shot-setup-date">${dateStr}</div>
     <div class="shot-section-lbl">📝 일정 메모 <span style="font-size:10px;font-weight:400;color:var(--t3)">(선택)</span></div>
-    <input class="finput" id="shot-memo-inp" placeholder="오늘 일정 관련 메모를 입력하세요" value="${_shotState.raidMemo||''}" style="font-size:13px;padding:10px 12px;width:100%" oninput="_shotState.raidMemo=this.value">
+    <textarea class="finput" id="shot-memo-inp" rows="3" placeholder="오늘 일정 관련 메모를 입력하세요 (엔터로 줄바꿈)" style="font-size:13px;padding:10px 12px;width:100%;resize:vertical;line-height:1.5;font-family:inherit" oninput="_shotState.raidMemo=this.value">${String(_shotState.raidMemo||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>
     <div class="shot-section-lbl">📋 일정 순서 <span style="font-size:10px;font-weight:400;color:var(--t3)">(▲▼로 순서 조정 · 체크 해제 시 제외)</span></div>
     <div class="shot-check-list" id="shot-cmb-list">${rows}</div>
     <div style="padding-top:12px;border-top:1px solid var(--border);margin-top:8px;display:flex;flex-direction:column;gap:8px;flex-shrink:0">
@@ -1899,7 +1899,7 @@ function _moveCombined(pos,dir){
 }
 function _saveShotChecks(){
   _saveCombinedChecks();
-  _shotState.raidMemo=(document.getElementById('shot-memo-inp')?.value||'').trim();
+  _shotState.raidMemo=(document.getElementById('shot-memo-inp')?.value||'').replace(/\r/g,'').trim();
 }
 // 새벽 일정 아이템 계산 공통 함수 (설정 패널 + 결과 패널 공용)
 function _buildEvItemsForDate(nowMs,targetDate){
@@ -2050,7 +2050,7 @@ function renderShotResult(panel){
     <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 14px 8px;border-bottom:2px solid #0891b2;margin-bottom:10px">
       <span style="font-size:14px;font-weight:800;color:#0891b2;letter-spacing:1px">결사 일정</span><span style="font-size:14px;font-weight:800;color:${T1}">${dateStr}</span>
     </div>
-    ${raidMemoVal?`<div style="background:#0d9488;border-radius:10px;padding:10px 14px;margin:0 10px 10px"><div style="font-size:21px;font-weight:700;color:#fff;line-height:1.4">${esc(raidMemoVal)}</div></div>`:''}`;
+    ${raidMemoVal?`<div style="background:#0d9488;border-radius:10px;padding:10px 14px;margin:0 10px 10px"><div style="font-size:21px;font-weight:700;color:#fff;line-height:1.4;white-space:pre-wrap;word-break:keep-all">${esc(raidMemoVal)}</div></div>`:''}`;
 
   if(selItems.length){
     body+=rowsHtml;
