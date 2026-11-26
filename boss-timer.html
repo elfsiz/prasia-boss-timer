@@ -332,6 +332,8 @@ input[type="date"]{color-scheme:dark}
 .month-day-picker{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
 .mdp-btn{padding:5px 0;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;width:36px;text-align:center}
 .mdp-btn.on{background:var(--gold-bg);border-color:var(--gold);color:var(--gold2)}
+.memo-sz{flex:1;padding:6px 2px;border:1px solid var(--border);background:var(--card);color:var(--t2,#555);border-radius:8px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer}
+.memo-sz.on{background:#0d9488;border-color:#0d9488;color:#fff}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -1786,9 +1788,11 @@ function openShotPanel(){
   renderShotSetup(panel);panel.classList.add('show');
 }
 // ── 스크린샷 상태: 통합 순서 방식 ──
-let _shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSet:new Set(),customRegenTimes:{}};
+let _shotState={raidMemoSize:_loadMemoSize(),raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSet:new Set(),customRegenTimes:{}};
 
-function _resetShotState(){_shotState={raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSet:new Set(),customRegenTimes:{}};}
+function _loadMemoSize(){try{const v=parseInt(localStorage.getItem('shotMemoSize'));return [14,18,21,26,32].includes(v)?v:21;}catch(e){return 21;}}
+function _setMemoSize(v){_shotState.raidMemoSize=v;try{localStorage.setItem('shotMemoSize',String(v));}catch(e){}document.querySelectorAll('.memo-sz').forEach(b=>b.classList.toggle('on',+b.dataset.sz===v));const t=document.getElementById('shot-memo-inp');if(t)t.style.fontSize=Math.min(v,22)+'px';}
+function _resetShotState(){_shotState={raidMemoSize:_loadMemoSize(),raidMemo:'',combinedOrder:null,combinedChecks:null,hiddenRegenSet:new Set(),customRegenTimes:{}};}
 
 function _openRegenEditor(si,defaultTime){
   document.getElementById('regen-editor-pop')?.remove();
@@ -1875,7 +1879,8 @@ function renderShotSetup(panel){
   panel.innerHTML=`<div class="shot-setup">
     <div class="shot-setup-title">📋 일정표 생성</div><div class="shot-setup-date">${dateStr}</div>
     <div class="shot-section-lbl">📝 일정 메모 <span style="font-size:10px;font-weight:400;color:var(--t3)">(선택)</span></div>
-    <textarea class="finput" id="shot-memo-inp" rows="3" placeholder="오늘 일정 관련 메모를 입력하세요 (엔터로 줄바꿈)" style="font-size:13px;padding:10px 12px;width:100%;resize:vertical;line-height:1.5;font-family:inherit" oninput="_shotState.raidMemo=this.value">${String(_shotState.raidMemo||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>
+    <textarea class="finput" id="shot-memo-inp" rows="3" placeholder="오늘 일정 관련 메모를 입력하세요 (엔터로 줄바꿈)" style="font-size:${Math.min(_shotState.raidMemoSize||21,22)}px;padding:10px 12px;width:100%;resize:vertical;line-height:1.5;font-family:inherit" oninput="_shotState.raidMemo=this.value">${String(_shotState.raidMemo||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>
+    <div style="display:flex;align-items:center;gap:6px;margin:6px 0 2px"><span style="font-size:11px;color:var(--t3);margin-right:2px">글자 크기</span>${[[14,'작게'],[18,'보통'],[21,'크게'],[26,'더 크게'],[32,'아주 크게']].map(([v,l])=>`<button type="button" class="memo-sz${_shotState.raidMemoSize===v?' on':''}" data-sz="${v}" onclick="_setMemoSize(${v})">${l}</button>`).join('')}</div>
     <div class="shot-section-lbl">📋 일정 순서 <span style="font-size:10px;font-weight:400;color:var(--t3)">(▲▼로 순서 조정 · 체크 해제 시 제외)</span></div>
     <div class="shot-check-list" id="shot-cmb-list">${rows}</div>
     <div style="padding-top:12px;border-top:1px solid var(--border);margin-top:8px;display:flex;flex-direction:column;gap:8px;flex-shrink:0">
@@ -2050,7 +2055,7 @@ function renderShotResult(panel){
     <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 14px 8px;border-bottom:2px solid #0891b2;margin-bottom:10px">
       <span style="font-size:14px;font-weight:800;color:#0891b2;letter-spacing:1px">결사 일정</span><span style="font-size:14px;font-weight:800;color:${T1}">${dateStr}</span>
     </div>
-    ${raidMemoVal?`<div style="background:#0d9488;border-radius:10px;padding:10px 14px;margin:0 10px 10px"><div style="font-size:21px;font-weight:700;color:#fff;line-height:1.4;white-space:pre-wrap;word-break:keep-all">${esc(raidMemoVal)}</div></div>`:''}`;
+    ${raidMemoVal?`<div style="background:#0d9488;border-radius:10px;padding:10px 14px;margin:0 10px 10px"><div style="font-size:${_shotState.raidMemoSize||21}px;font-weight:700;color:#fff;line-height:1.4;white-space:pre-wrap;word-break:keep-all">${esc(raidMemoVal)}</div></div>`:''}`;
 
   if(selItems.length){
     body+=rowsHtml;
