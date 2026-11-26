@@ -2133,7 +2133,7 @@ function renderShotResult(panel){
 
   const th=_getShotTheme();
   const T3='#7fb3c8';
-  const PERS=[{name:'새벽',from:0,to:6},{name:'오전',from:6,to:12},{name:'오후',from:12,to:18},{name:'저녁',from:18,to:24}];
+  const PERS=[{name:'새벽',from:0,to:6},{name:'아침',from:6,to:12},{name:'낮',from:12,to:18},{name:'밤',from:18,to:24}];
   const NOPER={name:'미정',rail:'#dbe4ea',deep:'#4a6a80',card:'#f3f7f9'};
   const perIdx=min=>min<0?-1:Math.min(3,Math.floor(min/360));
   const perStyle=ix=>ix<0?NOPER:th.per[ix];
