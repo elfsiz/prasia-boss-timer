@@ -282,6 +282,11 @@ input[type="date"]{color-scheme:dark}
 .shot-order-btn{width:22px;height:18px;border-radius:4px;border:1px solid var(--border2);background:var(--bg);color:var(--t2);font-size:10px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
 .shot-order-btn:active{opacity:.6}
 .shot-order-btn:disabled{opacity:.25;cursor:default}
+.shot-tsel{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.shot-tsel select{padding:4px 1px;border-radius:6px;border:1px solid var(--border2);background:var(--bg);color:var(--gold2);font-size:13px;font-weight:700;text-align:center;-webkit-appearance:none;appearance:none;width:36px;cursor:pointer}
+.shot-tsel b{color:var(--gold2);font-size:13px}
+.shot-tsel.chg select{border-color:var(--gold);background:var(--gold-bg)}
+.shot-treset{width:22px;height:22px;margin-left:2px;border-radius:50%;border:1px solid var(--border2);background:var(--bg);color:var(--t2);font-size:12px;cursor:pointer;padding:0;line-height:1}
 .shot-order-num{font-size:11px;font-weight:700;color:var(--gold2);width:18px;text-align:center;flex-shrink:0}
 .shot-generate-btn{width:100%;margin-top:16px;padding:13px;border-radius:var(--rs);background:var(--gold);border:none;color:#1a1200;font-size:14px;font-weight:700;cursor:pointer}
 .shot-generate-btn:active{opacity:.8}
@@ -1925,103 +1930,6 @@ function _setShotTheme(id){try{localStorage.setItem('shotTheme',id);}catch(e){}d
 function _setMemoSize(v){_shotState.raidMemoSize=v;try{localStorage.setItem('shotMemoSize',String(v));}catch(e){}document.querySelectorAll('.memo-sz').forEach(b=>b.classList.toggle('on',+b.dataset.sz===v));const t=document.getElementById('shot-memo-inp');if(t)t.style.fontSize=Math.min(v,22)+'px';}
 function _resetShotState(){_shotState={raidMemoSize:_loadMemoSize(),raidMemo:'',combinedOrder:null,combinedChecks:null,customRegenTimes:{}};}
 
-function _openRegenEditor(si,defaultTime){
-  document.getElementById('regen-editor-pop')?.remove();
-  const curTime=_shotState.customRegenTimes[String(si).split(',')[0]]||defaultTime||'';
-  const [defH,defM]=curTime?curTime.split(':').map(Number):[0,0];
-  const hOpts=Array.from({length:24},(_,i)=>`<option value="${i}" ${i===defH?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('');
-  const mOpts=Array.from({length:60},(_,i)=>`<option value="${i}" ${i===defM?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('');
-  const selStyle='flex:1;padding:10px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:#222240;color:#e8e8f0;font-size:20px;font-weight:700;text-align:center;cursor:pointer;-webkit-appearance:none;appearance:none';
-  const pop=document.createElement('div');
-  pop.id='regen-editor-pop';
-  pop.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center';
-  pop.innerHTML=`<div style="background:#1c1c30;border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:20px;min-width:260px;max-width:320px;width:90%">
-    <div style="font-size:14px;font-weight:700;color:#e8e8f0;margin-bottom:14px">리젠 시간 설정</div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-      <select id="regen-h-sel" style="${selStyle}">${hOpts}</select>
-      <span style="font-size:22px;font-weight:800;color:#e8e8f0">:</span>
-      <select id="regen-m-sel" style="${selStyle}">${mOpts}</select>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button onclick="_applyRegenTime('${si}')" style="flex:1;padding:10px;border-radius:8px;border:none;background:#0d9488;color:#fff;font-size:13px;font-weight:700;cursor:pointer">확인</button>
-      <button onclick="document.getElementById('regen-editor-pop').remove()" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:#2a2a48;color:#aaa;font-size:13px;cursor:pointer">취소</button>
-    </div>
-  </div>`;
-  pop.addEventListener('click',e=>{if(e.target===pop)pop.remove();});
-  document.body.appendChild(pop);
-}
-
-// ── 그룹 편집: 같은 시간 칸의 항목별 시간 + 순서 ──
-let _gp=null;
-function _openGroupEditor(sis){
-  const panel=document.getElementById('shot-panel');
-  const dayOffset=panel._dayOffset||0;
-  const td=new Date();if(dayOffset>0)td.setDate(td.getDate()+dayOffset);
-  const {all}=_buildCombinedItems(td,Date.now(),dayOffset);
-  const members=String(sis).split(',').map(Number).map(si=>{
-    const it=all[si],k=_shotKeyOf(it,si),editable=it._kind==='boss';
-    const orig=editable?(/^\d/.test(k.key)?k.key:''):k.key;
-    const [h,m]=orig&&/^\d/.test(orig)?orig.split(':'):['',''];
-    return{si,name:it._label||it.name,editable,orig,key:k.key,h:editable?h:'',m:editable?m:''};
-  });
-  const ed=members.find(x=>x.editable);
-  _gp={members,allH:ed&&ed.h!==''?ed.h:'00',allM:ed&&ed.m!==''?ed.m:'00',title:(members[0].orig||'').replace(/^d/,'')||'시간 미정'};
-  document.getElementById('group-editor-pop')?.remove();
-  const pop=document.createElement('div');
-  pop.id='group-editor-pop';
-  pop.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center';
-  pop.addEventListener('click',e=>{if(e.target===pop)pop.remove();});
-  document.body.appendChild(pop);
-  _gpRender();
-}
-function _gpTv(m){return m.h===''||m.m===''?'':String(m.h).padStart(2,'0')+':'+String(m.m).padStart(2,'0');}
-function _gpEk(m){return m.editable?_gpTv(m):m.key;}
-function _gpRender(){
-  const pop=document.getElementById('group-editor-pop');if(!pop||!_gp)return;
-  const g=_gp,esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const sel='padding:5px 2px;border-radius:6px;border:1px solid rgba(255,255,255,.18);background:#2f2f55;color:#e8e8f0;font-size:14px;font-weight:800;text-align:center;-webkit-appearance:none;appearance:none;width:42px;cursor:pointer';
-  const opts=(n,v,blank)=>(blank?`<option value=""${v===''?' selected':''}>--</option>`:'')+Array.from({length:n},(_,i)=>{const t=String(i).padStart(2,'0');return`<option value="${t}"${t===v?' selected':''}>${t}</option>`;}).join('');
-  const nEd=g.members.filter(x=>x.editable).length;
-  const allRow=nEd>1?`<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;font-size:12px;color:#bfe;"><span style="flex:1">전체 시간 한 번에</span><select style="${sel}" onchange="_gp.allH=this.value">${opts(24,g.allH)}</select><b>:</b><select style="${sel}" onchange="_gp.allM=this.value">${opts(60,g.allM)}</select><button onclick="_gpAll()" style="padding:5px 10px;border-radius:6px;border:none;background:#0d9488;color:#fff;font-size:12px;font-weight:700;cursor:pointer">적용</button></div>`:'';
-  const rows=g.members.map((m,i)=>{
-    const ek=_gpEk(m),upOk=i>0&&_gpEk(g.members[i-1])===ek,dnOk=i<g.members.length-1&&_gpEk(g.members[i+1])===ek;
-    const chg=m.editable&&_gpTv(m)!==m.orig&&_gpTv(m)!=='';
-    const tm=m.editable
-      ?`<select style="${sel};${chg?'border-color:#f6d77a;color:#f6d77a':''}" onchange="_gpSet(${i},'h',this.value)">${opts(24,m.h,m.orig==='')}</select><b style="color:${chg?'#f6d77a':'#e8e8f0'}">:</b><select style="${sel};${chg?'border-color:#f6d77a;color:#f6d77a':''}" onchange="_gpSet(${i},'m',this.value)">${opts(60,m.m,m.orig==='')}</select>`
-      :`<span style="font-size:12px;color:#8a8aa8;width:93px;text-align:center">${esc(m.key==='all'?'종일':m.key.replace(/^d/,'')||'시간 고정')}</span>`;
-    const ab=(d,ok,ch)=>`<button onclick="_gpMove(${i},${d})" ${ok?'':'disabled'} style="width:26px;height:26px;border-radius:6px;border:none;background:#2f2f55;color:#cfd;font-size:11px;cursor:pointer;${ok?'':'opacity:.25;cursor:default'}">${ch}</button>`;
-    return`<div style="display:flex;align-items:center;gap:6px;padding:7px 0;${i<g.members.length-1?'border-bottom:1px solid rgba(255,255,255,.07)':''}"><span style="flex:1;min-width:0;font-size:13px;font-weight:700;color:#e8e8f0;word-break:keep-all">${esc(m.name)}</span>${tm}${ab(-1,upOk,'▲')}${ab(1,dnOk,'▼')}</div>`;
-  }).join('');
-  pop.innerHTML=`<div style="background:#1c1c30;border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:16px;width:92%;max-width:360px;max-height:86vh;overflow:auto">
-    <div style="font-size:14px;font-weight:700;color:#e8e8f0;margin-bottom:3px">${esc(g.title)} 그룹 편집</div>
-    <div style="font-size:11px;color:#9aa;margin-bottom:10px;line-height:1.5">시간은 항목별로 바꿀 수 있고, 순서(▲▼)는 같은 시간 안에서만 바뀝니다.</div>
-    ${allRow}
-    <div style="background:#222240;border-radius:8px;padding:0 8px;margin-bottom:12px">${rows}</div>
-    <div style="display:flex;gap:8px"><button onclick="_gpApply()" style="flex:1;padding:10px;border-radius:8px;border:none;background:#0d9488;color:#fff;font-size:13px;font-weight:700;cursor:pointer">확인</button><button onclick="document.getElementById('group-editor-pop').remove()" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:#2a2a48;color:#aaa;font-size:13px;cursor:pointer">취소</button></div>
-  </div>`;
-}
-function _gpSet(i,f,v){const m=_gp.members[i];m[f]=v;if(f==='h'&&v!==''&&m.m==='')m.m='00';if(f==='m'&&v!==''&&m.h==='')m.h='00';if(v===''){m.h='';m.m='';}_gpRender();}
-function _gpAll(){_gp.members.forEach(m=>{if(m.editable){m.h=_gp.allH;m.m=_gp.allM;}});_gpRender();}
-function _gpMove(i,d){const a=_gp.members,j=i+d;if(j<0||j>=a.length||_gpEk(a[i])!==_gpEk(a[j]))return;[a[i],a[j]]=[a[j],a[i]];_gpRender();}
-function _gpApply(){
-  const arr=_shotState.combinedOrder,kept=[],changed=[];
-  _gp.members.forEach(m=>{if(m.editable){const t=_gpTv(m);if(t!==''&&t!==m.orig){changed.push(m);return;}}kept.push(m);});
-  const P=kept.map(m=>arr.indexOf(m.si)).sort((a,b)=>a-b);
-  kept.forEach((m,x)=>{arr[P[x]]=m.si;});
-  changed.forEach(m=>{_shotState.customRegenTimes[m.si]=_gpTv(m);const ix=arr.indexOf(m.si);arr.splice(ix,1);arr.push(m.si);});
-  document.getElementById('group-editor-pop')?.remove();
-  _gp=null;
-  renderShotResult(document.getElementById('shot-panel'));
-}
-function _applyRegenTime(si){
-  const h=document.getElementById('regen-h-sel')?.value??'';
-  const m=document.getElementById('regen-m-sel')?.value??'';
-  document.getElementById('regen-editor-pop')?.remove();
-  const val=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-  String(si).split(',').forEach(x=>{const n=Number(x);_shotState.customRegenTimes[n]=val;});
-  renderShotResult(document.getElementById('shot-panel'));
-}
-
 function _buildCombinedItems(targetDate,nowMs,dayOffset){
   const bossItems=getBossItemsForDate(targetDate);
   const evItems=_buildEvItemsForDate(nowMs,targetDate);
@@ -2058,10 +1966,20 @@ function renderShotSetup(panel){
   const rows=disp.length
     ?disp.map((d,pos)=>{
       const si=d.si,it=all[si];
-      const timeStr=(it._kind==='boss'&&_shotState.customRegenTimes[si])?('리젠 '+_shotState.customRegenTimes[si]):(it._time||'');
       const upOk=pos>0&&disp[pos-1].k.key===d.k.key;
       const dnOk=pos<disp.length-1&&disp[pos+1].k.key===d.k.key;
-      return`<label class="shot-check-row"><input type="checkbox" class="shot-cmb-chk" data-si="${si}" ${_shotState.combinedChecks.has(si)?'checked':''}><span class="shot-order-num">${pos+1}</span><span class="shot-check-dot" style="background:${it._dot}"></span><span class="shot-check-name">${it._label}${it._kind==='dawn'?' 🌙':''}</span><span class="shot-check-sub" style="color:var(--gold2);font-weight:700">${timeStr}</span><div class="shot-order-btns"><button type="button" class="shot-order-btn" onclick="_moveCombined(${si},-1)" ${upOk?'':'disabled'}>▲</button><button type="button" class="shot-order-btn" onclick="_moveCombined(${si},1)" ${dnOk?'':'disabled'}>▼</button></div></label>`;
+      let timeHtml;
+      if(it._kind==='boss'){
+        const auto=it.timeMs>0?_hhmmG(it.timeMs):'';
+        const cur=_shotState.customRegenTimes[si]||auto;
+        const [ch,cm]=cur?cur.split(':'):['',''];
+        const chg=!!_shotState.customRegenTimes[si]&&_shotState.customRegenTimes[si]!==auto;
+        const op=(n,v,blank)=>(blank?`<option value=""${v===''?' selected':''}>--</option>`:'')+Array.from({length:n},(_,i)=>{const t=String(i).padStart(2,'0');return`<option value="${t}"${t===v?' selected':''}>${t}</option>`;}).join('');
+        timeHtml=`<span class="shot-tsel${chg?' chg':''}" onclick="event.preventDefault();event.stopPropagation()"><select id="tsh-${si}" onchange="_setRegenHM(${si})">${op(24,ch,auto==='')}</select><b>:</b><select id="tsm-${si}" onchange="_setRegenHM(${si})">${op(60,cm,auto==='')}</select>${chg?`<button type="button" class="shot-treset" title="원래 시간으로" onclick="_resetRegenTime(${si})">↺</button>`:''}</span>`;
+      }else{
+        timeHtml=`<span class="shot-check-sub" style="color:var(--gold2);font-weight:700">${it._time||''}</span>`;
+      }
+      return`<label class="shot-check-row"><input type="checkbox" class="shot-cmb-chk" data-si="${si}" ${_shotState.combinedChecks.has(si)?'checked':''}><span class="shot-order-num">${pos+1}</span><span class="shot-check-dot" style="background:${it._dot}"></span><span class="shot-check-name">${it._label}${it._kind==='dawn'?' 🌙':''}</span>${timeHtml}<div class="shot-order-btns"><button type="button" class="shot-order-btn" onclick="_moveCombined(${si},-1)" ${upOk?'':'disabled'}>▲</button><button type="button" class="shot-order-btn" onclick="_moveCombined(${si},1)" ${dnOk?'':'disabled'}>▼</button></div></label>`;
     }).join('')
     :'<div class="shot-empty">일정이 없습니다</div>';
 
@@ -2071,7 +1989,7 @@ function renderShotSetup(panel){
     <textarea class="finput" id="shot-memo-inp" rows="3" placeholder="오늘 일정 관련 메모를 입력하세요 (엔터로 줄바꿈)" style="font-size:${Math.min(_shotState.raidMemoSize||21,22)}px;padding:10px 12px;width:100%;resize:vertical;line-height:1.5;font-family:inherit" oninput="_shotState.raidMemo=this.value">${String(_shotState.raidMemo||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>
     <div style="display:flex;align-items:center;gap:6px;margin:6px 0 2px"><span style="font-size:11px;color:var(--t3);margin-right:2px">글자 크기</span>${[[14,'작게'],[18,'보통'],[21,'크게'],[26,'더 크게'],[32,'아주 크게']].map(([v,l])=>`<button type="button" class="memo-sz${_shotState.raidMemoSize===v?' on':''}" data-sz="${v}" onclick="_setMemoSize(${v})">${l}</button>`).join('')}</div>
     <div style="display:flex;align-items:center;gap:6px;margin:8px 0 2px"><span style="font-size:11px;color:var(--t3);margin-right:2px">테마</span>${Object.entries(SHOT_THEMES).map(([id,t])=>`<button type="button" class="th-sz${_loadShotTheme()===id?' on':''}" data-th="${id}" onclick="_setShotTheme('${id}')">${t.label}</button>`).join('')}</div>
-    <div class="shot-section-lbl">📋 일정 순서 <span style="font-size:10px;font-weight:400;color:var(--t3)">(시각순 고정 · 같은 시각끼리만 ▲▼ · 체크 해제 시 제외)</span></div>
+    <div class="shot-section-lbl">📋 일정 순서 <span style="font-size:10px;font-weight:400;color:var(--t3)">(보스 시간 직접 수정 · 시각순 자동 정렬 · 같은 시각끼리만 ▲▼ · 체크 해제 시 제외)</span></div>
     <div class="shot-check-list" id="shot-cmb-list">${rows}</div>
     <div style="padding-top:12px;border-top:1px solid var(--border);margin-top:8px;display:flex;flex-direction:column;gap:8px;flex-shrink:0">
       <button class="shot-generate-btn" style="margin-top:0" onclick="_saveShotChecks();renderShotResult(document.getElementById('shot-panel'))">일정표 생성 →</button>
@@ -2093,6 +2011,22 @@ function _shotKeyOf(it,si){
 // 표시 순서: 시각순 고정, 같은 시각 안에서는 사용자가 정한 순서
 function _shotDisplayOrder(all){
   return _shotState.combinedOrder.map((si,pos)=>({si,pos,k:_shotKeyOf(all[si],si)})).sort((a,b)=>a.k.min-b.k.min||a.pos-b.pos);
+}
+function _setRegenHM(si){
+  const h=document.getElementById('tsh-'+si)?.value??'',m=document.getElementById('tsm-'+si)?.value??'';
+  _saveCombinedChecks();
+  _shotState.raidMemo=document.getElementById('shot-memo-inp')?.value||'';
+  if(h===''&&m===''){delete _shotState.customRegenTimes[si];}
+  else{_shotState.customRegenTimes[si]=(h===''?'00':h)+':'+(m===''?'00':m);}
+  const arr=_shotState.combinedOrder;const ix=arr.indexOf(si);if(ix>=0){arr.splice(ix,1);arr.push(si);}
+  renderShotSetup(document.getElementById('shot-panel'));
+}
+function _resetRegenTime(si){
+  _saveCombinedChecks();
+  _shotState.raidMemo=document.getElementById('shot-memo-inp')?.value||'';
+  delete _shotState.customRegenTimes[si];
+  const arr=_shotState.combinedOrder;const ix=arr.indexOf(si);if(ix>=0){arr.splice(ix,1);arr.push(si);}
+  renderShotSetup(document.getElementById('shot-panel'));
 }
 function _moveCombined(si,dir){
   const panel=document.getElementById('shot-panel');
@@ -2233,9 +2167,9 @@ function renderShotResult(panel){
     return u;
   };
   const bodyOf=u=>`<span style="display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:2px 6px;min-width:0"><span style="font-size:14px;font-weight:800;color:${u.isEv?th.ev:th.nm};white-space:nowrap">${esc(u.name)}</span>${u.loot}${u.tag}${u.memo?`<span style="font-size:11px;font-weight:600;color:${th.ev};white-space:nowrap">${esc(u.memo)}</span>`:''}${u.range?`<span style="font-size:11px;font-weight:600;color:${th.sub};white-space:nowrap">~ ${u.range}</span>`:''}</span>`;
-  const itemHtml=(u,last,dot,gsis,gmulti)=>{
-    const clk=u.boss||gmulti;
-    const click=clk?` onclick="_openGroupEditor('${gsis}')"`:'';
+  const itemHtml=(u,last,dot)=>{
+    const clk=false;
+    const click='';
     return `<div${click} data-n="${esc(u.name)}" data-t="${u.dawn?'익일 ':''}${esc(u.timeStr)}" style="display:flex;align-items:center;gap:7px;line-height:1.55;padding:1px 0;${last?'':`border-bottom:1px dotted ${th.line};`}${clk?'cursor:pointer;':''}"><span style="width:6px;height:6px;border-radius:50%;background:${dot};flex-shrink:0;opacity:.7"></span>${bodyOf(u)}</div>`;
   };
   const periodCard=(ps,railName,units)=>{
@@ -2247,10 +2181,8 @@ function renderShotResult(panel){
     const rows=gs.map((g,k)=>{
       const small=g.t==='처치 가능';
       const bs=g.list.filter(x=>x.boss);
-      const gsis=g.list.map(x=>x.si).join(',');
-      const gmulti=g.list.length>1;
-      const tclick=(bs.length||gmulti)?` onclick="_openGroupEditor('${gsis}')"`:'';
-      return `<div style="display:flex;gap:10px;padding:5px 12px 5px 10px;${k<gs.length-1?`border-bottom:1px dashed ${th.line};`:''}align-items:flex-start"><div${tclick} style="${(bs.length||gmulti)?'cursor:pointer;':''}width:56px;flex-shrink:0;font-size:${small?'14px':'19px'};font-weight:800;color:${ps.deep};line-height:${small?'1.7':'1.3'};white-space:nowrap">${g.t}</div><div style="flex:1;min-width:0">${g.list.map((u,j)=>itemHtml(u,j===g.list.length-1,ps.deep,gsis,gmulti)).join('')}</div></div>`;
+      const tclick='';
+      return `<div style="display:flex;gap:10px;padding:5px 12px 5px 10px;${k<gs.length-1?`border-bottom:1px dashed ${th.line};`:''}align-items:flex-start"><div${tclick} style="width:56px;flex-shrink:0;font-size:${small?'14px':'19px'};font-weight:800;color:${ps.deep};line-height:${small?'1.7':'1.3'};white-space:nowrap">${g.t}</div><div style="flex:1;min-width:0">${g.list.map((u,j)=>itemHtml(u,j===g.list.length-1,ps.deep)).join('')}</div></div>`;
     }).join('');
     return `<div style="display:flex;margin:0 10px 6px;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.18);${th.cardBorder?`border:1.5px solid ${th.cardBorder};`:''}">${rail}<div style="flex:1;min-width:0;background:${ps.card};display:flex;flex-direction:column;justify-content:center">${rows}</div></div>`;
   };
