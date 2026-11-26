@@ -18,6 +18,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Pretendard',-apple
 .tab{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--t2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 .tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .tab.past{opacity:.6}
+.tg{font-size:10px;font-weight:700;margin-left:4px;opacity:.8}
 .note{font-size:12px;color:var(--t3);text-align:center;margin-top:14px;line-height:1.7}
 .msg{text-align:center;padding:48px 16px;color:var(--t3);font-size:14px;line-height:1.8}
 .past-flag{font-size:12px;color:#b45309;background:rgba(180,83,9,.1);border:1px solid rgba(180,83,9,.3);border-radius:8px;padding:6px 10px;margin-bottom:10px;text-align:center}
@@ -50,15 +51,21 @@ let items={},curKey=null;
 function todayKey(){const d=new Date();return`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;}
 function fmtTime(ms){if(!ms)return'';const d=new Date(ms);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
 
+function dkey(d){return`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;}
+function rangeKeys(){const t=new Date();const y=new Date(t);y.setDate(t.getDate()-1);const n=new Date(t);n.setDate(t.getDate()+1);return{y:dkey(y),t:dkey(t),n:dkey(n)};}
 function render(){
-  const keys=Object.keys(items).sort();
+  const R=rangeKeys();
+  // 어제 · 오늘 · 내일 일정만 표시
+  const keys=Object.keys(items).filter(k=>k>=R.y&&k<=R.n).sort();
   const tabs=document.getElementById('tabs'),body=document.getElementById('body'),flag=document.getElementById('flag'),upd=document.getElementById('upd');
   if(!keys.length){tabs.innerHTML='';flag.innerHTML='';upd.textContent='';body.innerHTML='<div class="msg">아직 배포된 일정이 없습니다.</div>';return;}
+  if(curKey&&!keys.includes(curKey))curKey=null;
   if(!curKey||!items[curKey]){
     const t=todayKey();
     curKey=items[t]?t:(keys.filter(k=>k>=t)[0]||keys[keys.length-1]);
   }
-  tabs.innerHTML=keys.map(k=>`<button class="tab${k===curKey?' on':''}${k<todayKey()?' past':''}" onclick="pick('${k}')">${esc(items[k].label||k)}</button>`).join('');
+  const tg={[R.y]:'어제',[R.t]:'오늘',[R.n]:'내일'};
+  tabs.innerHTML=keys.map(k=>`<button class="tab${k===curKey?' on':''}${k<todayKey()?' past':''}" onclick="pick('${k}')">${esc(items[k].label||k)}<span class="tg">${tg[k]||''}</span></button>`).join('');
   const it=items[curKey];
   upd.innerHTML=`마지막 수정<br>${fmtTime(it.updatedAt)}`;
   flag.innerHTML=curKey<todayKey()?'<div class="past-flag">지난 날짜의 일정입니다</div>':'';
@@ -67,6 +74,9 @@ function render(){
 function esc(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function pick(k){curKey=k;render();}
 
+let lastDay=todayKey();
+setInterval(()=>{const d=todayKey();if(d!==lastDay){lastDay=d;curKey=null;render();}},30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){const d=todayKey();if(d!==lastDay){lastDay=d;curKey=null;}render();}});
 db.ref('published/items').on('value',snap=>{
   items=snap.val()||{};render();
 },err=>{
